@@ -32,7 +32,7 @@ export function CardComposer({ value, setValue, onSave, onCancel }: CardComposer
   return (
     <form
       ref={composerRef}
-      className="card-composer"
+      className="card-composer min-w-0 flex-none"
       onSubmit={(event) => {
         event.preventDefault()
         onSave()
@@ -40,6 +40,7 @@ export function CardComposer({ value, setValue, onSave, onCancel }: CardComposer
     >
       <textarea
         ref={textareaRef}
+        className="block min-h-[54px] max-h-[180px] w-full resize-y overflow-y-auto rounded-lg border-0 bg-white px-2.5 py-[7px] text-[13px] leading-[1.32] text-[#172b4d] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)] [field-sizing:content] placeholder:text-[#626f86] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#0c66e4] supports-[field-sizing:content]:resize-none [@media(pointer:coarse)]:text-base"
         name="card-text"
         required
         aria-label="New card"
@@ -54,8 +55,13 @@ export function CardComposer({ value, setValue, onSave, onCancel }: CardComposer
         }}
         placeholder="Enter a title for this card…"
       />
-      <div className="composer-actions">
-        <button type="submit" className="composer-submit">Add card</button>
+      <div className="composer-actions mt-1.5 flex items-center gap-1">
+        <button
+          type="submit"
+          className="composer-submit min-h-7 rounded-md border-0 bg-[#0c66e4] px-2.5 py-1 text-xs leading-4 font-semibold text-white hover:bg-[#0055cc]"
+        >
+          Add card
+        </button>
       </div>
     </form>
   )

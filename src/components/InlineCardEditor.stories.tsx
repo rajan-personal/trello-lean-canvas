@@ -15,7 +15,7 @@ function EditorHarness({ initialValue = '', showOutsideTarget = false, onSave, o
   const [open, setOpen] = useState(true)
 
   return (
-    <div className="storybook-inline-editor-frame">
+    <div className="storybook-inline-editor-frame grid w-[300px] gap-3 rounded-xl bg-[#f1f2f4] p-3 text-[#172b4d]">
       {open ? (
         <InlineCardEditor
           value={value}
@@ -27,7 +27,14 @@ function EditorHarness({ initialValue = '', showOutsideTarget = false, onSave, o
           }}
         />
       ) : <p>Editor closed</p>}
-      {showOutsideTarget && <button type="button" className="storybook-outside-target">Outside editor</button>}
+      {showOutsideTarget && (
+        <button
+          type="button"
+          className="storybook-outside-target justify-self-start rounded-[5px] border border-[#b7bec8] bg-white px-2 py-[5px] text-xs text-[#44546f]"
+        >
+          Outside editor
+        </button>
+      )}
     </div>
   )
 }

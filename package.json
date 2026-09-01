@@ -11,7 +11,10 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
+    "tailwind:manager": "tailwindcss -i .storybook/tailwind.css -o .storybook/manager-tailwind.css",
+    "prestorybook": "npm run tailwind:manager",
     "storybook": "storybook dev -p 6006",
+    "prebuild-storybook": "npm run tailwind:manager",
     "build-storybook": "storybook build",
     "chromatic": "chromatic --exit-zero-on-changes"
   },
@@ -27,6 +30,8 @@
     "@storybook/addon-a11y": "^10.5.10",
     "@storybook/addon-docs": "^10.5.10",
     "@storybook/react-vite": "^10.5.10",
+    "@tailwindcss/cli": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^26.4.0",
     "@types/react": "^19.2.18",
@@ -41,6 +46,7 @@
     "globals": "^17.11.0",
     "jiti": "^2.7.0",
     "storybook": "^10.5.10",
+    "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.69.0",
     "vite": "^8.2.2"

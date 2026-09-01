@@ -1,6 +1,7 @@
 node_modules
 dist
 storybook-static
+.storybook/manager-tailwind.css
 playwright-report
 test-results
 .pi-subagents

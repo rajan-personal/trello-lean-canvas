@@ -55,6 +55,7 @@ interface SidebarProps {
   onSelect: (canvasId: string) => void
   onLoadSamples: () => void
   open: boolean
+  collapsed: boolean
   onClose: () => void
 }
 
@@ -75,14 +76,25 @@ function readStoredCanvases(): LeanCanvas[] {
   }
 }
 
+const toolbarButtonClass = 'grid size-8 flex-none place-items-center rounded-md border-0 bg-transparent p-0 text-white/75 hover:bg-white/17 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white'
+const brandActionButtonClass = 'grid size-7 flex-none place-items-center rounded-md border-0 bg-transparent p-0 text-white hover:bg-white/16 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white'
+const panelClass = 'min-w-0 overflow-hidden rounded-xl bg-[#f1f2f4] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)]'
+const columnGridClass: Partial<Record<SectionId, string>> = {
+  problem: 'col-[1/3]',
+  solution: 'col-[3/5]',
+  value: 'col-[5/7]',
+  advantage: 'col-[7/9]',
+  segments: 'col-[9/11]',
+}
+
 function Brand() {
-  return <div className="brand" aria-label="Lean">Lean</div>
+  return <div className="brand inline-flex items-center gap-2 text-xl font-bold tracking-[-0.45px]" aria-label="Lean">Lean</div>
 }
 
 function IconButton({ label, title, onClick, children, active = false, pressed }: IconButtonProps) {
   return (
     <button
-      className={`toolbar-icon${active ? ' active' : ''}`}
+      className={`toolbar-icon ${toolbarButtonClass} ${active ? 'text-[#f5cd47]' : ''}`}
       aria-label={label}
       aria-pressed={pressed}
       title={title ?? label}
@@ -117,10 +129,10 @@ function BoardTitle({ canvas, onRename }: BoardTitleProps) {
   }
 
   return (
-    <h1 className={`board-title${editing ? ' editing' : ''}`}>
+    <h1 className={`board-title m-0 flex min-w-0 max-w-[min(52vw,620px)] items-center text-lg leading-7 font-bold tracking-[-0.15px] whitespace-nowrap max-[760px]:text-base ${editing ? 'flex-[0_1_auto] overflow-visible' : 'overflow-hidden'}`}>
       {editing ? (
         <input
-          className="board-title-input"
+          className="board-title-input h-8 w-[clamp(100px,18vw,260px)] min-w-0 rounded-sm border-2 border-[#85b8ff] bg-white px-1.5 py-0.5 font-[inherit] leading-6 tracking-[inherit] text-[#172b4d] outline-none focus:border-[#579dff] focus:shadow-[0_0_0_1px_rgba(255,255,255,0.85)] max-[760px]:w-[clamp(90px,30vw,170px)]"
           aria-label="Rename canvas"
           autoFocus
           value={draft}
@@ -141,7 +153,7 @@ function BoardTitle({ canvas, onRename }: BoardTitleProps) {
       ) : (
         <button
           type="button"
-          className="board-title-button"
+          className="board-title-button ms-[-6px] min-w-0 max-w-[min(52vw,620px)] overflow-hidden text-ellipsis whitespace-nowrap rounded-sm border-0 bg-transparent px-1.5 py-0.5 font-[inherit] leading-[inherit] tracking-[inherit] text-[inherit] hover:bg-white/17 focus-visible:bg-white/17 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white"
           title="Rename canvas"
           onClick={() => {
             setDraft(displayTitle)
@@ -155,35 +167,44 @@ function BoardTitle({ canvas, onRename }: BoardTitleProps) {
   )
 }
 
-function Sidebar({ canvases, activeId, onSelect, onLoadSamples, open, onClose }: SidebarProps) {
+function Sidebar({ canvases, activeId, onSelect, onLoadSamples, open, collapsed, onClose }: SidebarProps) {
   return (
     <>
-      {open && <button className="sidebar-scrim" onClick={onClose} aria-label="Close sidebar" />}
-      <aside id="canvas-sidebar" className={`sidebar${open ? ' open' : ''}`}>
-        <div className="sidebar-heading">
-          <button className="mobile-close" onClick={onClose} aria-label="Close sidebar"><X size={18} /></button>
+      {open && (
+        <button
+          className="sidebar-scrim fixed inset-x-0 top-12 bottom-0 z-50 block h-[calc(100dvh-48px)] w-full border-0 bg-[rgba(9,30,66,0.45)] p-0 min-[761px]:hidden"
+          onClick={onClose}
+          aria-label="Close sidebar"
+        />
+      )}
+      <aside
+        id="canvas-sidebar"
+        className={`sidebar relative z-10 flex h-full w-[248px] basis-[248px] flex-col overflow-hidden bg-[#07558f] px-2.5 py-3.5 text-white shadow-[1px_0_0_rgba(255,255,255,0.14)] transition-[flex-basis,width,padding] duration-180 ease-out max-[760px]:fixed max-[760px]:top-12 max-[760px]:bottom-0 max-[760px]:left-0 max-[760px]:z-60 max-[760px]:h-auto max-[760px]:shadow-[8px_0_24px_rgba(9,30,66,0.35)] max-[760px]:transition-transform ${open ? 'max-[760px]:translate-x-0' : 'max-[760px]:translate-x-[-102%]'} ${collapsed ? 'min-[761px]:w-0 min-[761px]:basis-0 min-[761px]:px-0 min-[761px]:shadow-none' : ''}`}
+      >
+        <div className="sidebar-heading hidden min-h-[34px] justify-end max-[760px]:mb-1.5 max-[760px]:flex">
+          <button className={`${brandActionButtonClass} mobile-close`} onClick={onClose} aria-label="Close sidebar"><X size={18} /></button>
         </div>
-        <nav aria-label="Lean canvases">
+        <nav className="grid min-h-0 gap-[3px] overflow-y-auto" aria-label="Lean canvases">
           {canvases.map((canvas) => (
             <button
-              className={`canvas-nav-item${canvas.id === activeId ? ' active' : ''}`}
+              className={`canvas-nav-item flex min-h-[38px] w-full items-center gap-2 overflow-hidden rounded-md border-0 px-2.5 py-2 ps-3.5 text-left text-sm leading-5 font-medium whitespace-nowrap text-white/90 hover:bg-white/10 ${canvas.id === activeId ? 'bg-white/16 text-white' : 'bg-transparent'}`}
               key={canvas.id}
               onClick={() => {
                 onSelect(canvas.id)
                 onClose()
               }}
             >
-              <span className="canvas-nav-label">{canvas.name}</span>
+              <span className="canvas-nav-label min-w-0 flex-1 overflow-hidden text-ellipsis">{canvas.name}</span>
               {canvas.favorite && (
-                <Star className="canvas-nav-favorite" size={15} fill="currentColor" aria-hidden="true" />
+                <Star className="canvas-nav-favorite flex-none text-[#f5cd47]" size={15} fill="currentColor" aria-hidden="true" />
               )}
             </button>
           ))}
         </nav>
-        <div className="sidebar-footer">
+        <div className="sidebar-footer mt-auto border-t border-white/14 pt-2.5">
           <button
             type="button"
-            className="load-samples-button"
+            className="load-samples-button flex min-h-[38px] w-full items-center gap-2.5 rounded-md border-0 bg-transparent px-2.5 py-2 text-left text-sm leading-5 font-medium text-white/90 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
             onClick={() => {
               onLoadSamples()
               onClose()
@@ -382,10 +403,10 @@ export default function App() {
   }
 
   return (
-    <div className={`app-shell${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
-      <header className="topbar">
+    <div className="app-shell h-dvh min-h-[640px] overflow-hidden bg-linear-[130deg,#0c66e4_0%,#338bfa_100%]">
+      <header className="topbar relative z-20 flex h-12 items-center bg-[#0b4a6f] text-white shadow-[0_1px_0_rgba(9,30,66,0.25)]">
         <button
-          className="desktop-sidebar-button"
+          className={`desktop-sidebar-button ms-2 me-[7px] ${toolbarButtonClass} max-[760px]:hidden`}
           onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
           aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           aria-expanded={!sidebarCollapsed}
@@ -393,11 +414,11 @@ export default function App() {
         >
           <Menu size={19} />
         </button>
-        <div className="topbar-brand">
+        <div className={`topbar-brand flex h-full items-center gap-2 overflow-hidden px-3 transition-[flex-basis] duration-180 ease-out max-[760px]:gap-1.5 max-[760px]:px-2.5 ${sidebarCollapsed ? 'basis-[145px]' : 'basis-[201px] max-[760px]:basis-[132px]'}`}>
           <Brand />
           <button
             type="button"
-            className="brand-action-button new-canvas-button"
+            className={`${brandActionButtonClass} new-canvas-button ms-auto`}
             onClick={() => setCanvasDialog({ heading: 'Create canvas', submitLabel: 'Create canvas', value: '' })}
             aria-label="Add canvas"
             title="New canvas"
@@ -405,9 +426,9 @@ export default function App() {
             <Plus size={20} />
           </button>
         </div>
-        <div className="board-toolbar">
+        <div className="board-toolbar flex h-full min-w-0 flex-1 items-center border-s border-white/14 px-3 text-white max-[760px]:px-1.5">
           <button
-            className="mobile-sidebar-button"
+            className={`mobile-sidebar-button me-[7px] hidden max-[760px]:grid ${toolbarButtonClass}`}
             onClick={() => setSidebarOpen(true)}
             aria-label="Open sidebar"
             aria-expanded={sidebarOpen}
@@ -416,7 +437,7 @@ export default function App() {
             <Menu size={19} />
           </button>
           {activeCanvas && <BoardTitle key={activeCanvas.id} canvas={activeCanvas} onRename={renameCanvas} />}
-          <span className="toolbar-spacer" />
+          <span className="toolbar-spacer flex-1" />
           {activeCanvas && (
             <>
               <IconButton label="Favorite canvas" onClick={() => updateActiveCanvas((canvas) => ({ ...canvas, favorite: !canvas.favorite }))} active={activeCanvas.favorite} pressed={activeCanvas.favorite}>
@@ -430,10 +451,10 @@ export default function App() {
               <IconButton label="Delete board" onClick={deleteCanvas}><Trash2 size={17} /></IconButton>
             </>
           )}
-          <input ref={importInputRef} className="file-input" type="file" accept=".yaml,.yml,text/yaml,application/yaml" aria-label="Upload canvas YAML file" onChange={importYaml} />
+          <input ref={importInputRef} className="file-input hidden" type="file" accept=".yaml,.yml,text/yaml,application/yaml" aria-label="Upload canvas YAML file" onChange={importYaml} />
         </div>
       </header>
-      <div className="workspace-layout">
+      <div className="workspace-layout flex h-[calc(100dvh-48px)] min-h-[592px]">
         <Sidebar
           canvases={canvases}
           activeId={activeCanvas?.id ?? null}
@@ -444,20 +465,21 @@ export default function App() {
           }}
           onLoadSamples={loadSampleData}
           open={sidebarOpen}
+          collapsed={sidebarCollapsed}
           onClose={() => setSidebarOpen(false)}
         />
-        <main className="main-area">
+        <main className="main-area h-full min-w-0 flex-1">
           {activeCanvas ? (
-            <div className="board-scroll">
-              <div className="lean-grid">
+            <div className="board-scroll h-[calc(100dvh-48px)] min-h-[592px] w-full overflow-auto p-3 [scrollbar-color:rgba(255,255,255,0.35)_rgba(0,0,0,0.12)]">
+              <div className="lean-grid grid min-h-full w-full min-w-[1000px] grid-cols-10 grid-rows-[auto_auto_auto] content-stretch gap-2.5 max-[760px]:min-w-[1100px]">
                 {columnGroups.map(([topId, bottomId]) => (
-                  <div className={`canvas-column ${topId}`} key={topId}>
+                  <div className={`canvas-column ${topId} ${panelClass} ${columnGridClass[topId] ?? ''} row-[1/3] grid min-h-0 grid-rows-subgrid gap-y-0 [&>section+section]:border-t-2 [&>section+section]:border-[#d6dce5]`} key={topId}>
                     <CanvasSection section={sectionsById[topId]} {...sectionProps} />
                     <CanvasSection section={sectionsById[bottomId]} {...sectionProps} />
                   </div>
                 ))}
-                <div className="bottom-panel cost"><CanvasSection section={sectionsById.cost} bottom {...sectionProps} /></div>
-                <div className="bottom-panel revenue"><CanvasSection section={sectionsById.revenue} bottom {...sectionProps} /></div>
+                <div className={`bottom-panel cost ${panelClass} col-[1/6] row-start-3 flex min-h-0`}><CanvasSection section={sectionsById.cost} bottom {...sectionProps} /></div>
+                <div className={`bottom-panel revenue ${panelClass} col-[6/11] row-start-3 flex min-h-0`}><CanvasSection section={sectionsById.revenue} bottom {...sectionProps} /></div>
               </div>
             </div>
           ) : null}
@@ -473,7 +495,14 @@ export default function App() {
           setCanvasDialog(null)
         }}
       />
-      {notice && <div className="toast" role="status">{notice}</div>}
+      {notice && (
+        <div
+          className="toast fixed right-[18px] bottom-[18px] z-120 max-w-[min(420px,calc(100vw-36px))] rounded-[7px] bg-[#172b4d] px-[15px] py-[11px] text-sm text-white shadow-[0_6px_18px_rgba(9,30,66,0.3)]"
+          role="status"
+        >
+          {notice}
+        </div>
+      )}
     </div>
   )
 }

@@ -15,7 +15,11 @@ const meta = {
     },
   },
   decorators: [
-    (Story) => <div className="storybook-card-frame"><Story /></div>,
+    (Story) => (
+      <div className="storybook-card-frame w-[300px] rounded-xl bg-[#f1f2f4] p-3 text-[#172b4d]">
+        <Story />
+      </div>
+    ),
   ],
   args: {
     sectionId: 'problem',

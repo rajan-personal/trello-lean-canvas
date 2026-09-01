@@ -90,7 +90,11 @@ const meta = {
   },
   decorators: [
     (Story, context) => (
-      <div className={context.args.bottom ? 'storybook-bottom-section-frame' : 'storybook-section-frame'}>
+      <div
+        className={context.args.bottom
+          ? 'storybook-bottom-section-frame flex h-[260px] w-[620px] overflow-hidden rounded-xl bg-[#f1f2f4] text-[#172b4d]'
+          : 'storybook-section-frame flex h-[520px] w-[300px] overflow-hidden rounded-xl bg-[#f1f2f4] text-[#172b4d]'}
+      >
         <Story />
       </div>
     ),

@@ -15,7 +15,7 @@ function ComposerHarness({ initialValue = '', showOutsideTarget = false, onSave,
   const [open, setOpen] = useState(true)
 
   return (
-    <div className="storybook-composer-harness">
+    <div className="storybook-composer-harness grid gap-3 [&>button]:justify-self-start [&>button]:rounded-[5px] [&>button]:border [&>button]:border-[#b7bec8] [&>button]:bg-white [&>button]:px-2 [&>button]:py-[5px] [&>button]:text-xs [&>button]:text-[#44546f]">
       {open ? (
         <CardComposer
           value={value}
@@ -47,7 +47,11 @@ const meta = {
     },
   },
   decorators: [
-    (Story) => <div className="storybook-composer-frame"><Story /></div>,
+    (Story) => (
+      <div className="storybook-composer-frame w-[300px] rounded-xl bg-[#f1f2f4] p-3 text-[#172b4d]">
+        <Story />
+      </div>
+    ),
   ],
   args: {
     onSave: fn(),

@@ -50,17 +50,22 @@ export function CanvasSection({
   startAddingCard,
   dragHandlers,
 }: CanvasSectionProps) {
+  const isAdding = addingSectionId === section.id
+  const hasHint = section.cards.length === 0 && !isAdding
+
   return (
     <section
-      className={`canvas-cell${bottom ? ' bottom-cell' : ''}`}
+      className={`canvas-cell flex min-h-0 min-w-0 flex-[1_0_auto] flex-col px-[9px] pt-[11px] pb-[9px] ${bottom ? 'bottom-cell min-h-[150px] w-full' : 'min-h-[200px]'}`}
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => dragHandlers.onDrop(event, section.id)}
     >
-      <header className="cell-heading">
-        <strong>{section.title}</strong>
+      <header className="cell-heading flex min-h-5 items-start justify-between gap-[5px]">
+        <strong className="ps-px text-sm leading-[19px] font-bold text-[#172b4d]">{section.title}</strong>
       </header>
-      {section.cards.length === 0 && addingSectionId !== section.id && <p className="cell-hint">{section.hint}</p>}
-      <div className="canvas-cards">
+      {hasHint && <p className="cell-hint mx-px mt-px mb-1.5 min-h-7 text-[11px] leading-3.5 text-[#626f86]">{section.hint}</p>}
+      <div
+        className={`canvas-cards min-h-0 flex-none ${hasHint ? '' : 'mt-[7px]'} ${bottom ? 'grid grid-cols-2 gap-[7px] [&>.card-composer]:col-span-full' : 'flex flex-col gap-1.5'}`}
+      >
         {section.cards.map((card, index) => {
           const isEditing = editingCard?.sectionId === section.id && editingCard.index === index
           return isEditing ? (
@@ -84,7 +89,7 @@ export function CanvasSection({
             />
           )
         })}
-        {addingSectionId === section.id && (
+        {isAdding && (
           <CardComposer
             value={cardDraft}
             setValue={setCardDraft}
@@ -93,8 +98,13 @@ export function CanvasSection({
           />
         )}
       </div>
-      {addingSectionId !== section.id && (
-        <button className="add-card-button" onClick={() => startAddingCard(section.id)}>＋ Add a card</button>
+      {!isAdding && (
+        <button
+          className="add-card-button mt-[7px] min-h-7 w-full rounded-md border-0 bg-transparent px-[7px] py-1 text-left text-xs leading-[18px] text-[#44546f] hover:bg-[#dcdfe4] hover:text-[#172b4d]"
+          onClick={() => startAddingCard(section.id)}
+        >
+          ＋ Add a card
+        </button>
       )}
     </section>
   )

@@ -21,8 +21,12 @@ export function InlineCardEditor({ value, setValue, onSave, onCancel }: InlineCa
   }, [onCancel])
 
   return (
-    <div ref={editorRef} className="inline-card-editor">
+    <div
+      ref={editorRef}
+      className="inline-card-editor min-w-0 rounded-lg bg-white p-[7px] shadow-[0_0_0_2px_#0c66e4,0_4px_10px_rgba(9,30,66,0.2)]"
+    >
       <textarea
+        className="h-auto min-h-[34px] max-h-24 w-full resize-none overflow-y-auto border-0 bg-white p-[3px] text-[13px] leading-[1.32] text-[#172b4d] outline-none [field-sizing:content]"
         autoFocus
         aria-label="Edit card"
         value={value}
@@ -35,8 +39,15 @@ export function InlineCardEditor({ value, setValue, onSave, onCancel }: InlineCa
           if (event.key === 'Escape') onCancel()
         }}
       />
-      <div className="inline-card-actions">
-        <button type="button" className="save-card-button" onClick={onSave} disabled={!value.trim()}>Save</button>
+      <div className="inline-card-actions mt-1.5 flex items-center gap-[5px]">
+        <button
+          type="button"
+          className="save-card-button grid min-h-[30px] min-w-[30px] place-items-center rounded-[5px] border-0 bg-[#0c66e4] px-[11px] py-0 font-semibold text-white hover:not-disabled:brightness-96 disabled:cursor-not-allowed disabled:bg-[#dcdfe4] disabled:text-[#8993a4]"
+          onClick={onSave}
+          disabled={!value.trim()}
+        >
+          Save
+        </button>
       </div>
     </div>
   )
