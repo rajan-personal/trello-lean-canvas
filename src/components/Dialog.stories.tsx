@@ -54,6 +54,8 @@ export const Open: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('dialog', { name: 'Create canvas' })).toBeInTheDocument()
     await expect(canvas.getByRole('textbox', { name: 'Canvas name' })).toHaveFocus()
+    await expect(canvas.getByRole('button', { name: 'Cancel' })).toHaveStyle({ backgroundColor: 'rgb(241, 242, 244)' })
+    await expect(canvas.getByRole('button', { name: 'Create canvas' })).toHaveStyle({ backgroundColor: 'rgb(12, 102, 228)' })
   },
 }
 

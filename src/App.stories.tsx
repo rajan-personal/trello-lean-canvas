@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, waitFor, within } from 'storybook/test'
 import App from './App'
-import { sectionTemplate, type LeanCanvas } from './data'
+import { createExampleCanvases, sectionTemplate, type LeanCanvas } from './data'
 
 const STORAGE_KEY = 'lean-canvas:v2'
 
@@ -13,6 +13,9 @@ const blankCanvas: LeanCanvas = {
   favorite: false,
   sections: sectionTemplate.map((section) => ({ ...section, cards: [] })),
 }
+
+const [airbnbCanvas, facebookCanvas, ...remainingExampleCanvases] = createExampleCanvases()
+const reorderedCanvases = [facebookCanvas, airbnbCanvas, ...remainingExampleCanvases]
 
 interface SeededAppProps {
   canvases?: LeanCanvas[]
@@ -73,6 +76,16 @@ export const BlankCanvas: Story = {
   },
 }
 
+export const ReorderedSidebar: Story = {
+  render: () => <SeededApp canvases={reorderedCanvases} />,
+  play: async ({ canvasElement }) => {
+    const navigation = within(canvasElement).getByRole('navigation', { name: 'Lean canvases' })
+    const canvasButtons = within(navigation).getAllByRole('button')
+    await expect(canvasButtons[0]).toHaveAccessibleName('Facebook')
+    await expect(canvasButtons[1]).toHaveAccessibleName('Airbnb')
+  },
+}
+
 export const MobileSidebar: Story = {
   globals: {
     viewport: { value: 'mobile1', isRotated: false },
@@ -105,8 +118,11 @@ export const CreateCanvasDialog: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Add canvas' }))
-    await expect(canvas.getByRole('dialog', { name: 'Create canvas' })).toBeInTheDocument()
+    const dialog = canvas.getByRole('dialog', { name: 'Create canvas' })
+    await expect(dialog).toBeInTheDocument()
     await expect(canvas.getByRole('textbox', { name: 'Canvas name' })).toHaveFocus()
+    await expect(within(dialog).getByRole('button', { name: 'Cancel' })).toHaveStyle({ backgroundColor: 'rgb(241, 242, 244)' })
+    await expect(within(dialog).getByRole('button', { name: 'Create canvas' })).toHaveStyle({ backgroundColor: 'rgb(12, 102, 228)' })
   },
 }
 

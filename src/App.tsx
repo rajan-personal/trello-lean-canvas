@@ -11,7 +11,9 @@ import {
 } from 'lucide-react'
 import {
   CanvasSection,
+  type CanvasDraggedCard,
   type CanvasDragHandlers,
+  type CanvasDropTarget,
   type CanvasSectionProps,
   type EditingCard,
 } from './components/CanvasSection'
@@ -60,9 +62,37 @@ interface SidebarProps {
   onClose: () => void
 }
 
-interface DraggedCard {
-  sectionId: SectionId
-  index: number
+function moveCardInCanvas(canvas: LeanCanvas, draggedCard: CanvasDraggedCard, dropTarget: CanvasDropTarget): LeanCanvas {
+  const sourceSection = canvas.sections.find((section) => section.id === draggedCard.sectionId)
+  const targetSection = canvas.sections.find((section) => section.id === dropTarget.sectionId)
+  const card = sourceSection?.cards[draggedCard.index]
+  if (!sourceSection || !targetSection || card === undefined) return canvas
+
+  let targetIndex = Math.max(0, Math.min(dropTarget.index, targetSection.cards.length))
+  if (sourceSection.id === targetSection.id) {
+    const cards = [...sourceSection.cards]
+    cards.splice(draggedCard.index, 1)
+    if (draggedCard.index < targetIndex) targetIndex -= 1
+    if (draggedCard.index === targetIndex) return canvas
+    cards.splice(targetIndex, 0, card)
+    return {
+      ...canvas,
+      sections: canvas.sections.map((section) => section.id === sourceSection.id ? { ...section, cards } : section),
+    }
+  }
+
+  const targetCards = [...targetSection.cards]
+  targetCards.splice(targetIndex, 0, card)
+  return {
+    ...canvas,
+    sections: canvas.sections.map((section) => {
+      if (section.id === sourceSection.id) {
+        return { ...section, cards: section.cards.filter((_, index) => index !== draggedCard.index) }
+      }
+      if (section.id === targetSection.id) return { ...section, cards: targetCards }
+      return section
+    }),
+  }
 }
 
 function readStoredCanvases(): LeanCanvas[] {
@@ -291,7 +321,9 @@ export default function App() {
   const [notice, setNotice] = useState('')
   const [canvasDialog, setCanvasDialog] = useState<CanvasDialogState | null>(null)
   const importInputRef = useRef<HTMLInputElement>(null)
-  const draggedCardRef = useRef<DraggedCard | null>(null)
+  const draggedCardRef = useRef<CanvasDraggedCard | null>(null)
+  const [draggedCard, setDraggedCard] = useState<CanvasDraggedCard | null>(null)
+  const [cardDropTarget, setCardDropTarget] = useState<CanvasDropTarget | null>(null)
 
   const activeCanvas = canvases.find((canvas) => canvas.id === activeId) ?? canvases[0]
 
@@ -427,34 +459,44 @@ export default function App() {
   }
 
   const dragHandlers: CanvasDragHandlers = {
+    draggedCard,
+    dropTarget: cardDropTarget,
     onDragStart(event, sectionId, index) {
       event.dataTransfer.effectAllowed = 'move'
       event.dataTransfer.setData('text/plain', `${sectionId}:${index}`)
-      draggedCardRef.current = { sectionId, index }
+      const nextDraggedCard = { sectionId, index, height: event.currentTarget.getBoundingClientRect().height }
+      draggedCardRef.current = nextDraggedCard
+      setDraggedCard(nextDraggedCard)
+      setCardDropTarget(null)
+    },
+    onDragOver(event, targetSectionId, targetIndex) {
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'move'
+      if (!draggedCardRef.current) return
+      setCardDropTarget((current) => (
+        current?.sectionId === targetSectionId && current.index === targetIndex
+          ? current
+          : { sectionId: targetSectionId, index: targetIndex }
+      ))
     },
     onDragEnd() {
       draggedCardRef.current = null
+      setDraggedCard(null)
+      setCardDropTarget(null)
     },
-    onDrop(event, targetSectionId) {
+    onDrop(event, targetSectionId, targetIndex) {
       event.preventDefault()
       const draggedCard = draggedCardRef.current
-      if (!draggedCard || draggedCard.sectionId === targetSectionId) return
-      updateActiveCanvas((canvas) => {
-        const source = canvas.sections.find((section) => section.id === draggedCard.sectionId)
-        const card = source?.cards[draggedCard.index]
-        if (!card) return canvas
-        return {
-          ...canvas,
-          sections: canvas.sections.map((section) => {
-            if (section.id === draggedCard.sectionId) {
-              return { ...section, cards: section.cards.filter((_, index) => index !== draggedCard.index) }
-            }
-            if (section.id === targetSectionId) return { ...section, cards: [...section.cards, card] }
-            return section
-          }),
-        }
-      })
+      const dropTarget = { sectionId: targetSectionId, index: targetIndex }
       draggedCardRef.current = null
+      setDraggedCard(null)
+      setCardDropTarget(null)
+      if (!draggedCard || !activeCanvas) return
+
+      const movedCanvas = moveCardInCanvas(activeCanvas, draggedCard, dropTarget)
+      if (movedCanvas === activeCanvas) return
+      updateActiveCanvas((canvas) => moveCardInCanvas(canvas, draggedCard, dropTarget))
+      setEditingCard(null)
       notify('Card moved')
     },
   }

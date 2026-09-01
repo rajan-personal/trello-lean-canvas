@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn } from 'storybook/test'
 import { sectionTemplate, type CanvasSectionData, type SectionId } from '../data'
-import { CanvasSection, type CanvasSectionProps, type EditingCard } from './CanvasSection'
+import { CanvasSection, type CanvasDragHandlers, type CanvasSectionProps, type EditingCard } from './CanvasSection'
 
 function getSectionTemplate(sectionId: SectionId): CanvasSectionData {
   const section = sectionTemplate.find((candidate) => candidate.id === sectionId)
@@ -22,6 +22,15 @@ const problemSection: CanvasSectionData = {
 const costSection: CanvasSectionData = {
   ...getSectionTemplate('cost'),
   cards: ['Fixed\nProduct team and infrastructure', 'Variable\nAI summaries and support'],
+}
+
+const defaultDragHandlers: CanvasDragHandlers = {
+  draggedCard: null,
+  dropTarget: null,
+  onDrop: fn(),
+  onDragOver: fn(),
+  onDragStart: fn(),
+  onDragEnd: fn(),
 }
 
 function CanvasSectionHarness(args: CanvasSectionProps) {
@@ -113,11 +122,7 @@ const meta = {
     setEditingCard: fn(),
     saveEditedCard: fn(),
     startAddingCard: fn(),
-    dragHandlers: {
-      onDrop: fn(),
-      onDragStart: fn(),
-      onDragEnd: fn(),
-    },
+    dragHandlers: defaultDragHandlers,
   },
   render: (args) => (
     <CanvasSectionHarness
@@ -138,6 +143,24 @@ export const Populated: Story = {
     await expect(canvas.queryByRole('button', { name: 'Clear Problem' })).not.toBeInTheDocument()
     await userEvent.click(canvas.getByRole('button', { name: '＋ Add a card' }))
     await expect(args.startAddingCard).toHaveBeenCalledWith('problem')
+  },
+}
+
+export const DraggingDown: Story = {
+  args: {
+    dragHandlers: {
+      ...defaultDragHandlers,
+      draggedCard: { sectionId: 'problem', index: 0, height: 42 },
+      dropTarget: { sectionId: 'problem', index: 3 },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const cardSlots = canvasElement.querySelectorAll<HTMLElement>('.canvas-card-drop-slot')
+    await expect(cardSlots).toHaveLength(3)
+    await expect(cardSlots[0]).toHaveStyle({ opacity: '0.35' })
+    await expect(cardSlots[1].style.transform).toBe('translate3d(0, -48px, 0)')
+    await expect(cardSlots[2].style.transform).toBe('translate3d(0, -48px, 0)')
+    await expect(canvasElement.querySelector('[class*="before:bg-[#0c66e4]"]')).toBeNull()
   },
 }
 

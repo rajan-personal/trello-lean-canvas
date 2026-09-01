@@ -13,7 +13,7 @@ interface DialogProps {
   onSubmit: (dialog: CanvasDialogState) => void
 }
 
-const dialogButtonClass = 'min-h-8 rounded-md border-0 bg-[#0c66e4] px-3 py-1.5 font-semibold text-white'
+const dialogButtonClass = 'min-h-8 rounded-md border-0 px-3 py-1.5 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4]'
 
 /** Modal form for creating a canvas. */
 export function Dialog({ dialog, setDialog, onSubmit }: DialogProps) {
@@ -57,12 +57,12 @@ export function Dialog({ dialog, setDialog, onSubmit }: DialogProps) {
         <div className="dialog-actions mt-[18px] flex justify-end gap-2">
           <button
             type="button"
-            className={`${dialogButtonClass} secondary bg-[#f1f2f4] text-[#172b4d]`}
+            className={`${dialogButtonClass} secondary bg-[#f1f2f4] text-[#172b4d] hover:bg-[#dcdfe4]`}
             onClick={() => setDialog(null)}
           >
             Cancel
           </button>
-          <button type="submit" className={dialogButtonClass}>{dialog.submitLabel}</button>
+          <button type="submit" className={`${dialogButtonClass} bg-[#0c66e4] text-white hover:bg-[#0055cc]`}>{dialog.submitLabel}</button>
         </div>
       </form>
     </div>

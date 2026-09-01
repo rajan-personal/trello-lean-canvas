@@ -64,6 +64,9 @@ test('starts with researched examples, creates, uploads, edits, switches, and ex
   await expect(page.getByText('Booking fees from travellers')).toBeVisible()
 
   await page.getByRole('button', { name: 'Add canvas' }).click()
+  const createCanvasDialog = page.getByRole('dialog', { name: 'Create canvas' })
+  await expect(createCanvasDialog.getByRole('button', { name: 'Cancel' })).toHaveCSS('background-color', 'rgb(241, 242, 244)')
+  await expect(createCanvasDialog.getByRole('button', { name: 'Create canvas' })).toHaveCSS('background-color', 'rgb(12, 102, 228)')
   await page.getByRole('textbox', { name: 'Canvas name' }).fill('Blank canvas')
   await page.getByRole('button', { name: 'Create canvas' }).click()
   await expect(page.getByRole('heading', { name: 'Blank canvas' })).toBeVisible()
@@ -280,6 +283,30 @@ test('keeps the white canvas columns coherent and evenly sized', async ({ page }
   expect(new Set(columnHeights).size).toBe(1)
   expect(new Set(secondRowTops).size).toBe(1)
   expect(new Set(bottomPanelHeights).size).toBe(1)
+})
+
+test('reorders cards vertically with drag and drop and persists the order', async ({ page }) => {
+  await page.setViewportSize({ width: 1424, height: 797 })
+  await openSampleCanvas(page)
+
+  const problemSection = page.locator('.canvas-column.problem .canvas-cell').first()
+  const firstCard = problemSection.locator('.canvas-card').filter({ hasText: 'Decisions disappear across chat, docs, and meetings' })
+  const thirdCard = problemSection.locator('.canvas-card').filter({ hasText: 'Remote teams cannot see blockers early enough' })
+  const thirdCardBox = await thirdCard.boundingBox()
+  expect(thirdCardBox).not.toBeNull()
+
+  await firstCard.dragTo(thirdCard, {
+    targetPosition: { x: 20, y: thirdCardBox!.height - 2 },
+  })
+
+  await expect(page.getByRole('status')).toHaveText('Card moved')
+  await expect(problemSection.locator('.card-content').nth(0)).toHaveAccessibleName('Weekly status updates take team leads 2–3 hours')
+  await expect(problemSection.locator('.card-content').nth(1)).toHaveAccessibleName('Remote teams cannot see blockers early enough')
+  await expect(problemSection.locator('.card-content').nth(2)).toHaveAccessibleName('Decisions disappear across chat, docs, and meetings')
+
+  await page.reload()
+  await page.getByRole('button', { name: 'Team alignment', exact: true }).click()
+  await expect(problemSection.locator('.card-content').nth(2)).toHaveAccessibleName('Decisions disappear across chat, docs, and meetings')
 })
 
 test('reveals a cross on hover and deletes the card', async ({ page }) => {
