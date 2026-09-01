@@ -1,12 +1,19 @@
 import { useEffect, useRef } from 'react'
 
+interface InlineCardEditorProps {
+  value: string
+  setValue: (value: string) => void
+  onSave: () => void
+  onCancel: () => void
+}
+
 /** In-place Trello-style editor for an existing canvas card. */
-export function InlineCardEditor({ value, setValue, onSave, onCancel }) {
-  const editorRef = useRef(null)
+export function InlineCardEditor({ value, setValue, onSave, onCancel }: InlineCardEditorProps) {
+  const editorRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handlePointerDown = (event) => {
-      if (!editorRef.current?.contains(event.target)) onCancel()
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && !editorRef.current?.contains(event.target)) onCancel()
     }
 
     document.addEventListener('pointerdown', handlePointerDown)

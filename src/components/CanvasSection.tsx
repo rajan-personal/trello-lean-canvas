@@ -1,7 +1,39 @@
+import type { Dispatch, DragEvent, SetStateAction } from 'react'
 import { MoreHorizontal } from 'lucide-react'
-import { CanvasCard } from './CanvasCard.jsx'
-import { CardComposer } from './CardComposer.jsx'
-import { InlineCardEditor } from './InlineCardEditor.jsx'
+import type { CanvasSectionData, SectionId } from '../data'
+import { CanvasCard } from './CanvasCard'
+import { CardComposer } from './CardComposer'
+import { InlineCardEditor } from './InlineCardEditor'
+
+export interface EditingCard {
+  sectionId: SectionId
+  index: number
+  value: string
+}
+
+export interface CanvasDragHandlers {
+  onDragStart: (event: DragEvent<HTMLDivElement>, sectionId: SectionId, index: number) => void
+  onDragEnd: () => void
+  onDrop: (event: DragEvent<HTMLElement>, targetSectionId: SectionId) => void
+}
+
+export interface CanvasSectionProps {
+  section: CanvasSectionData
+  bottom?: boolean
+  addingSectionId: SectionId | null
+  setAddingSectionId: Dispatch<SetStateAction<SectionId | null>>
+  cardDraft: string
+  setCardDraft: Dispatch<SetStateAction<string>>
+  addCard: (sectionId: SectionId) => void
+  editCard: (sectionId: SectionId, index: number, value: string) => void
+  deleteCard: (sectionId: SectionId, index: number) => void
+  editingCard: EditingCard | null
+  setEditingCard: Dispatch<SetStateAction<EditingCard | null>>
+  saveEditedCard: () => void
+  startAddingCard: (sectionId: SectionId) => void
+  clearSection: (sectionId: SectionId) => void
+  dragHandlers: CanvasDragHandlers
+}
 
 /** One numbered or supporting section in the Lean Canvas grid. */
 export function CanvasSection({
@@ -20,7 +52,7 @@ export function CanvasSection({
   startAddingCard,
   clearSection,
   dragHandlers,
-}) {
+}: CanvasSectionProps) {
   return (
     <section
       className={`canvas-cell${bottom ? ' bottom-cell' : ''}`}

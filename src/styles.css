@@ -82,9 +82,11 @@ button {
 .sidebar {
   position: relative;
   z-index: 10;
-  flex: 0 0 248px;
+  display: flex;
   width: 248px;
   height: 100%;
+  flex: 0 0 248px;
+  flex-direction: column;
   padding: 14px 10px;
   overflow: hidden;
   color: #fff;
@@ -97,11 +99,12 @@ button {
   display: none;
 }
 
-.new-canvas-button,
+.brand-action-button,
 .mobile-close {
   display: grid;
   width: 28px;
   height: 28px;
+  flex: 0 0 28px;
   padding: 0;
   place-items: center;
   border: 0;
@@ -115,9 +118,14 @@ button {
   margin-inline-start: auto;
 }
 
-.new-canvas-button:hover,
+.brand-action-button:hover,
 .mobile-close:hover {
   background: rgba(255, 255, 255, 0.16);
+}
+
+.brand-action-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
 }
 
 .mobile-close {
@@ -126,7 +134,43 @@ button {
 
 .sidebar nav {
   display: grid;
+  min-height: 0;
   gap: 3px;
+  overflow-y: auto;
+}
+
+.sidebar-footer {
+  margin-block-start: auto;
+  padding-block-start: 10px;
+  border-block-start: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.load-samples-button {
+  display: flex;
+  width: 100%;
+  min-height: 38px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: left;
+}
+
+.load-samples-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.load-samples-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: -2px;
 }
 
 .canvas-nav-item {
@@ -301,10 +345,9 @@ button {
   display: grid;
   width: 100%;
   min-width: 1000px;
-  height: auto;
-  min-height: max(100%, 668px);
   grid-template-columns: repeat(10, minmax(0, 1fr));
-  grid-template-rows: minmax(500px, auto) minmax(190px, 1fr);
+  grid-template-rows: auto auto auto;
+  align-content: start;
   gap: 10px;
 }
 
@@ -319,9 +362,11 @@ button {
 
 .canvas-column {
   display: grid;
-  min-height: 500px;
-  grid-row: 1;
-  grid-template-rows: repeat(2, minmax(250px, 1fr));
+  min-height: 0;
+  grid-row: 1 / 3;
+  grid-template-rows: auto 1fr;
+  grid-template-rows: subgrid;
+  row-gap: 0;
 }
 
 .canvas-column.problem { grid-column: 1 / 3; }
@@ -334,8 +379,8 @@ button {
 
 .bottom-panel {
   display: flex;
-  min-height: 190px;
-  grid-row: 2;
+  min-height: 0;
+  grid-row: 3;
 }
 
 .canvas-cell {
@@ -347,12 +392,17 @@ button {
   padding: 11px 9px 9px;
 }
 
+.canvas-column > .canvas-cell {
+  min-height: 200px;
+}
+
 .canvas-column > .canvas-cell + .canvas-cell {
   border-top: 2px solid #d6dce5;
 }
 
 .bottom-panel > .canvas-cell {
   width: 100%;
+  min-height: 150px;
 }
 
 .cell-heading {
@@ -525,7 +575,7 @@ button {
 .add-card-button {
   width: 100%;
   min-height: 28px;
-  margin-top: auto;
+  margin-top: 7px;
   padding: 4px 7px;
   border: 0;
   border-radius: 6px;
@@ -775,7 +825,7 @@ button {
 
 @media (min-width: 761px) {
   .app-shell.sidebar-collapsed .topbar-brand {
-    flex-basis: 105px;
+    flex-basis: 145px;
   }
 
   .app-shell.sidebar-collapsed .sidebar {
@@ -811,7 +861,7 @@ button {
   }
 
   .topbar-brand {
-    flex-basis: 92px;
+    flex-basis: 132px;
     gap: 6px;
     padding-inline: 10px;
   }

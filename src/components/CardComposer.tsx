@@ -1,7 +1,14 @@
 import { X } from 'lucide-react'
 
+export interface CardComposerProps {
+  value: string
+  setValue: (value: string) => void
+  onSave: () => void
+  onCancel: () => void
+}
+
 /** Inline editor used to add a card to a Lean Canvas section. */
-export function CardComposer({ value, setValue, onSave, onCancel }) {
+export function CardComposer({ value, setValue, onSave, onCancel }: CardComposerProps) {
   return (
     <form
       className="card-composer"

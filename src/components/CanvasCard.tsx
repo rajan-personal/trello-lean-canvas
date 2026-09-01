@@ -1,8 +1,20 @@
+import type { DragEvent } from 'react'
 import { X } from 'lucide-react'
+import type { SectionId } from '../data'
+
+export interface CanvasCardProps {
+  text: string
+  sectionId: SectionId
+  index: number
+  onEdit: (sectionId: SectionId, index: number, value: string) => void
+  onDelete: (sectionId: SectionId, index: number) => void
+  onDragStart: (event: DragEvent<HTMLDivElement>, sectionId: SectionId, index: number) => void
+  onDragEnd: () => void
+}
 
 /** A draggable Lean Canvas hypothesis card with optional heading and body text. */
-export function CanvasCard({ text, sectionId, index, onEdit, onDelete, onDragStart, onDragEnd }) {
-  const [heading, ...body] = String(text).split('\n')
+export function CanvasCard({ text, sectionId, index, onEdit, onDelete, onDragStart, onDragEnd }: CanvasCardProps) {
+  const [heading, ...body] = text.split('\n')
   const hasHeading = body.length > 0
 
   return (

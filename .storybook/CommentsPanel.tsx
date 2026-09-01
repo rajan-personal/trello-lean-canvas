@@ -1,27 +1,51 @@
-import React, { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { useStorybookState } from 'storybook/manager-api'
 
 const STORAGE_PREFIX = 'trello-storybook-comments:v1'
 
-function storageKey(storyId) {
+interface ComponentComment {
+  id: string
+  text: string
+  createdAt: string
+}
+
+interface StorySummary {
+  title?: string
+  name?: string
+}
+
+interface StoryCommentsProps {
+  storyId: string
+  story?: StorySummary
+}
+
+function storageKey(storyId: string): string {
   return `${STORAGE_PREFIX}:${storyId}`
 }
 
-function readComments(storyId) {
+function isComponentComment(value: unknown): value is ComponentComment {
+  if (!value || typeof value !== 'object') return false
+  const comment = value as Record<string, unknown>
+  return typeof comment.id === 'string'
+    && typeof comment.text === 'string'
+    && typeof comment.createdAt === 'string'
+}
+
+function readComments(storyId: string): ComponentComment[] {
   if (!storyId) return []
   try {
-    const stored = JSON.parse(localStorage.getItem(storageKey(storyId)))
-    return Array.isArray(stored) ? stored : []
+    const stored: unknown = JSON.parse(localStorage.getItem(storageKey(storyId)) ?? '[]')
+    return Array.isArray(stored) ? stored.filter(isComponentComment) : []
   } catch {
     return []
   }
 }
 
-function writeComments(storyId, comments) {
+function writeComments(storyId: string, comments: ComponentComment[]): void {
   localStorage.setItem(storageKey(storyId), JSON.stringify(comments))
 }
 
-function createComment(text) {
+function createComment(text: string): ComponentComment {
   return {
     id: `comment-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     text,
@@ -29,7 +53,7 @@ function createComment(text) {
   }
 }
 
-const styles = {
+const styles: Record<string, CSSProperties> = {
   panel: {
     minHeight: '100%',
     padding: 16,
@@ -83,23 +107,20 @@ const styles = {
   },
 }
 
-function StoryComments({ storyId, story }) {
-  const [comments, setComments] = useState(() => readComments(storyId))
+function StoryComments({ storyId, story }: StoryCommentsProps) {
+  const [comments, setComments] = useState<ComponentComment[]>(() => readComments(storyId))
   const [draft, setDraft] = useState('')
 
   const addComment = () => {
     const text = draft.trim()
-    if (!text || !storyId) return
-    const nextComments = [
-      ...comments,
-      createComment(text),
-    ]
+    if (!text) return
+    const nextComments = [...comments, createComment(text)]
     setComments(nextComments)
     writeComments(storyId, nextComments)
     setDraft('')
   }
 
-  const deleteComment = (commentId) => {
+  const deleteComment = (commentId: string) => {
     const nextComments = comments.filter((comment) => comment.id !== commentId)
     setComments(nextComments)
     writeComments(storyId, nextComments)
@@ -150,5 +171,5 @@ export function CommentsPanel() {
     return <div style={styles.panel}>Select a component story to add comments.</div>
   }
 
-  return React.createElement(StoryComments, { key: storyId, storyId, story: index?.[storyId] })
+  return <StoryComments key={storyId} storyId={storyId} story={index?.[storyId]} />
 }

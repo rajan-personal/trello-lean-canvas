@@ -1,7 +1,20 @@
+import type { Dispatch, SetStateAction } from 'react'
 import { X } from 'lucide-react'
 
+export interface CanvasDialogState {
+  heading: string
+  submitLabel: string
+  value: string
+}
+
+interface DialogProps {
+  dialog: CanvasDialogState | null
+  setDialog: Dispatch<SetStateAction<CanvasDialogState | null>>
+  onSubmit: (dialog: CanvasDialogState) => void
+}
+
 /** Modal form for creating a canvas. */
-export function Dialog({ dialog, setDialog, onSubmit }) {
+export function Dialog({ dialog, setDialog, onSubmit }: DialogProps) {
   if (!dialog) return null
 
   return (

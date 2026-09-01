@@ -1,15 +1,18 @@
 # Lean
 
-A Lean Canvas workspace with Trello-style editing. The app starts with a clean workspace where canvases can be created or uploaded from YAML.
+A strict TypeScript Lean Canvas workspace with Trello-style editing. A first-time visitor starts on a populated Airbnb canvas and can switch to Facebook, Google, and Amazon examples before creating or uploading their own canvas.
 
 ## Features
 
+- Explore or restore four researched Lean Canvas examples using the **Load sample data** button
 - Create, upload, rename, favorite, switch, and delete Lean Canvases
 - Add, edit, delete, clear, and drag cards between all 12 canvas sections
 - Persist uploaded canvases locally in the browser
 - Download the current canvas as a portable YAML file
 - Upload additional YAML canvases
 - Responsive sidebar and horizontally scrollable canvas on small screens
+
+The examples are retrospective reconstructions rather than official company documents. Their starting assumptions were adapted from [Railsware’s Lean Canvas examples](https://railsware.com/blog/5-lean-canvas-examples/), with Facebook’s multi-sided model cross-checked against [Ash Maurya’s Facebook Lean Canvas](https://medium.com/lean-stack/how-to-model-a-multi-sided-business-60f2d7613e39).
 
 ## Run locally
 
@@ -40,6 +43,7 @@ Chromatic prints a build URL where reviewers can comment on each component snaps
 
 ```bash
 npm run lint
+npm run typecheck
 npm run build
 npm run test:e2e
 npm run build-storybook

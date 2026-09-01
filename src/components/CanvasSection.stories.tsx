@@ -1,9 +1,16 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn } from 'storybook/test'
-import { sectionTemplate } from '../data.js'
-import { CanvasSection } from './CanvasSection.jsx'
+import { sectionTemplate, type CanvasSectionData, type SectionId } from '../data'
+import { CanvasSection } from './CanvasSection'
 
-const problemSection = {
-  ...sectionTemplate.find((section) => section.id === 'problem'),
+function getSectionTemplate(sectionId: SectionId): CanvasSectionData {
+  const section = sectionTemplate.find((candidate) => candidate.id === sectionId)
+  if (!section) throw new Error(`Missing section template: ${sectionId}`)
+  return section
+}
+
+const problemSection: CanvasSectionData = {
+  ...getSectionTemplate('problem'),
   cards: [
     'Decisions disappear across chat, docs, and meetings',
     'Weekly status updates take team leads 2–3 hours',
@@ -11,8 +18,8 @@ const problemSection = {
   ],
 }
 
-const costSection = {
-  ...sectionTemplate.find((section) => section.id === 'cost'),
+const costSection: CanvasSectionData = {
+  ...getSectionTemplate('cost'),
   cards: ['Fixed\nProduct team and infrastructure', 'Variable\nAI summaries and support'],
 }
 
@@ -36,10 +43,15 @@ const meta = {
     bottom: false,
     addingSectionId: null,
     cardDraft: '',
+    editingCard: null,
     setAddingSectionId: fn(),
     setCardDraft: fn(),
     addCard: fn(),
     editCard: fn(),
+    deleteCard: fn(),
+    setEditingCard: fn(),
+    saveEditedCard: fn(),
+    startAddingCard: fn(),
     clearSection: fn(),
     dragHandlers: {
       onDrop: fn(),
@@ -47,25 +59,26 @@ const meta = {
       onDragEnd: fn(),
     },
   },
-}
+} satisfies Meta<typeof CanvasSection>
 
 export default meta
+type Story = StoryObj<typeof meta>
 
-export const Populated = {
+export const Populated: Story = {
   play: async ({ args, canvas, userEvent }) => {
-    await expect(canvas.getAllByTitle('Click to edit; drag to move')).toHaveLength(3)
+    await expect(canvas.getAllByTitle('Double-click to edit; drag to move')).toHaveLength(3)
     await userEvent.click(canvas.getByRole('button', { name: '＋ Add a card' }))
-    await expect(args.setAddingSectionId).toHaveBeenCalledWith('problem')
+    await expect(args.startAddingCard).toHaveBeenCalledWith('problem')
   },
 }
 
-export const Empty = {
+export const Empty: Story = {
   args: {
     section: { ...problemSection, cards: [] },
   },
 }
 
-export const Composing = {
+export const Composing: Story = {
   args: {
     addingSectionId: 'problem',
     cardDraft: 'A concise customer problem',
@@ -76,7 +89,7 @@ export const Composing = {
   },
 }
 
-export const BottomPanel = {
+export const BottomPanel: Story = {
   args: {
     bottom: true,
     section: costSection,

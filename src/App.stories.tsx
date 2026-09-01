@@ -1,5 +1,6 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, within } from 'storybook/test'
-import App from './App.jsx'
+import App from './App'
 
 const STORAGE_KEY = 'lean-canvas:v2'
 
@@ -19,14 +20,17 @@ const meta = {
   beforeEach: () => {
     localStorage.removeItem(STORAGE_KEY)
   },
-}
+} satisfies Meta<typeof App>
 
 export default meta
+type Story = StoryObj<typeof meta>
 
-export const Default = {
+export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByRole('main')).toBeEmptyDOMElement()
+    await expect(canvas.getByRole('heading', { name: 'Airbnb — 2008' })).toBeInTheDocument()
+    await expect(canvas.getByText('Booking fees from travellers')).toBeInTheDocument()
+    await expect(canvas.getByRole('button', { name: 'Load sample data' })).toBeInTheDocument()
     await expect(canvas.getByRole('button', { name: 'Add canvas' })).toBeInTheDocument()
   },
 }

@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type MouseEventHandler, type ReactNode } from 'react'
 import {
+  Database,
   Download,
   Menu,
   Plus,
@@ -8,14 +9,25 @@ import {
   Upload,
   X,
 } from 'lucide-react'
-import { CanvasSection } from './components/CanvasSection.jsx'
-import { Dialog } from './components/Dialog.jsx'
-import { createBlankCanvas } from './data.js'
-import { downloadYaml, yamlToCanvas } from './yaml.js'
+import {
+  CanvasSection,
+  type CanvasDragHandlers,
+  type CanvasSectionProps,
+  type EditingCard,
+} from './components/CanvasSection'
+import { Dialog, type CanvasDialogState } from './components/Dialog'
+import {
+  createBlankCanvas,
+  createExampleCanvases,
+  type CanvasSectionData,
+  type LeanCanvas,
+  type SectionId,
+} from './data'
+import { downloadYaml, yamlToCanvas } from './yaml'
 
 const STORAGE_KEY = 'lean-canvas:v2'
 const LEGACY_CANVAS_TITLE_PREFIX = 'Lean Canvas — '
-const columnGroups = [
+const columnGroups: readonly (readonly [SectionId, SectionId])[] = [
   ['problem', 'alternatives'],
   ['solution', 'metrics'],
   ['value', 'concept'],
@@ -23,10 +35,40 @@ const columnGroups = [
   ['segments', 'adopters'],
 ]
 
-function readStoredCanvases() {
+interface IconButtonProps {
+  label: string
+  title?: string
+  onClick: MouseEventHandler<HTMLButtonElement>
+  children: ReactNode
+  active?: boolean
+}
+
+interface BoardTitleProps {
+  canvas: LeanCanvas
+  onRename: (name: string) => void
+}
+
+interface SidebarProps {
+  canvases: LeanCanvas[]
+  activeId: string | null
+  onSelect: (canvasId: string) => void
+  onLoadSamples: () => void
+  open: boolean
+  onClose: () => void
+}
+
+interface DraggedCard {
+  sectionId: SectionId
+  index: number
+}
+
+function readStoredCanvases(): LeanCanvas[] {
+  const savedCanvases = localStorage.getItem(STORAGE_KEY)
+  if (savedCanvases === null) return createExampleCanvases()
+
   try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY))
-    return Array.isArray(stored) ? stored : []
+    const stored: unknown = JSON.parse(savedCanvases)
+    return Array.isArray(stored) ? stored as LeanCanvas[] : []
   } catch {
     return []
   }
@@ -36,7 +78,7 @@ function Brand() {
   return <div className="brand" aria-label="Lean">Lean</div>
 }
 
-function IconButton({ label, title, onClick, children, active = false }) {
+function IconButton({ label, title, onClick, children, active = false }: IconButtonProps) {
   return (
     <button
       className={`toolbar-icon${active ? ' active' : ''}`}
@@ -49,7 +91,7 @@ function IconButton({ label, title, onClick, children, active = false }) {
   )
 }
 
-function getCanvasDisplayTitle(canvas) {
+function getCanvasDisplayTitle(canvas: LeanCanvas): string {
   const title = canvas.title?.trim() || canvas.name
   if (title.startsWith(LEGACY_CANVAS_TITLE_PREFIX)) {
     return title.slice(LEGACY_CANVAS_TITLE_PREFIX.length).trim() || canvas.name
@@ -57,7 +99,7 @@ function getCanvasDisplayTitle(canvas) {
   return title
 }
 
-function BoardTitle({ canvas, onRename }) {
+function BoardTitle({ canvas, onRename }: BoardTitleProps) {
   const [editing, setEditing] = useState(false)
   const displayTitle = getCanvasDisplayTitle(canvas)
   const [draft, setDraft] = useState(displayTitle)
@@ -111,7 +153,7 @@ function BoardTitle({ canvas, onRename }) {
   )
 }
 
-function Sidebar({ canvases, activeId, onSelect, open, onClose }) {
+function Sidebar({ canvases, activeId, onSelect, onLoadSamples, open, onClose }: SidebarProps) {
   return (
     <>
       {open && <button className="sidebar-scrim" onClick={onClose} aria-label="Close sidebar" />}
@@ -133,23 +175,36 @@ function Sidebar({ canvases, activeId, onSelect, open, onClose }) {
             </button>
           ))}
         </nav>
+        <div className="sidebar-footer">
+          <button
+            type="button"
+            className="load-samples-button"
+            onClick={() => {
+              onLoadSamples()
+              onClose()
+            }}
+          >
+            <Database size={17} aria-hidden="true" />
+            <span>Load sample data</span>
+          </button>
+        </div>
       </aside>
     </>
   )
 }
 
 export default function App() {
-  const [canvases, setCanvases] = useState(readStoredCanvases)
-  const [activeId, setActiveId] = useState(() => readStoredCanvases()[0]?.id ?? null)
+  const [canvases, setCanvases] = useState<LeanCanvas[]>(readStoredCanvases)
+  const [activeId, setActiveId] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [addingSectionId, setAddingSectionId] = useState(null)
+  const [addingSectionId, setAddingSectionId] = useState<SectionId | null>(null)
   const [cardDraft, setCardDraft] = useState('')
-  const [editingCard, setEditingCard] = useState(null)
+  const [editingCard, setEditingCard] = useState<EditingCard | null>(null)
   const [notice, setNotice] = useState('')
-  const [canvasDialog, setCanvasDialog] = useState(null)
-  const importInputRef = useRef(null)
-  const draggedCardRef = useRef(null)
+  const [canvasDialog, setCanvasDialog] = useState<CanvasDialogState | null>(null)
+  const importInputRef = useRef<HTMLInputElement>(null)
+  const draggedCardRef = useRef<DraggedCard | null>(null)
 
   const activeCanvas = canvases.find((canvas) => canvas.id === activeId) ?? canvases[0]
 
@@ -157,25 +212,26 @@ export default function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(canvases))
   }, [canvases])
 
-  const notify = (message) => {
+  const notify = (message: string) => {
     setNotice(message)
     window.setTimeout(() => setNotice(''), 2200)
   }
 
-  const updateActiveCanvas = (updater) => {
+  const updateActiveCanvas = (updater: (canvas: LeanCanvas) => LeanCanvas) => {
+    if (!activeCanvas) return
     setCanvases((current) => current.map((canvas) => (
       canvas.id === activeCanvas.id ? updater(canvas) : canvas
     )))
   }
 
-  const updateSection = (sectionId, updater) => {
+  const updateSection = (sectionId: SectionId, updater: (section: CanvasSectionData) => CanvasSectionData) => {
     updateActiveCanvas((canvas) => ({
       ...canvas,
       sections: canvas.sections.map((section) => section.id === sectionId ? updater(section) : section),
     }))
   }
 
-  const addCard = (sectionId) => {
+  const addCard = (sectionId: SectionId) => {
     const text = cardDraft.trim()
     if (!text) return
     updateSection(sectionId, (section) => ({ ...section, cards: [...section.cards, text] }))
@@ -184,7 +240,7 @@ export default function App() {
     notify('Card added')
   }
 
-  const editCard = (sectionId, index, value) => {
+  const editCard = (sectionId: SectionId, index: number, value: string) => {
     setAddingSectionId(null)
     setCardDraft('')
     setEditingCard({ sectionId, index, value })
@@ -201,7 +257,7 @@ export default function App() {
     notify('Card updated')
   }
 
-  const deleteCard = (sectionId, index) => {
+  const deleteCard = (sectionId: SectionId, index: number) => {
     updateSection(sectionId, (section) => ({
       ...section,
       cards: section.cards.filter((_, cardIndex) => cardIndex !== index),
@@ -210,14 +266,14 @@ export default function App() {
     notify('Card deleted')
   }
 
-  const startAddingCard = (sectionId) => {
+  const startAddingCard = (sectionId: SectionId) => {
     setEditingCard(null)
     setCardDraft('')
     setAddingSectionId(sectionId)
   }
 
-  const clearSection = (sectionId) => {
-    const section = activeCanvas.sections.find((item) => item.id === sectionId)
+  const clearSection = (sectionId: SectionId) => {
+    const section = activeCanvas?.sections.find((item) => item.id === sectionId)
     if (!section?.cards.length) return notify('This section is already empty')
     if (window.confirm(`Clear every card from ${section.title}?`)) {
       updateSection(sectionId, (item) => ({ ...item, cards: [] }))
@@ -226,7 +282,7 @@ export default function App() {
     }
   }
 
-  const createCanvas = (name) => {
+  const createCanvas = (name: string) => {
     const canvas = createBlankCanvas(name)
     setCanvases((current) => [...current, canvas])
     setActiveId(canvas.id)
@@ -235,13 +291,26 @@ export default function App() {
     notify('Canvas created')
   }
 
-  const renameCanvas = (name) => {
+  const loadSampleData = () => {
+    const samples = createExampleCanvases()
+    const sampleIds = new Set(samples.map((canvas) => canvas.id))
+    setCanvases((current) => [
+      ...samples,
+      ...current.filter((canvas) => !sampleIds.has(canvas.id)),
+    ])
+    setActiveId(samples[0]?.id ?? null)
+    setAddingSectionId(null)
+    setEditingCard(null)
+    notify('Sample data loaded')
+  }
+
+  const renameCanvas = (name: string) => {
     updateActiveCanvas((canvas) => ({ ...canvas, name, title: name }))
     notify('Canvas renamed')
   }
 
   const deleteCanvas = () => {
-    if (!window.confirm(`Delete “${activeCanvas.name}”? This cannot be undone.`)) return
+    if (!activeCanvas || !window.confirm(`Delete “${activeCanvas.name}”? This cannot be undone.`)) return
     const nextCanvases = canvases.filter((canvas) => canvas.id !== activeCanvas.id)
     setCanvases(nextCanvases)
     setActiveId(nextCanvases[0]?.id ?? null)
@@ -250,7 +319,7 @@ export default function App() {
     notify('Canvas deleted')
   }
 
-  const importYaml = async (event) => {
+  const importYaml = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
     try {
@@ -268,7 +337,7 @@ export default function App() {
     }
   }
 
-  const dragHandlers = {
+  const dragHandlers: CanvasDragHandlers = {
     onDragStart(event, sectionId, index) {
       event.dataTransfer.effectAllowed = 'move'
       event.dataTransfer.setData('text/plain', `${sectionId}:${index}`)
@@ -301,10 +370,10 @@ export default function App() {
     },
   }
 
-  const sectionsById = activeCanvas
+  const sectionsById = (activeCanvas
     ? Object.fromEntries(activeCanvas.sections.map((section) => [section.id, section]))
-    : {}
-  const sectionProps = {
+    : {}) as Record<SectionId, CanvasSectionData>
+  const sectionProps: Omit<CanvasSectionProps, 'section' | 'bottom'> = {
     addingSectionId,
     setAddingSectionId,
     cardDraft,
@@ -336,7 +405,7 @@ export default function App() {
           <Brand />
           <button
             type="button"
-            className="new-canvas-button"
+            className="brand-action-button new-canvas-button"
             onClick={() => setCanvasDialog({ heading: 'Create canvas', submitLabel: 'Create canvas', value: '' })}
             aria-label="Add canvas"
             title="New canvas"
@@ -381,6 +450,7 @@ export default function App() {
             setAddingSectionId(null)
             setEditingCard(null)
           }}
+          onLoadSamples={loadSampleData}
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
         />

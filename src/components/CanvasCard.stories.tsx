@@ -1,5 +1,6 @@
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn } from 'storybook/test'
-import { CanvasCard } from './CanvasCard.jsx'
+import { CanvasCard } from './CanvasCard'
 
 const meta = {
   title: 'Lean Canvas/CanvasCard',
@@ -20,14 +21,16 @@ const meta = {
     sectionId: 'problem',
     index: 0,
     onEdit: fn(),
+    onDelete: fn(),
     onDragStart: fn(),
     onDragEnd: fn(),
   },
-}
+} satisfies Meta<typeof CanvasCard>
 
 export default meta
+type Story = StoryObj<typeof meta>
 
-export const Plain = {
+export const Plain: Story = {
   args: {
     text: 'Decisions disappear across chat, docs, and meetings',
   },
@@ -37,7 +40,7 @@ export const Plain = {
   },
 }
 
-export const HeadingAndBody = {
+export const HeadingAndBody: Story = {
   args: {
     text: 'North star\nTeams completing 3+ check-ins weekly',
   },
