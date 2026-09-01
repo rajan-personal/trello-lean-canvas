@@ -1,10 +1,10 @@
 # Lean
 
-A strict TypeScript Lean Canvas workspace with Trello-style editing. A first-time visitor starts on a populated Airbnb canvas and can switch to Facebook, Google, and Amazon examples before creating or uploading their own canvas.
+A strict TypeScript Lean Canvas workspace with Trello-style editing. Start with an empty workspace, then create a canvas, upload YAML, or load the Airbnb, Facebook, Google, and Amazon samples.
 
 ## Features
 
-- Explore or restore four researched Lean Canvas examples using the **Load sample data** button
+- Load four researched YAML examples on demand using the **Load sample data** button
 - Create, upload, rename, favorite, switch, and delete Lean Canvases
 - Add, edit, delete, clear, and drag cards between all 12 canvas sections
 - Persist uploaded canvases locally in the browser
@@ -12,7 +12,7 @@ A strict TypeScript Lean Canvas workspace with Trello-style editing. A first-tim
 - Upload additional YAML canvases
 - Responsive sidebar and horizontally scrollable canvas on small screens
 
-The examples are retrospective reconstructions rather than official company documents. Their starting assumptions were adapted from [Railsware’s Lean Canvas examples](https://railsware.com/blog/5-lean-canvas-examples/), with Facebook’s multi-sided model cross-checked against [Ash Maurya’s Facebook Lean Canvas](https://medium.com/lean-stack/how-to-model-a-multi-sided-business-60f2d7613e39).
+The YAML files in [`examples/`](examples/) are retrospective reconstructions rather than official company documents. Their starting assumptions were adapted from [Railsware’s Lean Canvas examples](https://railsware.com/blog/5-lean-canvas-examples/), with Facebook’s multi-sided model cross-checked against [Ash Maurya’s Facebook Lean Canvas](https://medium.com/lean-stack/how-to-model-a-multi-sided-business-60f2d7613e39).
 
 ## Run locally
 
@@ -29,15 +29,7 @@ Then open `http://127.0.0.1:5173`.
 npm run storybook
 ```
 
-Open `http://127.0.0.1:6006` to browse components locally. Select any story, open the **Comments** tab in the addon panel, and add notes scoped to that story. Local comments persist in that browser through `localStorage` and do not require a review branch.
-
-Publish the component snapshots to Chromatic for shared threaded review comments:
-
-```bash
-CHROMATIC_PROJECT_TOKEN=your-token npm run chromatic
-```
-
-Chromatic prints a build URL where reviewers can comment on each component snapshot. For automatic builds on every push, add `CHROMATIC_PROJECT_TOKEN` as a GitHub Actions repository secret; `.github/workflows/chromatic.yml` uses it without committing the token.
+Open `http://127.0.0.1:6006` to browse components and run their interaction and accessibility checks locally.
 
 ## Verify
 

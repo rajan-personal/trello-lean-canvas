@@ -17,6 +17,7 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.flat['recommended-latest'].rules,
       ...reactRefresh.configs.vite.rules,
+      'max-lines': ['error', { max: 100 }],
     },
     languageOptions: {
       ecmaVersion: 2023,

@@ -1,6 +1,6 @@
 import type { DragEvent } from 'react'
 import { X } from 'lucide-react'
-import type { SectionId } from '../data'
+import type { SectionId } from '../data/types'
 
 export interface CanvasCardProps {
   text: string
