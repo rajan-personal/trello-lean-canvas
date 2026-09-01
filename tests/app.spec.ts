@@ -299,6 +299,28 @@ test('edits cards with one save action and dismisses on outside click', async ({
   await expect(page.getByRole('button', { name: 'Saved note', exact: true })).toBeVisible()
 })
 
+test('dismisses the add-card composer outside while preserving its draft', async ({ page }) => {
+  await page.setViewportSize({ width: 1424, height: 797 })
+  await openSampleCanvas(page)
+
+  const section = page.locator('.canvas-column.solution .canvas-cell').first()
+  await section.getByRole('button', { name: '＋ Add a card' }).click()
+  const composer = section.getByRole('textbox', { name: 'New card' })
+  await composer.fill('A draft worth keeping')
+  await expect(section.getByRole('button', { name: 'Cancel adding card' })).toHaveCount(0)
+
+  await section.locator('.cell-heading').click()
+  await expect(composer).toHaveCount(0)
+
+  await section.getByRole('button', { name: '＋ Add a card' }).click()
+  const reopenedComposer = section.getByRole('textbox', { name: 'New card' })
+  await expect(reopenedComposer).toHaveValue('A draft worth keeping')
+  await expect(reopenedComposer).toBeFocused()
+  await expect.poll(() => reopenedComposer.evaluate((element) => (
+    element instanceof HTMLTextAreaElement ? element.selectionStart : -1
+  ))).toBe('A draft worth keeping'.length)
+})
+
 test('expands the white column for the composer without nested scrolling', async ({ page }) => {
   await page.setViewportSize({ width: 1424, height: 797 })
   await openSampleCanvas(page)

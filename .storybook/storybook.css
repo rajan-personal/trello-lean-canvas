@@ -1,3 +1,7 @@
+.sb-show-main.sb-main-fullscreen {
+  overflow-y: auto;
+}
+
 .storybook-card-frame,
 .storybook-composer-frame,
 .storybook-section-frame,

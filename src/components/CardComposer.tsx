@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 
 export interface CardComposerProps {
   value: string
@@ -9,8 +9,29 @@ export interface CardComposerProps {
 
 /** Inline editor used to add a card to a Lean Canvas section. */
 export function CardComposer({ value, setValue, onSave, onCancel }: CardComposerProps) {
+  const composerRef = useRef<HTMLFormElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useLayoutEffect(() => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+    const end = textarea.value.length
+    textarea.focus()
+    textarea.setSelectionRange(end, end)
+  }, [])
+
+  useEffect(() => {
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && !composerRef.current?.contains(event.target)) onCancel()
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
+  }, [onCancel])
+
   return (
     <form
+      ref={composerRef}
       className="card-composer"
       onSubmit={(event) => {
         event.preventDefault()
@@ -18,8 +39,8 @@ export function CardComposer({ value, setValue, onSave, onCancel }: CardComposer
       }}
     >
       <textarea
+        ref={textareaRef}
         name="card-text"
-        autoFocus
         required
         aria-label="New card"
         value={value}
@@ -35,9 +56,6 @@ export function CardComposer({ value, setValue, onSave, onCancel }: CardComposer
       />
       <div className="composer-actions">
         <button type="submit" className="composer-submit">Add card</button>
-        <button type="button" className="composer-cancel" onClick={onCancel} aria-label="Cancel adding card" title="Cancel">
-          <X size={20} />
-        </button>
       </div>
     </form>
   )

@@ -359,9 +359,10 @@ button {
   display: grid;
   width: 100%;
   min-width: 1000px;
+  min-height: 100%;
   grid-template-columns: repeat(10, minmax(0, 1fr));
   grid-template-rows: auto auto auto;
-  align-content: start;
+  align-content: stretch;
   gap: 10px;
 }
 
@@ -641,26 +642,15 @@ button {
   font-weight: 600;
 }
 
+.composer-submit {
+  min-height: 28px;
+  padding: 4px 10px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
 .composer-submit:hover {
   background: #0055cc;
-}
-
-.composer-cancel {
-  display: grid;
-  min-width: 32px;
-  min-height: 32px;
-  padding: 0;
-  place-items: center;
-  border: 0;
-  border-radius: 6px;
-  color: #44546f;
-  background: transparent;
-  cursor: pointer;
-}
-
-.composer-cancel:hover {
-  color: #172b4d;
-  background: #dcdfe4;
 }
 
 @media (pointer: coarse) {

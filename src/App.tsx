@@ -247,7 +247,6 @@ export default function App() {
 
   const editCard = (sectionId: SectionId, index: number, value: string) => {
     setAddingSectionId(null)
-    setCardDraft('')
     setEditingCard({ sectionId, index, value })
   }
 
@@ -273,7 +272,6 @@ export default function App() {
 
   const startAddingCard = (sectionId: SectionId) => {
     setEditingCard(null)
-    setCardDraft('')
     setAddingSectionId(sectionId)
   }
 

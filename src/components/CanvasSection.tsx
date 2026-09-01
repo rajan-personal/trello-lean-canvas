@@ -89,10 +89,7 @@ export function CanvasSection({
             value={cardDraft}
             setValue={setCardDraft}
             onSave={() => addCard(section.id)}
-            onCancel={() => {
-              setAddingSectionId(null)
-              setCardDraft('')
-            }}
+            onCancel={() => setAddingSectionId(null)}
           />
         )}
       </div>
