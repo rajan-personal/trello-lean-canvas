@@ -174,8 +174,11 @@ button {
 }
 
 .canvas-nav-item {
+  display: flex;
   width: 100%;
   min-height: 38px;
+  align-items: center;
+  gap: 8px;
   padding: 8px 10px 8px 14px;
   overflow: hidden;
   border: 0;
@@ -187,8 +190,19 @@ button {
   font-weight: 500;
   line-height: 20px;
   text-align: left;
-  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.canvas-nav-label {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.canvas-nav-favorite {
+  flex: 0 0 auto;
+  color: #f5cd47;
 }
 
 .canvas-nav-item:hover {

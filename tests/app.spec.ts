@@ -95,6 +95,22 @@ test('starts with researched examples, creates, uploads, edits, switches, and ex
   await expect(page.getByText('Decisions stay visible')).toBeVisible()
 })
 
+test('shows favorited canvases in the sidebar', async ({ page }) => {
+  await page.goto('/')
+
+  const favoriteButton = page.getByRole('button', { name: 'Favorite canvas' })
+  const airbnbSidebarItem = page.getByRole('navigation', { name: 'Lean canvases' })
+    .getByRole('button', { name: 'Airbnb', exact: true })
+
+  await expect(airbnbSidebarItem.locator('.canvas-nav-favorite')).toHaveCount(0)
+  await favoriteButton.click()
+  await expect(favoriteButton).toHaveAttribute('aria-pressed', 'true')
+  await expect(airbnbSidebarItem.locator('.canvas-nav-favorite')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Facebook', exact: true }).click()
+  await expect(airbnbSidebarItem.locator('.canvas-nav-favorite')).toBeVisible()
+})
+
 test('loads fresh sample data without removing custom canvases or creating duplicates', async ({ page }) => {
   await page.goto('/')
 

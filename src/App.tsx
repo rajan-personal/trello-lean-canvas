@@ -41,6 +41,7 @@ interface IconButtonProps {
   onClick: MouseEventHandler<HTMLButtonElement>
   children: ReactNode
   active?: boolean
+  pressed?: boolean
 }
 
 interface BoardTitleProps {
@@ -78,11 +79,12 @@ function Brand() {
   return <div className="brand" aria-label="Lean">Lean</div>
 }
 
-function IconButton({ label, title, onClick, children, active = false }: IconButtonProps) {
+function IconButton({ label, title, onClick, children, active = false, pressed }: IconButtonProps) {
   return (
     <button
       className={`toolbar-icon${active ? ' active' : ''}`}
       aria-label={label}
+      aria-pressed={pressed}
       title={title ?? label}
       onClick={onClick}
     >
@@ -171,7 +173,10 @@ function Sidebar({ canvases, activeId, onSelect, onLoadSamples, open, onClose }:
                 onClose()
               }}
             >
-              {canvas.name}
+              <span className="canvas-nav-label">{canvas.name}</span>
+              {canvas.favorite && (
+                <Star className="canvas-nav-favorite" size={15} fill="currentColor" aria-hidden="true" />
+              )}
             </button>
           ))}
         </nav>
@@ -427,7 +432,7 @@ export default function App() {
           <span className="toolbar-spacer" />
           {activeCanvas && (
             <>
-              <IconButton label="Favorite canvas" onClick={() => updateActiveCanvas((canvas) => ({ ...canvas, favorite: !canvas.favorite }))} active={activeCanvas.favorite}>
+              <IconButton label="Favorite canvas" onClick={() => updateActiveCanvas((canvas) => ({ ...canvas, favorite: !canvas.favorite }))} active={activeCanvas.favorite} pressed={activeCanvas.favorite}>
                 <Star size={17} fill={activeCanvas.favorite ? 'currentColor' : 'none'} />
               </IconButton>
               <IconButton label="Download canvas data as YAML" title="Download YAML" onClick={() => {
