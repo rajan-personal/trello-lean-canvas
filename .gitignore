@@ -1,5 +1,11 @@
 node_modules
 dist
+storybook-static
 playwright-report
 test-results
+.pi-subagents
+build-storybook.log
+chromatic.log
+chromatic-build-*.xml
+chromatic-diagnostics.json
 .DS_Store

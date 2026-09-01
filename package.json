@@ -9,7 +9,10 @@
     "deploy": "vite build --base=/trello-lean-canvas/ && gh-pages -d dist",
     "test:e2e": "playwright test",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "chromatic": "chromatic --exit-zero-on-changes"
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
@@ -20,12 +23,18 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.62.1",
+    "@storybook/addon-a11y": "^10.5.10",
+    "@storybook/addon-docs": "^10.5.10",
+    "@storybook/react-vite": "^10.5.10",
     "@vitejs/plugin-react": "^6.1.1",
+    "agentation": "^3.0.2",
+    "chromatic": "^18.7.2",
     "eslint": "^10.9.1",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.5",
     "gh-pages": "^6.3.0",
     "globals": "^17.11.0",
+    "storybook": "^10.5.10",
     "vite": "^8.2.2"
   }
 }
