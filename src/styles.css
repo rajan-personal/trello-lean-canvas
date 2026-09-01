@@ -435,29 +435,6 @@ button {
   line-height: 19px;
 }
 
-.cell-heading strong span {
-  color: #626f86;
-}
-
-.cell-heading button {
-  display: grid;
-  width: 24px;
-  height: 22px;
-  flex: 0 0 24px;
-  margin: -2px -3px 0 0;
-  padding: 0;
-  place-items: center;
-  border: 0;
-  border-radius: 5px;
-  color: #626f86;
-  background: transparent;
-  cursor: pointer;
-}
-
-.cell-heading button:hover {
-  background: #dcdfe4;
-}
-
 .cell-hint {
   min-height: 28px;
   margin: 1px 1px 6px;

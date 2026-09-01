@@ -277,16 +277,6 @@ export default function App() {
     setAddingSectionId(sectionId)
   }
 
-  const clearSection = (sectionId: SectionId) => {
-    const section = activeCanvas?.sections.find((item) => item.id === sectionId)
-    if (!section?.cards.length) return notify('This section is already empty')
-    if (window.confirm(`Clear every card from ${section.title}?`)) {
-      updateSection(sectionId, (item) => ({ ...item, cards: [] }))
-      if (editingCard?.sectionId === sectionId) setEditingCard(null)
-      notify(`${section.title} cleared`)
-    }
-  }
-
   const createCanvas = (name: string) => {
     const canvas = createBlankCanvas(name)
     setCanvases((current) => [...current, canvas])
@@ -390,7 +380,6 @@ export default function App() {
     setEditingCard,
     saveEditedCard,
     startAddingCard,
-    clearSection,
     dragHandlers,
   }
 

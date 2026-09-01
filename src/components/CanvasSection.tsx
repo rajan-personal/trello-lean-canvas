@@ -1,5 +1,4 @@
 import type { Dispatch, DragEvent, SetStateAction } from 'react'
-import { MoreHorizontal } from 'lucide-react'
 import type { CanvasSectionData, SectionId } from '../data'
 import { CanvasCard } from './CanvasCard'
 import { CardComposer } from './CardComposer'
@@ -31,11 +30,10 @@ export interface CanvasSectionProps {
   setEditingCard: Dispatch<SetStateAction<EditingCard | null>>
   saveEditedCard: () => void
   startAddingCard: (sectionId: SectionId) => void
-  clearSection: (sectionId: SectionId) => void
   dragHandlers: CanvasDragHandlers
 }
 
-/** One numbered or supporting section in the Lean Canvas grid. */
+/** One section in the Lean Canvas grid. */
 export function CanvasSection({
   section,
   bottom = false,
@@ -50,7 +48,6 @@ export function CanvasSection({
   setEditingCard,
   saveEditedCard,
   startAddingCard,
-  clearSection,
   dragHandlers,
 }: CanvasSectionProps) {
   return (
@@ -60,12 +57,7 @@ export function CanvasSection({
       onDrop={(event) => dragHandlers.onDrop(event, section.id)}
     >
       <header className="cell-heading">
-        <strong>{section.number && <span>{section.number}. </span>}{section.title}</strong>
-        {(section.number || bottom) && (
-          <button onClick={() => clearSection(section.id)} aria-label={`Clear ${section.title}`} title="Clear section">
-            <MoreHorizontal size={20} />
-          </button>
-        )}
+        <strong>{section.title}</strong>
       </header>
       {section.cards.length === 0 && addingSectionId !== section.id && <p className="cell-hint">{section.hint}</p>}
       <div className="canvas-cards">

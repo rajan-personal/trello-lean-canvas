@@ -52,7 +52,6 @@ const meta = {
     setEditingCard: fn(),
     saveEditedCard: fn(),
     startAddingCard: fn(),
-    clearSection: fn(),
     dragHandlers: {
       onDrop: fn(),
       onDragStart: fn(),
