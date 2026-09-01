@@ -36,3 +36,29 @@
 .storybook-bottom-section-frame .canvas-cell {
   width: 100%;
 }
+
+.storybook-inline-editor-frame,
+.storybook-composer-harness {
+  display: grid;
+  gap: 12px;
+}
+
+.storybook-inline-editor-frame {
+  width: 300px;
+  padding: 12px;
+  border-radius: 12px;
+  color: #172b4d;
+  background: #f1f2f4;
+}
+
+.storybook-outside-target,
+.storybook-composer-harness > button {
+  justify-self: start;
+  padding: 5px 8px;
+  border: 1px solid #b7bec8;
+  border-radius: 5px;
+  color: #44546f;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
