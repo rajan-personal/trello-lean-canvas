@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type MouseEventHandler, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type DragEvent, type MouseEventHandler, type ReactNode } from 'react'
 import {
   Database,
   Download,
@@ -53,6 +53,7 @@ interface SidebarProps {
   canvases: LeanCanvas[]
   activeId: string | null
   onSelect: (canvasId: string) => void
+  onMove: (canvasId: string, targetIndex: number) => void
   onLoadSamples: () => void
   open: boolean
   collapsed: boolean
@@ -113,6 +114,11 @@ function getCanvasDisplayTitle(canvas: LeanCanvas): string {
   return title
 }
 
+function getCanvasDropEdge(event: DragEvent<HTMLElement>): 'before' | 'after' {
+  const bounds = event.currentTarget.getBoundingClientRect()
+  return event.clientY < bounds.top + bounds.height / 2 ? 'before' : 'after'
+}
+
 function BoardTitle({ canvas, onRename }: BoardTitleProps) {
   const [editing, setEditing] = useState(false)
   const displayTitle = getCanvasDisplayTitle(canvas)
@@ -167,7 +173,23 @@ function BoardTitle({ canvas, onRename }: BoardTitleProps) {
   )
 }
 
-function Sidebar({ canvases, activeId, onSelect, onLoadSamples, open, collapsed, onClose }: SidebarProps) {
+function Sidebar({ canvases, activeId, onSelect, onMove, onLoadSamples, open, collapsed, onClose }: SidebarProps) {
+  const [draggedCanvasId, setDraggedCanvasId] = useState<string | null>(null)
+  const [dropTarget, setDropTarget] = useState<{ canvasId: string; edge: 'before' | 'after' } | null>(null)
+
+  const moveDroppedCanvas = (event: DragEvent<HTMLElement>, targetCanvasId: string) => {
+    event.preventDefault()
+    const sourceCanvasId = draggedCanvasId || event.dataTransfer.getData('text/plain')
+    const sourceIndex = canvases.findIndex((canvas) => canvas.id === sourceCanvasId)
+    const targetIndex = canvases.findIndex((canvas) => canvas.id === targetCanvasId)
+    if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) return
+
+    const insertionIndex = targetIndex + (getCanvasDropEdge(event) === 'after' ? 1 : 0)
+    onMove(sourceCanvasId, insertionIndex - (sourceIndex < insertionIndex ? 1 : 0))
+    setDraggedCanvasId(null)
+    setDropTarget(null)
+  }
+
   return (
     <>
       {open && (
@@ -185,21 +207,60 @@ function Sidebar({ canvases, activeId, onSelect, onLoadSamples, open, collapsed,
           <button className={`${brandActionButtonClass} mobile-close`} onClick={onClose} aria-label="Close sidebar"><X size={18} /></button>
         </div>
         <nav className="grid min-h-0 gap-[3px] overflow-y-auto" aria-label="Lean canvases">
-          {canvases.map((canvas) => (
-            <button
-              className={`canvas-nav-item flex min-h-[38px] w-full items-center gap-2 overflow-hidden rounded-md border-0 px-2.5 py-2 ps-3.5 text-left text-sm leading-5 font-medium whitespace-nowrap text-white/90 hover:bg-white/10 ${canvas.id === activeId ? 'bg-white/16 text-white' : 'bg-transparent'}`}
-              key={canvas.id}
-              onClick={() => {
-                onSelect(canvas.id)
-                onClose()
-              }}
-            >
-              <span className="canvas-nav-label min-w-0 flex-1 overflow-hidden text-ellipsis">{canvas.name}</span>
-              {canvas.favorite && (
-                <Star className="canvas-nav-favorite flex-none text-[#f5cd47]" size={15} fill="currentColor" aria-hidden="true" />
-              )}
-            </button>
-          ))}
+          {canvases.map((canvas, index) => {
+            const isDropTarget = draggedCanvasId !== null && dropTarget?.canvasId === canvas.id
+            const dropIndicatorClass = isDropTarget
+              ? dropTarget.edge === 'before'
+                ? 'before:absolute before:inset-x-1 before:top-[-2px] before:h-0.5 before:rounded-full before:bg-[#85b8ff]'
+                : 'after:absolute after:inset-x-1 after:bottom-[-2px] after:h-0.5 after:rounded-full after:bg-[#85b8ff]'
+              : ''
+
+            return (
+              <div
+                className={`canvas-nav-row relative ${dropIndicatorClass}`}
+                key={canvas.id}
+                onDragOver={(event) => {
+                  event.preventDefault()
+                  event.dataTransfer.dropEffect = 'move'
+                  if (draggedCanvasId !== canvas.id) {
+                    setDropTarget({ canvasId: canvas.id, edge: getCanvasDropEdge(event) })
+                  }
+                }}
+                onDrop={(event) => moveDroppedCanvas(event, canvas.id)}
+              >
+                <button
+                  type="button"
+                  draggable
+                  aria-label={canvas.name}
+                  title="Drag to reorder. Press Alt+Up or Alt+Down to move."
+                  className={`canvas-nav-item flex min-h-[38px] w-full items-center gap-2 overflow-hidden rounded-md border-0 px-2.5 py-2 ps-3.5 text-left text-sm leading-5 font-medium whitespace-nowrap text-white/90 hover:bg-white/10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white ${canvas.id === activeId ? 'bg-white/16 text-white' : 'bg-transparent'} ${draggedCanvasId === canvas.id ? 'opacity-45' : ''}`}
+                  onClick={() => {
+                    onSelect(canvas.id)
+                    onClose()
+                  }}
+                  onDragStart={(event) => {
+                    event.dataTransfer.effectAllowed = 'move'
+                    event.dataTransfer.setData('text/plain', canvas.id)
+                    setDraggedCanvasId(canvas.id)
+                  }}
+                  onDragEnd={() => {
+                    setDraggedCanvasId(null)
+                    setDropTarget(null)
+                  }}
+                  onKeyDown={(event) => {
+                    if (!event.altKey || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) return
+                    event.preventDefault()
+                    onMove(canvas.id, index + (event.key === 'ArrowUp' ? -1 : 1))
+                  }}
+                >
+                  <span className="canvas-nav-label min-w-0 flex-1 overflow-hidden text-ellipsis">{canvas.name}</span>
+                  {canvas.favorite && (
+                    <Star className="canvas-nav-favorite flex-none text-[#f5cd47]" size={15} fill="currentColor" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+            )
+          })}
         </nav>
         <div className="sidebar-footer mt-auto border-t border-white/14 pt-2.5">
           <button
@@ -303,6 +364,20 @@ export default function App() {
     setAddingSectionId(null)
     setEditingCard(null)
     notify('Canvas created')
+  }
+
+  const moveCanvas = (canvasId: string, targetIndex: number) => {
+    const sourceIndex = canvases.findIndex((canvas) => canvas.id === canvasId)
+    const boundedTargetIndex = Math.max(0, Math.min(targetIndex, canvases.length - 1))
+    if (sourceIndex < 0 || sourceIndex === boundedTargetIndex) return
+
+    setCanvases((current) => {
+      const next = [...current]
+      const [movedCanvas] = next.splice(sourceIndex, 1)
+      next.splice(boundedTargetIndex, 0, movedCanvas)
+      return next
+    })
+    notify('Canvas moved')
   }
 
   const loadSampleData = () => {
@@ -463,6 +538,7 @@ export default function App() {
             setAddingSectionId(null)
             setEditingCard(null)
           }}
+          onMove={moveCanvas}
           onLoadSamples={loadSampleData}
           open={sidebarOpen}
           collapsed={sidebarCollapsed}
