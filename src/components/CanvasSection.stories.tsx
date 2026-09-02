@@ -35,8 +35,12 @@ export const DraggingDown: CanvasSectionStory = {
     )
     await expect(slots).toHaveLength(3)
     await expect(slots[0]).toHaveStyle({ opacity: '0.35' })
-    await expect(slots[1].style.transform).toBe('translate3d(0, -48px, 0)')
-    await expect(slots[2].style.transform).toBe('translate3d(0, -48px, 0)')
+    await expect(slots[1].style.transform).toBe(
+      'translate3d(0px, -48px, 0px)',
+    )
+    await expect(slots[2].style.transform).toBe(
+      'translate3d(0px, -48px, 0px)',
+    )
     await expect(
       canvasElement.querySelector('[class*="before:bg-[#0c66e4]"]'),
     ).toBeNull()

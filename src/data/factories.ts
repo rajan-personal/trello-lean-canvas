@@ -13,6 +13,7 @@ export function createBlankCanvas(name: string): LeanCanvas {
     name: trimmedName,
     title: trimmedName,
     favorite: false,
+    notes: '',
     sections: sectionTemplate.map((section) => ({ ...section, cards: [] })),
   }
 }

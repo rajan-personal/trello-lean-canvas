@@ -36,6 +36,7 @@ export function canvasToYaml(canvas: LeanCanvas): string {
         name: canvas.name,
         title: canvas.title,
         favorite: canvas.favorite,
+        notes: canvas.notes,
         sections: canvas.sections.map(({ id, number, title, hint, cards }) => ({
           id,
           ...(number ? { number } : {}),
@@ -89,6 +90,7 @@ export function yamlToCanvas(
     name: String(input.name ?? fallbackCanvas.name),
     title: String(input.title ?? fallbackCanvas.title),
     favorite: Boolean(input.favorite ?? fallbackCanvas.favorite),
+    notes: String(input.notes ?? fallbackCanvas.notes),
     sections,
   }
 }

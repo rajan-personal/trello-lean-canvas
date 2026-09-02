@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react'
-import { Download, Star, Trash2 } from 'lucide-react'
+import { Download, NotebookPen, Star, Trash2 } from 'lucide-react'
 import type { LeanCanvas } from '../data/types'
 import { downloadYaml } from '../data/download'
 import { ToolbarIconButton } from './ToolbarIconButton'
@@ -7,7 +7,9 @@ import { UploadCanvasButton } from './UploadCanvasButton'
 
 interface Props {
   canvas: LeanCanvas
+  notepadOpen: boolean
   onFavorite: () => void
+  onToggleNotepad: () => void
   onDelete: () => void
   onImport: (event: ChangeEvent<HTMLInputElement>) => void
   onNotify: (text: string) => void
@@ -15,7 +17,9 @@ interface Props {
 
 export function CanvasToolbarActions({
   canvas,
+  notepadOpen,
   onFavorite,
+  onToggleNotepad,
   onDelete,
   onImport,
   onNotify,
@@ -29,6 +33,16 @@ export function CanvasToolbarActions({
         pressed={canvas.favorite}
       >
         <Star size={17} fill={canvas.favorite ? 'currentColor' : 'none'} />
+      </ToolbarIconButton>
+      <ToolbarIconButton
+        label="Notepad"
+        title={notepadOpen ? 'Close notepad' : 'Open notepad'}
+        onClick={onToggleNotepad}
+        active={notepadOpen}
+        expanded={notepadOpen}
+        controls="canvas-notepad"
+      >
+        <NotebookPen size={17} />
       </ToolbarIconButton>
       <ToolbarIconButton
         label="Download canvas data as YAML"

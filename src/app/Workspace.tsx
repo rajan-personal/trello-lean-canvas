@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Dialog, type CanvasDialogState } from '../components/Dialog'
 import { CanvasBoard } from '../components/CanvasBoard'
+import { NotepadPanel } from '../components/NotepadPanel'
 import { Sidebar } from '../components/Sidebar'
 import { Toast } from '../components/Toast'
 import { TopBar } from '../components/TopBar'
@@ -22,21 +23,9 @@ export function Workspace() {
   )
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [notepadOpen, setNotepadOpen] = useState(false)
   const [dialog, setDialog] = useState<CanvasDialogState | null>(null)
-  const sectionProps = {
-    addingSectionId: cards.addingSectionId,
-    setAddingSectionId: cards.setAddingSectionId,
-    cardDraft: cards.cardDraft,
-    setCardDraft: cards.setCardDraft,
-    addCard: cards.addCard,
-    editCard: cards.editCard,
-    deleteCard: cards.deleteCard,
-    editingCard: cards.editingCard,
-    setEditingCard: cards.setEditingCard,
-    saveEditedCard: cards.saveEditedCard,
-    startAddingCard: cards.startAddingCard,
-    dragHandlers,
-  }
+  const sectionProps = { ...cards, dragHandlers }
   return (
     <div className="app-shell h-dvh min-h-[640px] overflow-hidden bg-linear-[130deg,#0c66e4_0%,#338bfa_100%]">
       <TopBar
@@ -53,6 +42,8 @@ export function Workspace() {
           })
         }
         onRename={commands.renameCanvas}
+        notepadOpen={notepadOpen}
+        onToggleNotepad={() => setNotepadOpen((value) => !value)}
         onFavorite={() =>
           state.updateActiveCanvas((canvas) => ({
             ...canvas,
@@ -81,6 +72,16 @@ export function Workspace() {
           />
         ) : (
           <main className="main-area h-full min-w-0 flex-1" />
+        )}
+        {state.activeCanvas && (
+          <NotepadPanel
+            key={state.activeCanvas.id}
+            canvas={state.activeCanvas}
+            open={notepadOpen}
+            onChange={(notes) =>
+              state.updateActiveCanvas((canvas) => ({ ...canvas, notes }))
+            }
+          />
         )}
       </div>
       <Dialog

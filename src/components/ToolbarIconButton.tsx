@@ -8,6 +8,8 @@ interface Props {
   children: ReactNode
   active?: boolean
   pressed?: boolean
+  expanded?: boolean
+  controls?: string
 }
 export function ToolbarIconButton({
   label,
@@ -16,12 +18,16 @@ export function ToolbarIconButton({
   children,
   active = false,
   pressed,
+  expanded,
+  controls,
 }: Props) {
   return (
     <button
       className={`toolbar-icon ${toolbarButtonClass} ${active ? 'text-[#f5cd47]' : ''}`}
       aria-label={label}
       aria-pressed={pressed}
+      aria-expanded={expanded}
+      aria-controls={controls}
       title={title ?? label}
       onClick={onClick}
     >

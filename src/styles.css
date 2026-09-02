@@ -27,3 +27,31 @@
     cursor: pointer;
   }
 }
+
+@layer components {
+  .notepad-panel {
+    opacity: 1;
+    translate: 0;
+    transition:
+      width 220ms cubic-bezier(0.2, 0, 0, 1),
+      opacity 160ms ease-out,
+      translate 220ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .notepad-panel[data-open="false"] {
+    opacity: 0;
+    pointer-events: none;
+    translate: 0.75rem 0;
+  }
+
+  .notepad-panel[data-resizing="true"] {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notepad-panel {
+    translate: none;
+    transition: opacity 80ms linear;
+  }
+}

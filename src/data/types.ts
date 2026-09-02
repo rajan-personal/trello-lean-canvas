@@ -25,5 +25,6 @@ export interface LeanCanvas {
   name: string
   title: string
   favorite: boolean
+  notes: string
   sections: CanvasSectionData[]
 }

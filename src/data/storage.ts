@@ -7,7 +7,11 @@ export function readStoredCanvases(): LeanCanvas[] {
   if (saved === null) return []
   try {
     const stored: unknown = JSON.parse(saved)
-    return Array.isArray(stored) ? (stored as LeanCanvas[]) : []
+    if (!Array.isArray(stored)) return []
+    return (stored as LeanCanvas[]).map((canvas) => ({
+      ...canvas,
+      notes: typeof canvas.notes === 'string' ? canvas.notes : '',
+    }))
   } catch {
     return []
   }

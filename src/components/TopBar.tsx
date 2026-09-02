@@ -14,7 +14,9 @@ interface Props {
   onOpenSidebar: () => void
   onNewCanvas: () => void
   onRename: (name: string) => void
+  notepadOpen: boolean
   onFavorite: () => void
+  onToggleNotepad: () => void
   onDelete: () => void
   onImport: (event: ChangeEvent<HTMLInputElement>) => void
   onNotify: (text: string) => void
@@ -76,7 +78,9 @@ export function TopBar(props: Props) {
         {canvas ? (
           <CanvasToolbarActions
             canvas={canvas}
+            notepadOpen={props.notepadOpen}
             onFavorite={props.onFavorite}
+            onToggleNotepad={props.onToggleNotepad}
             onDelete={props.onDelete}
             onImport={props.onImport}
             onNotify={props.onNotify}

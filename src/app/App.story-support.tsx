@@ -12,6 +12,7 @@ export const blankCanvas: LeanCanvas = {
   name: 'Blank canvas',
   title: 'Blank canvas',
   favorite: false,
+  notes: '',
   sections: sectionTemplate.map((section) => ({ ...section, cards: [] })),
 }
 
