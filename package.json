@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "deploy": "vite build --base=/trello-lean-canvas/ && gh-pages -d dist",
+    "deploy": "vite build --base=/ && gh-pages -d dist",
     "test:e2e": "playwright test",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
