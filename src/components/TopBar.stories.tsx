@@ -16,19 +16,13 @@ const meta = {
     onToggleSidebar: fn(),
     onOpenSidebar: fn(),
     onNewCanvas: fn(),
+    onLoadSamples: fn(),
     onRename: fn(),
     onFavorite: fn(),
     onToggleNotepad: fn(),
     onDelete: fn(),
     onImport: fn(),
     onNotify: fn(),
-    user: {
-      uid: 'storybook-user',
-      displayName: 'Storybook User',
-      email: 'storybook@example.com',
-      photoURL: null,
-    },
-    onSignOut: fn(),
   },
 } satisfies Meta<typeof TopBar>
 
@@ -39,6 +33,9 @@ export const Desktop: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Collapse sidebar' }))
     await userEvent.click(canvas.getByRole('button', { name: 'Add canvas' }))
+    await userEvent.click(
+      canvas.getByRole('button', { name: /^New$/ }),
+    )
     await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
     await expect(args.onToggleSidebar).toHaveBeenCalledOnce()
     await expect(args.onNewCanvas).toHaveBeenCalledOnce()
@@ -64,10 +61,10 @@ export const ActiveTools: Story = {
 
 export const NoCanvas: Story = {
   args: { canvas: undefined },
-  play: async ({ canvas }) => {
-    await expect(
-      canvas.getByRole('button', { name: 'Upload another canvas from YAML' }),
-    ).toBeInTheDocument()
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Add canvas' }))
+    await expect(canvas.getByRole('button', { name: 'Upload' }))
+      .toBeInTheDocument()
     await expect(canvas.queryByRole('heading')).not.toBeInTheDocument()
   },
 }

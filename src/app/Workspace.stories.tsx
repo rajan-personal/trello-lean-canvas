@@ -54,7 +54,8 @@ export const Empty: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(canvas.queryByRole('heading')).not.toBeInTheDocument()
-    await expect(canvas.getByRole('button', { name: 'Load sample data' }))
-      .toBeInTheDocument()
+    await expect(
+      canvas.getByRole('button', { name: 'Add canvas' }),
+    ).toBeInTheDocument()
   },
 }

@@ -16,6 +16,7 @@ test('starts with researched examples, creates, uploads, edits, switches, and ex
   await expect(page.getByText('Booking fees from travellers')).toBeVisible()
 
   await page.getByRole('button', { name: 'Add canvas' }).click()
+  await page.getByRole('button', { name: 'New', exact: true }).click()
   const createCanvasDialog = page.getByRole('dialog', {
     name: 'Create canvas',
   })

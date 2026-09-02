@@ -5,14 +5,14 @@ test('loads fresh sample data without removing custom canvases or creating dupli
   page,
 }) => {
   await page.goto('/')
-
   await page.getByRole('button', { name: 'Add canvas' }).click()
+  await page.getByRole('button', { name: 'New', exact: true }).click()
   await page.getByRole('textbox', { name: 'Canvas name' }).fill('My startup')
   await page.getByRole('button', { name: 'Create canvas' }).click()
   await expect(page.getByRole('heading', { name: 'My startup' })).toBeVisible()
 
-  const loadSamples = page.getByRole('button', { name: 'Load sample data' })
-  await loadSamples.click()
+  await page.getByRole('button', { name: 'Add canvas' }).click()
+  await page.getByRole('button', { name: 'Sample' }).click()
   await expect(
     page.getByRole('heading', { name: 'Airbnb — 2008' }),
   ).toBeVisible()
@@ -24,7 +24,8 @@ test('loads fresh sample data without removing custom canvases or creating dupli
     page.getByRole('button', { name: 'My startup', exact: true }),
   ).toBeVisible()
 
-  await loadSamples.click()
+  await page.getByRole('button', { name: 'Add canvas' }).click()
+  await page.getByRole('button', { name: 'Sample' }).click()
   await expect(
     page.getByRole('navigation', { name: 'Lean canvases' }).getByRole('button'),
   ).toHaveCount(5)

@@ -20,7 +20,13 @@ const meta = {
     activeId: storyCanvas.id,
     onSelect: fn(),
     onMove: fn(),
-    onLoadSamples: fn(),
+    user: {
+      uid: 'storybook-user',
+      displayName: 'Storybook User',
+      email: 'storybook@example.com',
+      photoURL: null,
+    },
+    onSignOut: fn(),
     open: false,
     collapsed: false,
     onClose: fn(),
@@ -35,8 +41,10 @@ export const Desktop: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Team alignment' }))
     await expect(args.onSelect).toHaveBeenCalledWith(storyCanvas.id)
     await expect(args.onClose).toHaveBeenCalledOnce()
-    await userEvent.click(canvas.getByRole('button', { name: 'Load sample data' }))
-    await expect(args.onLoadSamples).toHaveBeenCalledOnce()
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Sign out storybook@example.com' }),
+    )
+    await expect(args.onSignOut).toHaveBeenCalledOnce()
   },
 }
 

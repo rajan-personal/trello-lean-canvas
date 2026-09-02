@@ -21,7 +21,6 @@ const meta = {
     onFavorite: fn(),
     onToggleNotepad: fn(),
     onDelete: fn(),
-    onImport: fn(),
     onNotify: fn(),
   },
 } satisfies Meta<typeof CanvasToolbarActions>

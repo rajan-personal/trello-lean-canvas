@@ -43,6 +43,7 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
         onNewCanvas={() =>
           setDialog({ heading: 'Create canvas', submitLabel: 'Create canvas', value: '' })
         }
+        onLoadSamples={commands.loadSampleData}
         onRename={commands.renameCanvas}
         notepadOpen={notepadOpen}
         onToggleNotepad={() => setNotepadOpen((value) => !value)}
@@ -55,8 +56,6 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
         onDelete={commands.deleteCanvas}
         onImport={commands.importYaml}
         onNotify={notify}
-        user={user}
-        onSignOut={onSignOut}
       />
       <div className="workspace-layout flex h-[calc(100dvh-48px)] min-h-[592px]">
         <Sidebar
@@ -64,7 +63,8 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
           activeId={state.activeCanvas?.id ?? null}
           onSelect={commands.selectCanvas}
           onMove={commands.moveCanvas}
-          onLoadSamples={commands.loadSampleData}
+          user={user}
+          onSignOut={onSignOut}
           open={sidebarOpen}
           collapsed={sidebarCollapsed}
           onClose={() => setSidebarOpen(false)}

@@ -12,17 +12,13 @@ export const Default: AppStory = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     await expect(canvas.queryAllByRole('heading')).toHaveLength(0)
-    await userEvent.click(
-      canvas.getByRole('button', { name: 'Load sample data' }),
-    )
+    await userEvent.click(canvas.getByRole('button', { name: 'Add canvas' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Sample' }))
     await expect(
       await canvas.findByRole('heading', { name: 'Airbnb — 2008' }),
     ).toBeInTheDocument()
     await expect(
       canvas.getByText('Booking fees from travellers'),
-    ).toBeInTheDocument()
-    await expect(
-      canvas.getByRole('button', { name: 'Load sample data' }),
     ).toBeInTheDocument()
     await expect(
       canvas.getByRole('button', { name: 'Add canvas' }),

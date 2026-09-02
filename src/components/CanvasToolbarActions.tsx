@@ -1,9 +1,7 @@
-import type { ChangeEvent } from 'react'
 import { Download, NotebookPen, Star, Trash2 } from 'lucide-react'
 import type { LeanCanvas } from '../data/types'
 import { downloadYaml } from '../data/download'
 import { ToolbarIconButton } from './ToolbarIconButton'
-import { UploadCanvasButton } from './UploadCanvasButton'
 
 interface Props {
   canvas: LeanCanvas
@@ -11,7 +9,6 @@ interface Props {
   onFavorite: () => void
   onToggleNotepad: () => void
   onDelete: () => void
-  onImport: (event: ChangeEvent<HTMLInputElement>) => void
   onNotify: (text: string) => void
 }
 
@@ -21,7 +18,6 @@ export function CanvasToolbarActions({
   onFavorite,
   onToggleNotepad,
   onDelete,
-  onImport,
   onNotify,
 }: Props) {
   return (
@@ -54,7 +50,6 @@ export function CanvasToolbarActions({
       >
         <Download size={17} />
       </ToolbarIconButton>
-      <UploadCanvasButton onImport={onImport} />
       <ToolbarIconButton label="Delete board" onClick={onDelete}>
         <Trash2 size={17} />
       </ToolbarIconButton>

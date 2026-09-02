@@ -1,12 +1,10 @@
 import type { ChangeEvent } from 'react'
-import { Menu, Plus } from 'lucide-react'
-import type { AppUser } from '../auth/auth-context'
+import { Menu } from 'lucide-react'
 import type { LeanCanvas } from '../data/types'
-import { AccountButton } from './AccountButton'
 import { BoardTitle } from './BoardTitle'
+import { CanvasAddMenu } from './CanvasAddMenu'
 import { CanvasToolbarActions } from './CanvasToolbarActions'
-import { UploadCanvasButton } from './UploadCanvasButton'
-import { brandActionButtonClass, toolbarButtonClass } from './workspace-classes'
+import { toolbarButtonClass } from './workspace-classes'
 
 interface Props {
   canvas?: LeanCanvas
@@ -15,6 +13,7 @@ interface Props {
   onToggleSidebar: () => void
   onOpenSidebar: () => void
   onNewCanvas: () => void
+  onLoadSamples: () => void
   onRename: (name: string) => void
   notepadOpen: boolean
   onFavorite: () => void
@@ -22,8 +21,6 @@ interface Props {
   onDelete: () => void
   onImport: (event: ChangeEvent<HTMLInputElement>) => void
   onNotify: (text: string) => void
-  user: AppUser
-  onSignOut: () => void
 }
 
 export function TopBar(props: Props) {
@@ -51,15 +48,11 @@ export function TopBar(props: Props) {
         >
           Lean
         </div>
-        <button
-          type="button"
-          className={`${brandActionButtonClass} new-canvas-button ms-auto`}
-          onClick={props.onNewCanvas}
-          aria-label="Add canvas"
-          title="New canvas"
-        >
-          <Plus size={20} />
-        </button>
+        <CanvasAddMenu
+          onNew={props.onNewCanvas}
+          onImport={props.onImport}
+          onLoadSamples={props.onLoadSamples}
+        />
       </div>
       <div className="board-toolbar flex h-full min-w-0 flex-1 items-center border-s border-white/14 px-3 text-white max-[760px]:px-1.5">
         <button
@@ -79,20 +72,16 @@ export function TopBar(props: Props) {
           />
         )}
         <span className="toolbar-spacer flex-1" />
-        {canvas ? (
+        {canvas && (
           <CanvasToolbarActions
             canvas={canvas}
             notepadOpen={props.notepadOpen}
             onFavorite={props.onFavorite}
             onToggleNotepad={props.onToggleNotepad}
             onDelete={props.onDelete}
-            onImport={props.onImport}
             onNotify={props.onNotify}
           />
-        ) : (
-          <UploadCanvasButton onImport={props.onImport} />
         )}
-        <AccountButton user={props.user} onSignOut={props.onSignOut} />
       </div>
     </header>
   )

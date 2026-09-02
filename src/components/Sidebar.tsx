@@ -1,6 +1,8 @@
 import { useState, type DragEvent } from 'react'
-import { Database, X } from 'lucide-react'
+import { X } from 'lucide-react'
+import type { AppUser } from '../auth/auth-context'
 import type { LeanCanvas } from '../data/types'
+import { AccountButton } from './AccountButton'
 import { brandActionButtonClass } from './workspace-classes'
 import { SidebarCanvasItem } from './SidebarCanvasItem'
 import { getCanvasDropEdge, type DropTarget } from './sidebar-drag'
@@ -9,7 +11,8 @@ interface Props {
   activeId: string | null
   onSelect: (id: string) => void
   onMove: (id: string, index: number) => void
-  onLoadSamples: () => void
+  user: AppUser
+  onSignOut: () => void
   open: boolean
   collapsed: boolean
   onClose: () => void
@@ -74,18 +77,8 @@ export function Sidebar(p: Props) {
             />
           ))}
         </nav>
-        <div className="sidebar-footer mt-auto border-t border-white/14 pt-2.5">
-          <button
-            type="button"
-            className="load-samples-button flex min-h-[38px] w-full items-center gap-2.5 rounded-md border-0 bg-transparent px-2.5 py-2 text-left text-sm leading-5 font-medium text-white/90 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
-            onClick={() => {
-              p.onLoadSamples()
-              p.onClose()
-            }}
-          >
-            <Database size={17} aria-hidden="true" />
-            <span>Load sample data</span>
-          </button>
+        <div className="sidebar-footer mt-auto border-t border-white/14 pt-2">
+          <AccountButton user={p.user} onSignOut={p.onSignOut} />
         </div>
       </aside>
     </>

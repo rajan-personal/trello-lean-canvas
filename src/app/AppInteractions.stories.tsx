@@ -42,6 +42,9 @@ export const CreateCanvasDialog: AppStory = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     await userEvent.click(canvas.getByRole('button', { name: 'Add canvas' }))
+    await userEvent.click(
+      canvas.getByRole('button', { name: /^New$/ }),
+    )
     const dialog = canvas.getByRole('dialog', { name: 'Create canvas' })
     await expect(dialog).toBeInTheDocument()
     await expect(
