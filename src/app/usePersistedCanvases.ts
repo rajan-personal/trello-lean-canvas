@@ -41,6 +41,7 @@ export function usePersistedCanvases(uid: string, persistence: 'firestore' | 'lo
             base.current = remote
             current.current = remote.canvases
             setCanvasState(remote.canvases)
+            setError(null)
           } else {
             const reconciled = reconcileRemote(base.current, current.current, remote)
             base.current = reconciled.value
