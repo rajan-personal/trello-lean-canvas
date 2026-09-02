@@ -2,11 +2,18 @@
 import { useEffect, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import App from './App'
+import type { AppUser } from '../auth/auth-context'
 import { loadExampleCanvases } from '../data/examples'
 import { sectionTemplate } from '../data/sections'
 import type { LeanCanvas } from '../data/types'
 
 const STORAGE_KEY = 'lean-canvas:v2'
+const previewUser: AppUser = {
+  uid: 'storybook-user',
+  displayName: 'Storybook User',
+  email: 'storybook@example.com',
+  photoURL: null,
+}
 export const blankCanvas: LeanCanvas = {
   id: 'storybook-blank',
   name: 'Blank canvas',
@@ -41,7 +48,7 @@ export function SeededApp({
       setReady(true)
     })
   }, [reordered, samples])
-  return ready ? <App /> : null
+  return ready ? <App previewUser={previewUser} /> : null
 }
 
 export const appMeta = {
@@ -53,7 +60,7 @@ export const appMeta = {
     docs: {
       description: {
         component:
-          'The complete Trello-style workspace with independent Lean Canvases and local persistence.',
+          'The authenticated Trello-style workspace with independent Lean Canvases.',
       },
     },
   },

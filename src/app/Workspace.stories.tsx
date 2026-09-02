@@ -6,13 +6,21 @@ import { storyCanvas } from '../components/component-story-fixtures'
 import { Workspace } from './Workspace'
 
 const STORAGE_KEY = 'lean-canvas:v2'
+const user = {
+  uid: 'storybook-user',
+  displayName: 'Storybook User',
+  email: 'storybook@example.com',
+  photoURL: null,
+}
 
 function SeededWorkspace({ canvases }: { canvases: LeanCanvas[] }) {
   const [ready] = useState(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(canvases))
     return true
   })
-  return ready ? <Workspace /> : null
+  return ready ? (
+    <Workspace user={user} onSignOut={() => {}} persistence="local" />
+  ) : null
 }
 
 const meta = {
@@ -20,6 +28,7 @@ const meta = {
   component: Workspace,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
+  args: { user, onSignOut: () => {}, persistence: 'local' },
 } satisfies Meta<typeof Workspace>
 
 export default meta

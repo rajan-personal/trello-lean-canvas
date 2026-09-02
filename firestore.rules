@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/workspaces/{workspaceId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && workspaceId == 'default'
+        && request.resource.data.keys().hasOnly(['canvases', 'updatedAt'])
+        && request.resource.data.canvases is list;
+      allow delete: if request.auth != null
+        && request.auth.uid == userId
+        && workspaceId == 'default';
+    }
+  }
+}

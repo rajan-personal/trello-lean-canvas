@@ -1,6 +1,8 @@
 import type { ChangeEvent } from 'react'
 import { Menu, Plus } from 'lucide-react'
+import type { AppUser } from '../auth/auth-context'
 import type { LeanCanvas } from '../data/types'
+import { AccountButton } from './AccountButton'
 import { BoardTitle } from './BoardTitle'
 import { CanvasToolbarActions } from './CanvasToolbarActions'
 import { UploadCanvasButton } from './UploadCanvasButton'
@@ -20,6 +22,8 @@ interface Props {
   onDelete: () => void
   onImport: (event: ChangeEvent<HTMLInputElement>) => void
   onNotify: (text: string) => void
+  user: AppUser
+  onSignOut: () => void
 }
 
 export function TopBar(props: Props) {
@@ -88,6 +92,7 @@ export function TopBar(props: Props) {
         ) : (
           <UploadCanvasButton onImport={props.onImport} />
         )}
+        <AccountButton user={props.user} onSignOut={props.onSignOut} />
       </div>
     </header>
   )

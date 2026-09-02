@@ -7,7 +7,8 @@ export default defineConfig({
     viewport: { width: 1440, height: 900 },
   },
   webServer: {
-    command: 'npm run preview -- --host 127.0.0.1',
+    command:
+      'npm run build -- --mode test && npm run preview -- --host 127.0.0.1',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: true,
   },

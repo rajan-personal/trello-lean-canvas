@@ -22,6 +22,13 @@ const meta = {
     onDelete: fn(),
     onImport: fn(),
     onNotify: fn(),
+    user: {
+      uid: 'storybook-user',
+      displayName: 'Storybook User',
+      email: 'storybook@example.com',
+      photoURL: null,
+    },
+    onSignOut: fn(),
   },
 } satisfies Meta<typeof TopBar>
 

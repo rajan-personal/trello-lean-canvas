@@ -4,6 +4,10 @@ storybook-static
 .storybook/manager-tailwind.css
 playwright-report
 test-results
+.firebase
+firebase-debug.log*
+.env.local
+.env.*.local
 .pi-subagents
 build-storybook.log
 chromatic.log

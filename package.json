@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "deploy": "vite build --base=/ && gh-pages -d dist",
+    "deploy:firebase": "npx -y firebase-tools@15.28.2 deploy --only auth,firestore",
+    "deploy:all": "npm run deploy:firebase && npm run deploy",
     "test:e2e": "playwright test",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -15,6 +17,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "firebase": "^12.18.0",
     "js-yaml": "^4.1.0",
     "lucide-react": "^1.37.0",
     "react": "^19.2.8",
