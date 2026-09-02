@@ -1,49 +1,59 @@
 import {
-  doc,
-  getFirestore,
-  onSnapshot,
-  serverTimestamp,
-  setDoc,
-  type Unsubscribe,
+  collection, doc, getFirestore, onSnapshot, type Unsubscribe,
 } from 'firebase/firestore'
 import { firebaseApp } from '../firebase'
+import { parseResult, workspaceSchema } from './canvas-schema'
+import { initializeWorkspace } from './firestore-migration'
+import { canvasesPath, decodeCanvas, workspacePath, type WorkspaceValue } from './firestore-model'
+import { saveCanvasDiff } from './firestore-writes'
 import type { LeanCanvas } from './types'
 
 const db = getFirestore(firebaseApp)
-
-interface WorkspaceDocument {
-  canvases?: unknown
+export async function prepareWorkspace(uid: string, local: LeanCanvas[]) {
+  return initializeWorkspace(db, uid, local)
 }
-
-const workspaceRef = (uid: string) =>
-  doc(db, 'users', uid, 'workspaces', 'default')
-
-function normalizeCanvases(value: unknown): LeanCanvas[] {
-  if (!Array.isArray(value)) return []
-  return (value as LeanCanvas[]).map((canvas) => ({
-    ...canvas,
-    notes: typeof canvas.notes === 'string' ? canvas.notes : '',
-  }))
-}
-
 export function subscribeToWorkspace(
-  uid: string,
-  onValue: (canvases: LeanCanvas[], exists: boolean) => void,
+  uid: string, onValue: (value: WorkspaceValue) => void,
   onError: (error: Error) => void,
 ): Unsubscribe {
-  return onSnapshot(
-    workspaceRef(uid),
-    (snapshot) => {
-      const data = snapshot.data() as WorkspaceDocument | undefined
-      onValue(normalizeCanvases(data?.canvases), snapshot.exists())
-    },
-    onError,
-  )
+  let workspace: ReturnType<typeof workspaceSchema.parse> | undefined
+  const children = new Map<string, ReturnType<typeof decodeCanvas>>()
+  let parentReady = false
+  let childrenReady = false
+  const publish = () => {
+    if (!parentReady || !childrenReady || !workspace) return
+    try {
+      const ordered = workspace.canvasOrder.map((id) => {
+        const item = children.get(id)
+        if (!item) throw new Error(`Canvas ${id} is missing from the workspace.`)
+        return item
+      })
+      onValue({ canvases: ordered.map(({ canvas }) => canvas),
+        revisions: Object.fromEntries(ordered.map(({ canvas, revision }) => [canvas.id, revision])),
+        orderRevision: workspace.orderRevision })
+    } catch (error) { onError(error instanceof Error ? error : new Error('Invalid workspace.')) }
+  }
+  const stopParent = onSnapshot(doc(db, workspacePath(uid)), (snapshot) => {
+    const parsed = parseResult(workspaceSchema, snapshot.data())
+    parentReady = true
+    if (!parsed.ok) { onError(new Error(`Invalid workspace: ${parsed.error}`)); return }
+    workspace = parsed.value
+    publish()
+  }, onError)
+  const stopChildren = onSnapshot(collection(db, canvasesPath(uid)), (snapshot) => {
+    const next = new Map<string, ReturnType<typeof decodeCanvas>>()
+    try {
+      snapshot.docs.forEach((item) => next.set(item.id, decodeCanvas(item.id, item.data())))
+    } catch (error) { onError(error instanceof Error ? error : new Error('Invalid canvas.')); return }
+    children.clear()
+    next.forEach((value, key) => children.set(key, value))
+    childrenReady = true
+    publish()
+  }, onError)
+  return () => { stopParent(); stopChildren() }
 }
-
-export async function saveWorkspace(
-  uid: string,
-  canvases: LeanCanvas[],
-): Promise<void> {
-  await setDoc(workspaceRef(uid), { canvases, updatedAt: serverTimestamp() })
+export function saveWorkspaceDiff(
+  uid: string, previous: WorkspaceValue, next: LeanCanvas[],
+): Promise<WorkspaceValue> {
+  return saveCanvasDiff(db, uid, previous, next)
 }

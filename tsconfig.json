@@ -21,8 +21,12 @@
     "src",
     ".storybook",
     "tests",
+    "unit",
+    "emulator",
     "eslint.config.ts",
     "playwright.config.ts",
-    "vite.config.ts"
+    "vite.config.ts",
+    "vitest.config.ts",
+    "vitest.emulator.config.ts"
   ]
 }

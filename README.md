@@ -23,7 +23,9 @@ npm run dev
 
 Then open `http://127.0.0.1:5173`. The checked-in Firebase web configuration targets `trello-lean-canvas-7kvrv`; it contains public client identifiers only. You can override it with `VITE_FIREBASE_*` variables in `.env.local`.
 
-Google is the only enabled sign-in provider. Firestore stores each workspace at `users/{uid}/workspaces/default`. On the first successful sign-in, existing `lean-canvas:v2` browser data is moved into an empty cloud workspace and removed locally only after the cloud write succeeds.
+Google is the only enabled sign-in provider. Firestore stores ordering metadata at `users/{uid}/workspaces/default` and each canvas independently under its `canvases/{canvasId}` subcollection. Runtime Zod schemas reject malformed local or cloud data before it reaches application state.
+
+On first sign-in after this schema upgrade, the app idempotently copies and verifies canvases from the former workspace-array document before replacing it with the metadata document. Existing `lean-canvas:v2` browser data follows the same verified path for an empty cloud workspace. Local migration and recovery copies remain until cloud persistence succeeds. Concurrent edits to different canvases are isolated; simultaneous edits to the same canvas remain last-writer-wins.
 
 ## Firebase backend and deployment
 
@@ -40,7 +42,9 @@ npm run deploy
 npm run deploy:all
 ```
 
-The Firebase CLI uses the project in [`.firebaserc`](.firebaserc). Security rules in [`firestore.rules`](firestore.rules) restrict every workspace to its matching authenticated UID. Keep `localhost`, `rajan-personal.github.io`, and `lean.addorimprove.com` in Firebase Authentication's authorized domains.
+The Firebase CLI uses the project in [`.firebaserc`](.firebaserc). Security rules in [`firestore.rules`](firestore.rules) restrict every workspace to its matching authenticated UID, validate top-level document types and canonical section IDs, and couple topology changes to the workspace order. Full nested card validation remains in the Zod runtime boundary because Firestore Rules cannot iterate arbitrary list elements efficiently. Keep `localhost`, `rajan-personal.github.io`, and `lean.addorimprove.com` in Firebase Authentication's authorized domains.
+
+During rollout, migrated metadata retains a compatibility `canvases` snapshot so already-open legacy clients do not suddenly render an empty workspace. It is not updated by the new client and legacy writes are rejected after migration. Remove this optional field and the transitional legacy-create/update rule in a later cleanup release after old browser sessions have expired.
 
 ## Component workbench and UI review
 
@@ -55,12 +59,14 @@ Open `http://127.0.0.1:6006` to browse components and run their interaction and 
 ```bash
 npm run lint
 npm run typecheck
+npm test
+npm run test:firestore
 npm run build
 npm run test:e2e
 npm run build-storybook
 ```
 
-Playwright builds in Vite's `test` mode and uses the test-only local persistence seam from [`.env.test`](.env.test); production builds always use Firebase Authentication and Firestore.
+The Firestore test command starts the local emulator and requires Java 21 or newer; on macOS the runner selects the newest installed JDK automatically. It covers owner isolation, malformed writes, per-canvas documents, and repeatable legacy migration. Playwright builds in Vite's `test` mode and uses the test-only local persistence seam from [`.env.test`](.env.test); production builds always use Firebase Authentication and Firestore.
 
 ## YAML format
 

@@ -1,16 +1,65 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function owner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    function validWorkspace(data) {
+      return data.keys().hasOnly(['schemaVersion', 'canvasOrder', 'orderRevision',
+          'updatedAt', 'canvases'])
+        && data.schemaVersion == 2 && data.canvasOrder is list
+        && data.canvasOrder.size() <= 5000 && data.orderRevision is int
+        && data.orderRevision > 0 && data.updatedAt == request.time
+        && (!data.keys().hasAny(['canvases']) || data.canvases is list);
+    }
+    function validLegacyWorkspace(data) {
+      return data.keys().hasOnly(['canvases', 'updatedAt'])
+        && data.canvases is list && data.updatedAt == request.time;
+    }
+    function validSections(values) {
+      return values is list && values.size() == 12
+        && values[0].id == 'problem' && values[1].id == 'alternatives'
+        && values[2].id == 'solution' && values[3].id == 'metrics'
+        && values[4].id == 'value' && values[5].id == 'concept'
+        && values[6].id == 'advantage' && values[7].id == 'channels'
+        && values[8].id == 'segments' && values[9].id == 'adopters'
+        && values[10].id == 'cost' && values[11].id == 'revenue';
+    }
+    function validCanvas(data) {
+      return data.keys().hasOnly(['schemaVersion', 'name', 'title', 'favorite', 'notes',
+          'sections', 'revision', 'updatedAt', 'legacyId'])
+        && data.schemaVersion == 1 && data.name is string && data.name.size() <= 500
+        && data.title is string && data.title.size() <= 500
+        && data.favorite is bool && data.notes is string && data.notes.size() <= 100000
+        && validSections(data.sections) && data.revision is int && data.revision > 0
+        && data.updatedAt == request.time
+        && (!data.keys().hasAny(['legacyId']) || data.legacyId is string);
+    }
     match /users/{userId}/workspaces/{workspaceId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow create, update: if request.auth != null
-        && request.auth.uid == userId
-        && workspaceId == 'default'
-        && request.resource.data.keys().hasOnly(['canvases', 'updatedAt'])
-        && request.resource.data.canvases is list;
-      allow delete: if request.auth != null
-        && request.auth.uid == userId
-        && workspaceId == 'default';
+      allow read: if owner(userId) && workspaceId == 'default';
+      allow create: if owner(userId) && workspaceId == 'default' && (
+        (validWorkspace(request.resource.data) && request.resource.data.orderRevision == 1)
+        || validLegacyWorkspace(request.resource.data));
+      allow update: if owner(userId) && workspaceId == 'default' && (
+        (validWorkspace(request.resource.data) &&
+          ((resource.data.schemaVersion == 2 && request.resource.data.orderRevision == resource.data.orderRevision + 1)
+            || (!resource.data.keys().hasAny(['schemaVersion']) && request.resource.data.orderRevision == 1)))
+        || (!resource.data.keys().hasAny(['schemaVersion'])
+          && validLegacyWorkspace(request.resource.data)));
+      allow delete: if false;
+      match /canvases/{canvasId} {
+        allow read: if owner(userId) && workspaceId == 'default';
+        allow create: if owner(userId) && workspaceId == 'default'
+          && validCanvas(request.resource.data) && request.resource.data.revision == 1
+          && ((!exists(/databases/$(database)/documents/users/$(userId)/workspaces/default))
+            || !get(/databases/$(database)/documents/users/$(userId)/workspaces/default).data.keys().hasAny(['schemaVersion'])
+            || canvasId in getAfter(/databases/$(database)/documents/users/$(userId)/workspaces/default).data.canvasOrder);
+        allow update: if owner(userId) && workspaceId == 'default'
+          && validCanvas(request.resource.data)
+          && request.resource.data.revision == resource.data.revision + 1;
+        allow delete: if owner(userId) && workspaceId == 'default'
+          && !(canvasId in getAfter(/databases/$(database)/documents/users/$(userId)/workspaces/default).data.canvasOrder);
+      }
     }
   }
 }

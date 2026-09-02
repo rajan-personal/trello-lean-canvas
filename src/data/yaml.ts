@@ -86,7 +86,7 @@ export function yamlToCanvas(
 
   return {
     ...fallbackCanvas,
-    id: String(input.id ?? fallbackCanvas.id),
+    id: fallbackCanvas.id,
     name: String(input.name ?? fallbackCanvas.name),
     title: String(input.title ?? fallbackCanvas.title),
     favorite: Boolean(input.favorite ?? fallbackCanvas.favorite),

@@ -12,8 +12,9 @@ export async function loadExampleCanvases(): Promise<LeanCanvas[]> {
     left.localeCompare(right),
   )
   return Promise.all(
-    files.map(async ([, load]) =>
-      yamlToCanvas(await load(), createBlankCanvas('Sample canvas')),
-    ),
+    files.map(async ([path, load]) => ({
+      ...yamlToCanvas(await load(), createBlankCanvas('Sample canvas')),
+      id: `sample-${path.split('/').pop()?.replace(/\.ya?ml$/i, '')}`,
+    })),
   )
 }
