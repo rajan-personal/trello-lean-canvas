@@ -86,13 +86,14 @@ export const NoCanvas: Story = {
 export const Mobile: Story = {
   args: { sidebarOpen: true },
   globals: { viewport: { value: 'mobile1', isRotated: false } },
-  play: async ({ canvas, canvasElement }) => {
-    await expect(canvas.getByRole('button', { name: 'Open sidebar' }))
-      .toBeVisible()
+  play: async ({ canvas }) => {
+    const menu = canvas.getByRole('button', { name: 'Open sidebar' })
+    const add = canvas.getByRole('button', { name: 'Add canvas' })
+    await expect(menu).toBeVisible()
+    await expect(menu.getBoundingClientRect().right).toBeLessThanOrEqual(
+      add.getBoundingClientRect().left,
+    )
     await expect(canvas.queryByText('Lean', { exact: true }))
       .not.toBeInTheDocument()
-    await expect(
-      canvasElement.querySelector('.topbar-brand')?.getBoundingClientRect().width,
-    ).toBe(44)
   },
 }

@@ -29,6 +29,15 @@ export function TopBar(props: Props) {
   return (
     <header className="topbar relative z-20 flex h-12 items-center bg-[#0b4a6f] text-white shadow-[0_1px_0_rgba(9,30,66,0.25)]">
       <button
+        className={`mobile-sidebar-button ms-2 me-[7px] hidden ${toolbarButtonClass} max-[760px]:grid`}
+        onClick={props.onOpenSidebar}
+        aria-label="Open sidebar"
+        aria-expanded={props.sidebarOpen}
+        aria-controls="canvas-sidebar"
+      >
+        <Menu size={19} />
+      </button>
+      <button
         className={`desktop-sidebar-button ms-2 me-[7px] ${toolbarButtonClass} max-[760px]:hidden`}
         onClick={props.onToggleSidebar}
         aria-label={
@@ -47,15 +56,6 @@ export function TopBar(props: Props) {
         />
       </div>
       <div className="board-toolbar flex h-full min-w-0 flex-1 items-center border-s border-white/14 px-3 text-white max-[760px]:px-1.5">
-        <button
-          className={`mobile-sidebar-button me-[7px] hidden max-[760px]:grid ${toolbarButtonClass}`}
-          onClick={props.onOpenSidebar}
-          aria-label="Open sidebar"
-          aria-expanded={props.sidebarOpen}
-          aria-controls="canvas-sidebar"
-        >
-          <Menu size={19} />
-        </button>
         {canvas && (
           <BoardTitle
             key={canvas.id}

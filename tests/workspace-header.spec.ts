@@ -7,8 +7,14 @@ test('keeps the mobile header compact without a Lean wordmark', async ({ page })
 
   await expect(page.getByText('Lean', { exact: true })).toHaveCount(0)
   await expect(page.locator('.topbar-brand')).toHaveCSS('width', '44px')
-  await expect(page.getByRole('button', { name: 'Open sidebar' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Add canvas' })).toBeVisible()
+  const menu = page.getByRole('button', { name: 'Open sidebar' })
+  const add = page.getByRole('button', { name: 'Add canvas' })
+  await expect(menu).toBeVisible()
+  await expect(add).toBeVisible()
+  const [menuBox, addBox] = await Promise.all([menu.boundingBox(), add.boundingBox()])
+  expect(menuBox).not.toBeNull()
+  expect(addBox).not.toBeNull()
+  expect(menuBox!.x + menuBox!.width).toBeLessThanOrEqual(addBox!.x)
 })
 
 test('renames the canvas inline from the board header', async ({ page }) => {
