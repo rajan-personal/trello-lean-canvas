@@ -3,9 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fireEvent, fn, waitFor } from 'storybook/test'
 import { NotepadPanel } from './NotepadPanel'
 import { storyCanvas } from './component-story-fixtures'
-
 type Props = ComponentProps<typeof NotepadPanel>
-
 function NotepadHarness(args: Props) {
   const [canvas, setCanvas] = useState(args.canvas)
   return (
@@ -87,10 +85,15 @@ export const Mobile: Story = {
   globals: { viewport: { value: 'mobile1', isRotated: false } },
   play: async ({ canvas }) => {
     const panel = canvas.getByRole('complementary', { name: 'Notepad' })
+    const bounds = panel.getBoundingClientRect()
     await expect(panel).toBeVisible()
     await expect(panel).toHaveStyle({ position: 'fixed', top: '48px' })
-    await expect(
-      canvas.getByRole('textbox', { name: 'Canvas notes' }),
-    ).toBeVisible()
+    await expect([bounds.left, bounds.right, bounds.bottom]).toEqual([
+      0, window.innerWidth, window.innerHeight,
+    ])
+    await expect(canvas.getByRole('separator', { name: 'Resize notepad' }))
+      .not.toBeVisible()
+    await expect(canvas.getByRole('textbox', { name: 'Canvas notes' }))
+      .toBeVisible()
   },
 }

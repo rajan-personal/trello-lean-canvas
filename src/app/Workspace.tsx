@@ -32,7 +32,7 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
   if (state.loading) return <AppStatus />
   if (state.error && !state.canvases.length) return <AppStatus message={state.error} onSignOut={onSignOut} />
   return (
-    <div className="app-shell h-dvh min-h-[640px] overflow-hidden bg-linear-[130deg,#0c66e4_0%,#338bfa_100%]">
+    <div className="app-shell h-dvh min-h-[640px] overflow-hidden bg-linear-[130deg,#0c66e4_0%,#338bfa_100%] max-[760px]:min-h-0">
       <TopBar
         canvas={state.activeCanvas}
         sidebarOpen={panels.sidebarOpen}
@@ -56,7 +56,7 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
         onImport={commands.importYaml}
         onNotify={notify}
       />
-      <div className="workspace-layout flex h-[calc(100dvh-48px)] min-h-[592px]">
+      <div className="workspace-layout flex h-[calc(100dvh-48px)] min-h-[592px] max-[760px]:min-h-0">
         <Sidebar
           canvases={state.canvases}
           activeId={state.activeCanvas?.id ?? null}

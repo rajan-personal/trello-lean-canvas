@@ -64,3 +64,26 @@ test('opens, expands, and persists the canvas notepad', async ({ page }) => {
     page.getByRole('textbox', { name: 'Canvas notes' }),
   ).toHaveValue('Ask five customers about their current workflow.')
 })
+
+test('uses the full workspace for notes on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 })
+  await openSampleCanvas(page)
+
+  await page.getByRole('button', { name: 'Notepad', exact: true }).click()
+
+  const panel = page.getByRole('complementary', { name: 'Notepad' })
+  await expect(panel).toBeVisible()
+  await expect(page.getByRole('separator', { name: 'Resize notepad' }))
+    .not.toBeVisible()
+  await expect
+    .poll(() => panel.evaluate((element) => {
+      const bounds = element.getBoundingClientRect()
+      return {
+        left: Math.round(bounds.left),
+        right: Math.round(bounds.right),
+        top: Math.round(bounds.top),
+        bottom: Math.round(bounds.bottom),
+      }
+    }))
+    .toEqual({ left: 0, right: 375, top: 48, bottom: 667 })
+})

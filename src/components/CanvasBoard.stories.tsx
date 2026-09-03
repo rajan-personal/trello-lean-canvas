@@ -58,3 +58,18 @@ export const ComposingInProblem: Story = {
     )
   },
 }
+
+export const MobileScrollable: Story = {
+  globals: { viewport: { value: 'mobile1', isRotated: false } },
+  play: async ({ canvasElement }) => {
+    const board = canvasElement.querySelector('.board-scroll')
+    const grid = canvasElement.querySelector('.lean-grid')
+    if (!(board instanceof HTMLElement) || !(grid instanceof HTMLElement)) {
+      throw new Error('Mobile canvas layout is incomplete')
+    }
+    await expect(getComputedStyle(grid).display).toBe('grid')
+    await expect(grid.getBoundingClientRect().width).toBeGreaterThan(
+      board.clientWidth,
+    )
+  },
+}

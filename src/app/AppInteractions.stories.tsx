@@ -1,10 +1,5 @@
 import { expect, fireEvent, waitFor, within } from 'storybook/test'
-import {
-  appMeta,
-  blankCanvas,
-  SeededApp,
-  type AppStory,
-} from './App.story-support'
+import { appMeta, blankCanvas, SeededApp, type AppStory } from './App.story-support'
 const meta = { ...appMeta, title: 'Screens/LeanCanvasWorkspace' }
 export default meta
 export const MobileSidebar: AppStory = {
@@ -24,6 +19,11 @@ export const MobileSidebar: AppStory = {
       .toBeInTheDocument()
     const notes = await canvas.findByRole('textbox', { name: 'Canvas notes' })
     await waitFor(() => expect(notes).toBeVisible())
+    const notepadBounds = canvas.getByRole('complementary', { name: 'Notepad' })
+      .getBoundingClientRect()
+    await expect([notepadBounds.left, notepadBounds.right]).toEqual([
+      0, window.innerWidth,
+    ])
   },
 }
 export const CollapsedSidebar: AppStory = {

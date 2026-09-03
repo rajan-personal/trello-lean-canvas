@@ -46,7 +46,7 @@ export function NotepadPanel({ canvas, open, onChange }: Props) {
   return (
     <aside
       id="canvas-notepad"
-      className="notepad-panel relative z-30 h-full min-w-0 max-w-full flex-none overflow-hidden bg-[#0c66e4] shadow-[-2px_0_8px_rgba(9,30,66,0.18)] max-[900px]:fixed max-[900px]:top-12 max-[900px]:right-0 max-[900px]:bottom-0 max-[900px]:h-auto"
+      className={`notepad-panel relative z-30 h-full min-w-0 max-w-full flex-none overflow-hidden bg-[#0c66e4] shadow-[-2px_0_8px_rgba(9,30,66,0.18)] max-[900px]:fixed max-[900px]:inset-x-0 max-[900px]:top-12 max-[900px]:bottom-0 max-[900px]:h-auto max-[900px]:max-w-none max-[900px]:shadow-none ${open ? 'max-[900px]:!w-full' : ''}`}
       style={{ width: open ? width : 0 }}
       data-open={open}
       data-resizing={resizing}
@@ -55,7 +55,7 @@ export function NotepadPanel({ canvas, open, onChange }: Props) {
       inert={!open}
     >
       <div
-        className="group absolute inset-y-0 start-0 z-10 w-2 -translate-x-1/2 cursor-col-resize touch-pan-y focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#0c66e4]"
+        className="group absolute inset-y-0 start-0 z-10 w-2 -translate-x-1/2 cursor-col-resize touch-pan-y focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#0c66e4] max-[900px]:hidden"
         role="separator"
         aria-label="Resize notepad"
         aria-orientation="vertical"
@@ -78,7 +78,7 @@ export function NotepadPanel({ canvas, open, onChange }: Props) {
       </div>
       <textarea
         ref={textareaRef}
-        className="absolute inset-2 h-auto w-auto resize-none rounded-lg border-2 border-[#0c66e4] bg-[#e4e7ec] p-3 text-sm leading-6 text-[#172b4d] shadow-[inset_0_1px_2px_rgba(9,30,66,0.08),0_0_1px_rgba(9,30,66,0.24)] outline-none placeholder:text-[#626f86] focus-visible:border-[#0055cc]"
+        className="absolute inset-2 h-auto w-auto resize-none rounded-lg border-2 border-[#0c66e4] bg-[#e4e7ec] p-3 text-sm leading-6 text-[#172b4d] shadow-[inset_0_1px_2px_rgba(9,30,66,0.08),0_0_1px_rgba(9,30,66,0.24)] outline-none placeholder:text-[#626f86] focus-visible:border-[#0055cc] max-[900px]:inset-0 max-[900px]:rounded-none max-[900px]:border-0"
         value={canvas.notes}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Write notes…"

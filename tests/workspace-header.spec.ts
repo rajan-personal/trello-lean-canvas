@@ -1,6 +1,16 @@
 import { expect, test } from '@playwright/test'
 import { openSampleCanvas } from './support/canvas-fixtures'
 
+test('keeps the mobile header compact without a Lean wordmark', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 })
+  await openSampleCanvas(page)
+
+  await expect(page.getByText('Lean', { exact: true })).toHaveCount(0)
+  await expect(page.locator('.topbar-brand')).toHaveCSS('width', '44px')
+  await expect(page.getByRole('button', { name: 'Open sidebar' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Add canvas' })).toBeVisible()
+})
+
 test('renames the canvas inline from the board header', async ({ page }) => {
   await page.setViewportSize({ width: 1424, height: 797 })
   await openSampleCanvas(page)

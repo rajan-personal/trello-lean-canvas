@@ -39,15 +39,7 @@ export function TopBar(props: Props) {
       >
         <Menu size={19} />
       </button>
-      <div
-        className={`topbar-brand flex h-full items-center gap-2 overflow-hidden px-3 transition-[flex-basis] duration-180 ease-out max-[760px]:gap-1.5 max-[760px]:px-2.5 ${props.sidebarCollapsed ? 'basis-[145px]' : 'basis-[201px] max-[760px]:basis-[132px]'}`}
-      >
-        <div
-          className="brand inline-flex items-center gap-2 text-xl font-bold tracking-[-0.45px]"
-          aria-label="Lean"
-        >
-          Lean
-        </div>
+      <div className="topbar-brand flex h-full w-11 flex-none items-center justify-center px-2">
         <CanvasAddMenu
           onNew={props.onNewCanvas}
           onImport={props.onImport}
