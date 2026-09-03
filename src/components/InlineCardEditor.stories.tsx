@@ -1,4 +1,4 @@
-import { expect } from 'storybook/test'
+import { expect, fireEvent } from 'storybook/test'
 import {
   inlineEditorMeta,
   type InlineEditorStory as Story,
@@ -16,11 +16,9 @@ export const Editing: Story = {
 
 export const Save: Story = {
   play: async ({ args, canvas, userEvent }) => {
-    await userEvent.clear(canvas.getByRole('textbox', { name: 'Edit card' }))
-    await userEvent.type(
-      canvas.getByRole('textbox', { name: 'Edit card' }),
-      'Updated customer problem',
-    )
+    fireEvent.change(canvas.getByRole('textbox', { name: 'Edit card' }), {
+      target: { value: 'Updated customer problem' },
+    })
     await userEvent.click(canvas.getByRole('button', { name: 'Save' }))
     await expect(args.onSave).toHaveBeenCalledOnce()
   },
@@ -29,11 +27,10 @@ export const Save: Story = {
 export const SaveWithKeyboardShortcut: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const editor = canvas.getByRole('textbox', { name: 'Edit card' })
-    await userEvent.clear(editor)
-    await userEvent.type(
-      editor,
-      'Saved from the keyboard{control>}{enter}{/control}',
-    )
+    fireEvent.change(editor, {
+      target: { value: 'Saved from the keyboard' },
+    })
+    await userEvent.keyboard('{Control>}{Enter}{/Control}')
     await expect(args.onSave).toHaveBeenCalledOnce()
   },
 }

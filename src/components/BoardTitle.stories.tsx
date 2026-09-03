@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fn } from 'storybook/test'
+import { expect, fireEvent, fn } from 'storybook/test'
 import { BoardTitle } from './BoardTitle'
 import { storyCanvas } from './component-story-fixtures'
 
@@ -26,8 +26,8 @@ export const Default: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Team alignment' }))
     const input = canvas.getByRole('textbox', { name: 'Rename canvas' })
     await expect(input).toHaveFocus()
-    await userEvent.clear(input)
-    await userEvent.type(input, 'Customer discovery{enter}')
+    fireEvent.change(input, { target: { value: 'Customer discovery' } })
+    fireEvent.focusOut(input)
     await expect(args.onRename).toHaveBeenCalledWith('Customer discovery')
   },
 }

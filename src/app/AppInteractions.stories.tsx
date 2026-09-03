@@ -1,4 +1,4 @@
-import { expect, waitFor, within } from 'storybook/test'
+import { expect, fireEvent, waitFor, within } from 'storybook/test'
 import {
   appMeta,
   blankCanvas,
@@ -7,17 +7,23 @@ import {
 } from './App.story-support'
 const meta = { ...appMeta, title: 'Screens/LeanCanvasWorkspace' }
 export default meta
-
 export const MobileSidebar: AppStory = {
   globals: { viewport: { value: 'mobile1', isRotated: false } },
+  render: () => <SeededApp canvases={[blankCanvas]} />,
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
-    const open = canvas.getByRole('button', { name: 'Open sidebar' })
+    const open = await canvas.findByRole('button', { name: 'Open sidebar' })
     await expect(open).toBeVisible()
     await userEvent.click(open)
     await expect(
       canvas.getByRole('navigation', { name: 'Lean canvases' }),
     ).toBeVisible()
+    await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
+    await expect(open).toHaveAttribute('aria-expanded', 'false')
+    await expect(canvasElement.querySelector('.sidebar-scrim')).not
+      .toBeInTheDocument()
+    const notes = await canvas.findByRole('textbox', { name: 'Canvas notes' })
+    await waitFor(() => expect(notes).toBeVisible())
   },
 }
 export const CollapsedSidebar: AppStory = {
@@ -25,7 +31,7 @@ export const CollapsedSidebar: AppStory = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Collapse sidebar' }),
+      await canvas.findByRole('button', { name: 'Collapse sidebar' }),
     )
     await expect(
       canvas.getByRole('button', { name: 'Expand sidebar' }),
@@ -41,11 +47,13 @@ export const CollapsedSidebar: AppStory = {
 export const CreateCanvasDialog: AppStory = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
-    await userEvent.click(canvas.getByRole('button', { name: 'Add canvas' }))
+    await userEvent.click(
+      await canvas.findByRole('button', { name: 'Add canvas' }),
+    )
     await userEvent.click(
       canvas.getByRole('button', { name: /^New$/ }),
     )
-    const dialog = canvas.getByRole('dialog', { name: 'Create canvas' })
+    const dialog = await canvas.findByRole('dialog', { name: 'Create canvas' })
     await expect(dialog).toBeInTheDocument()
     await expect(
       canvas.getByRole('textbox', { name: 'Canvas name' }),
@@ -62,16 +70,16 @@ export const AddCardDraftResume: AppStory = {
   render: () => <SeededApp canvases={[blankCanvas]} />,
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
+    await canvas.findByRole('heading', { name: 'Blank canvas' })
     const section = canvasElement.querySelector(
       '.canvas-column.problem .canvas-cell',
     )
     if (!section) throw new Error('Problem section is missing')
     const cell = within(section as HTMLElement)
     await userEvent.click(cell.getByRole('button', { name: '＋ Add a card' }))
-    await userEvent.type(
-      cell.getByRole('textbox', { name: 'New card' }),
-      'A draft worth keeping',
-    )
+    fireEvent.change(cell.getByRole('textbox', { name: 'New card' }), {
+      target: { value: 'A draft worth keeping' },
+    })
     await userEvent.click(cell.getByText('Problem'))
     await expect(
       cell.queryByRole('textbox', { name: 'New card' }),

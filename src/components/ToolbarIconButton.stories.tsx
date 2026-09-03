@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Star } from 'lucide-react'
+import { NotebookPen, Star } from 'lucide-react'
 import { expect, fn } from 'storybook/test'
 import { ToolbarIconButton } from './ToolbarIconButton'
 
@@ -9,8 +9,11 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'centered' },
   decorators: [
-    (Story) => (
-      <div className="rounded-md bg-[#0b4a6f] p-3 text-white"><Story /></div>
+    (Story, context) => (
+      <div className="rounded-md bg-[#0b4a6f] p-3 text-white">
+        <Story />
+        {context.args.controls && <div id={context.args.controls} hidden />}
+      </div>
     ),
   ],
   args: {
@@ -34,12 +37,30 @@ export const Default: Story = {
 export const ActivePressed: Story = {
   args: { active: true, pressed: true, title: 'Remove favorite' },
   play: async ({ canvas }) => {
-    await expect(
-      canvas.getByRole('button', { name: 'Favorite canvas' }),
-    ).toHaveAttribute('aria-pressed', 'true')
+    const button = canvas.getByRole('button', { name: 'Favorite canvas' })
+    await expect(button).toHaveAttribute('aria-pressed', 'true')
+    await expect(getComputedStyle(button).color).toBe('rgb(245, 205, 71)')
+    await expect(getComputedStyle(button).backgroundColor).toBe(
+      'rgba(0, 0, 0, 0)',
+    )
   },
 }
 
 export const ExpandedControl: Story = {
-  args: { expanded: true, controls: 'controlled-panel' },
+  args: {
+    label: 'Notepad',
+    active: true,
+    expanded: true,
+    controls: 'controlled-panel',
+    children: <NotebookPen size={17} />,
+  },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole('button', { name: 'Notepad' })
+    await expect(button).toHaveAttribute('aria-expanded', 'true')
+    await expect(button).toHaveAttribute('aria-controls', 'controlled-panel')
+    await expect(getComputedStyle(button).color).toBe('rgb(245, 205, 71)')
+    await expect(getComputedStyle(button).backgroundColor).not.toBe(
+      'rgba(0, 0, 0, 0)',
+    )
+  },
 }

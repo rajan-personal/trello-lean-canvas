@@ -15,7 +15,7 @@ export function AppStatus({ message, onSignOut }: Props) {
         <h1 className="text-2xl font-bold">
           {message ? 'We could not open your workspace' : 'Opening your workspace…'}
         </h1>
-        {message && <p className="mt-3 text-sm leading-6 text-white/85">{message}</p>}
+        {message && <p className="mt-3 text-sm leading-6 text-white/95">{message}</p>}
         {message && (
           <div className="mt-6 flex justify-center gap-3">
             <button

@@ -7,10 +7,10 @@ export default meta
 export const Open: DialogStory = {
   play: async ({ canvas }) => {
     await expect(
-      canvas.getByRole('dialog', { name: 'Create canvas' }),
+      await canvas.findByRole('dialog', { name: 'Create canvas' }),
     ).toBeInTheDocument()
     await expect(
-      canvas.getByRole('textbox', { name: 'Canvas name' }),
+      await canvas.findByRole('textbox', { name: 'Canvas name' }),
     ).toHaveFocus()
     await expect(canvas.getByRole('button', { name: 'Cancel' })).toHaveStyle({
       backgroundColor: 'rgb(241, 242, 244)',

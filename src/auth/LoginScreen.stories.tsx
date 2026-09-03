@@ -28,4 +28,11 @@ export const Error: Story = {
   },
 }
 
-export const Busy: Story = { args: { busy: true } }
+export const Busy: Story = {
+  args: { busy: true },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('button', { name: 'Connecting to Google…' }),
+    ).toBeDisabled()
+  },
+}

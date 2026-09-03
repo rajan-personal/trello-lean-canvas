@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react'
+import { useEffect, useRef, type Dispatch, type SetStateAction } from 'react'
 import { X } from 'lucide-react'
 
 export interface CanvasDialogState {
@@ -17,24 +17,40 @@ const dialogButtonClass = 'min-h-8 rounded-md border-0 px-3 py-1.5 font-semibold
 
 /** Modal form for creating a canvas. */
 export function Dialog({ dialog, setDialog, onSubmit }: DialogProps) {
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const open = Boolean(dialog)
+
+  useEffect(() => {
+    const element = dialogRef.current
+    if (!open || !element) return
+    const closeFromBackdrop = (event: MouseEvent) => {
+      if (event.target === element) setDialog(null)
+    }
+    element.addEventListener('mousedown', closeFromBackdrop)
+    element.showModal()
+    inputRef.current?.focus()
+    return () => {
+      element.removeEventListener('mousedown', closeFromBackdrop)
+      if (element.open) element.close()
+    }
+  }, [open, setDialog])
+
   if (!dialog) return null
 
   return (
-    <div
-      className="dialog-backdrop fixed inset-0 z-100 grid place-items-center bg-[rgba(9,30,66,0.54)] p-5"
-      role="presentation"
-      onMouseDown={() => setDialog(null)}
+    <dialog
+      ref={dialogRef}
+      className="dialog dialog-backdrop m-auto w-[calc(100%-40px)] max-w-[440px] rounded-xl border-0 bg-white p-5 text-[#172b4d] shadow-[0_10px_30px_rgba(9,30,66,0.35)] backdrop:bg-[rgba(9,30,66,0.54)]"
+      aria-label={dialog.heading}
+      onCancel={() => setDialog(null)}
+      onClose={() => setDialog(null)}
     >
       <form
-        className="dialog w-full max-w-[440px] rounded-xl bg-white p-5 shadow-[0_10px_30px_rgba(9,30,66,0.35)]"
-        role="dialog"
-        aria-modal="true"
-        aria-label={dialog.heading}
         onSubmit={(event) => {
           event.preventDefault()
           onSubmit(dialog)
         }}
-        onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="dialog-header mb-4 flex items-center justify-between">
           <h2 className="m-0 text-xl font-bold">{dialog.heading}</h2>
@@ -48,6 +64,7 @@ export function Dialog({ dialog, setDialog, onSubmit }: DialogProps) {
           </button>
         </div>
         <input
+          ref={inputRef}
           className="w-full rounded-md border-2 border-[#8590a2] px-3 py-2.5 text-[#172b4d] outline-none focus:border-[#0c66e4]"
           autoFocus
           aria-label="Canvas name"
@@ -65,6 +82,6 @@ export function Dialog({ dialog, setDialog, onSubmit }: DialogProps) {
           <button type="submit" className={`${dialogButtonClass} bg-[#0c66e4] text-white hover:bg-[#0055cc]`}>{dialog.submitLabel}</button>
         </div>
       </form>
-    </div>
+    </dialog>
   )
 }

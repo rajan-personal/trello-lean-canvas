@@ -8,6 +8,15 @@ const meta = {
   component: TopBar,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
+  decorators: [
+    (Story) => (
+      <>
+        <Story />
+        <aside id="canvas-sidebar" hidden />
+        <aside id="canvas-notepad" hidden />
+      </>
+    ),
+  ],
   args: {
     canvas: storyCanvas,
     sidebarOpen: false,
@@ -50,11 +59,16 @@ export const ActiveTools: Story = {
     sidebarCollapsed: true,
   },
   play: async ({ canvas }) => {
+    const favorite = canvas.getByRole('button', { name: 'Favorite canvas' })
+    const notepad = canvas.getByRole('button', { name: 'Notepad' })
     await expect(canvas.getByRole('button', { name: 'Expand sidebar' }))
       .toBeInTheDocument()
-    await expect(canvas.getByRole('button', { name: 'Notepad' })).toHaveAttribute(
-      'aria-expanded',
-      'true',
+    await expect(notepad).toHaveAttribute('aria-expanded', 'true')
+    await expect(getComputedStyle(favorite).backgroundColor).toBe(
+      'rgba(0, 0, 0, 0)',
+    )
+    await expect(getComputedStyle(notepad).backgroundColor).not.toBe(
+      'rgba(0, 0, 0, 0)',
     )
   },
 }

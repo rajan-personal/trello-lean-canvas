@@ -11,8 +11,9 @@ export default meta
 export const Default: AppStory = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
+    const addCanvas = await canvas.findByRole('button', { name: 'Add canvas' })
     await expect(canvas.queryAllByRole('heading')).toHaveLength(0)
-    await userEvent.click(canvas.getByRole('button', { name: 'Add canvas' }))
+    await userEvent.click(addCanvas)
     await userEvent.click(canvas.getByRole('button', { name: 'Sample' }))
     await expect(
       await canvas.findByRole('heading', { name: 'Airbnb — 2008' }),
@@ -30,7 +31,7 @@ export const BlankCanvas: AppStory = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(
-      canvas.getByRole('heading', { name: 'Blank canvas' }),
+      await canvas.findByRole('heading', { name: 'Blank canvas' }),
     ).toBeInTheDocument()
     await expect(canvasElement.querySelectorAll('.cell-hint')).toHaveLength(12)
     const grid = canvasElement.querySelector('.lean-grid')

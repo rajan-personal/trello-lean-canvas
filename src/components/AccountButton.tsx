@@ -32,7 +32,7 @@ export function AccountButton({ user, onSignOut }: Props) {
           {name}
         </span>
         {email && (
-          <span className="block truncate text-[11px] leading-4 text-white/55">
+          <span className="block truncate text-[11px] leading-4 text-white/75">
             {email}
           </span>
         )}
@@ -40,7 +40,7 @@ export function AccountButton({ user, onSignOut }: Props) {
       <button
         type="button"
         onClick={onSignOut}
-        className="flex-none rounded px-1.5 py-1 text-[11px] leading-4 font-medium text-white/60 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white"
+        className="flex-none rounded px-1.5 py-1 text-[11px] leading-4 font-medium text-white/75 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white"
         aria-label={`Sign out ${signOutLabel}`}
       >
         Sign out

@@ -14,6 +14,7 @@ import { useCanvasState } from './useCanvasState'
 import { useCardDrag } from './useCardDrag'
 import { useCardEditing } from './useCardEditing'
 import { useNotice } from './useNotice'
+import { useWorkspacePanels } from './useWorkspacePanels'
 interface Props {
   user: AppUser
   onSignOut: () => void
@@ -25,9 +26,7 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
   const cards = useCardEditing(state, notify)
   const commands = useCanvasCommands(state, cards.clearCardEditing, notify)
   const dragHandlers = useCardDrag(state, () => cards.setEditingCard(null), notify)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [notepadOpen, setNotepadOpen] = useState(false)
+  const panels = useWorkspacePanels()
   const [dialog, setDialog] = useState<CanvasDialogState | null>(null)
   const sectionProps = { ...cards, dragHandlers }
   if (state.loading) return <AppStatus />
@@ -36,17 +35,17 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
     <div className="app-shell h-dvh min-h-[640px] overflow-hidden bg-linear-[130deg,#0c66e4_0%,#338bfa_100%]">
       <TopBar
         canvas={state.activeCanvas}
-        sidebarOpen={sidebarOpen}
-        sidebarCollapsed={sidebarCollapsed}
-        onToggleSidebar={() => setSidebarCollapsed((value) => !value)}
-        onOpenSidebar={() => setSidebarOpen(true)}
+        sidebarOpen={panels.sidebarOpen}
+        sidebarCollapsed={panels.sidebarCollapsed}
+        onToggleSidebar={panels.toggleSidebar}
+        onOpenSidebar={panels.openSidebar}
         onNewCanvas={() =>
           setDialog({ heading: 'Create canvas', submitLabel: 'Create canvas', value: '' })
         }
         onLoadSamples={commands.loadSampleData}
         onRename={commands.renameCanvas}
-        notepadOpen={notepadOpen}
-        onToggleNotepad={() => setNotepadOpen((value) => !value)}
+        notepadOpen={panels.notepadOpen}
+        onToggleNotepad={panels.toggleNotepad}
         onFavorite={() =>
           state.updateActiveCanvas((canvas) => ({
             ...canvas,
@@ -65,9 +64,9 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
           onMove={commands.moveCanvas}
           user={user}
           onSignOut={onSignOut}
-          open={sidebarOpen}
-          collapsed={sidebarCollapsed}
-          onClose={() => setSidebarOpen(false)}
+          open={panels.sidebarOpen}
+          collapsed={panels.sidebarCollapsed}
+          onClose={panels.closeSidebar}
         />
         {state.activeCanvas ? (
           <CanvasBoard
@@ -81,7 +80,7 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
           <NotepadPanel
             key={state.activeCanvas.id}
             canvas={state.activeCanvas}
-            open={notepadOpen}
+            open={panels.notepadOpen}
             onChange={(notes) =>
               state.updateActiveCanvas((canvas) => ({ ...canvas, notes }))
             }

@@ -23,7 +23,7 @@ export function ToolbarIconButton({
 }: Props) {
   return (
     <button
-      className={`toolbar-icon ${toolbarButtonClass} ${active ? 'text-[#f5cd47]' : ''}`}
+      className={`toolbar-icon ${toolbarButtonClass} ${active ? 'text-[#f5cd47]!' : ''} ${active && expanded ? 'bg-white/20!' : ''}`}
       aria-label={label}
       aria-pressed={pressed}
       aria-expanded={expanded}

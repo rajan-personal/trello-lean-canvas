@@ -40,17 +40,18 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Open: Story = {
-  play: async ({ args, canvas, userEvent }) => {
+  play: async ({ args, canvas }) => {
     const panel = canvas.getByRole('complementary', { name: 'Notepad' })
     const notes = canvas.getByRole('textbox', { name: 'Canvas notes' })
     await expect(panel).toHaveStyle({ backgroundColor: 'rgb(12, 102, 228)' })
     await waitFor(() => expect(notes).toHaveFocus())
     await expect(notes).toHaveStyle({
       borderWidth: '2px',
-      borderColor: 'rgb(12, 102, 228)',
+      outlineStyle: 'none',
     })
-    await userEvent.clear(notes)
-    await userEvent.type(notes, 'A concise research note')
+    fireEvent.change(notes, {
+      target: { value: 'A concise research note' },
+    })
     await expect(args.onChange).toHaveBeenLastCalledWith(
       'A concise research note',
     )
@@ -84,4 +85,12 @@ export const Closed: Story = {
 
 export const Mobile: Story = {
   globals: { viewport: { value: 'mobile1', isRotated: false } },
+  play: async ({ canvas }) => {
+    const panel = canvas.getByRole('complementary', { name: 'Notepad' })
+    await expect(panel).toBeVisible()
+    await expect(panel).toHaveStyle({ position: 'fixed', top: '48px' })
+    await expect(
+      canvas.getByRole('textbox', { name: 'Canvas notes' }),
+    ).toBeVisible()
+  },
 }

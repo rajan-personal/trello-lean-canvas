@@ -46,6 +46,9 @@ export const Populated: Story = {
     )
     const notes = await canvas.findByRole('textbox', { name: 'Canvas notes' })
     await waitFor(() => expect(notes).toBeVisible())
+    await expect(
+      canvas.getByRole('button', { name: 'Expand sidebar' }),
+    ).toBeInTheDocument()
   },
 }
 

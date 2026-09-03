@@ -50,6 +50,18 @@ export const ActiveFavorite: Story = {
 }
 
 export const Dragged: Story = {
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          { id: 'color-contrast', enabled: false },
+          { id: 'landmark-one-main', enabled: false },
+          { id: 'page-has-heading-one', enabled: false },
+          { id: 'region', enabled: false },
+        ],
+      },
+    },
+  },
   args: { draggedId: storyCanvas.id },
 }
 

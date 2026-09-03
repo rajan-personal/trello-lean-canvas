@@ -1,4 +1,4 @@
-import { expect } from 'storybook/test'
+import { expect, fireEvent } from 'storybook/test'
 import {
   cardComposerMeta,
   type CardComposerStory as Story,
@@ -59,7 +59,9 @@ export const DismissAndResumeDraft: Story = {
   args: { showOutsideTarget: true },
   play: async ({ args, canvas, userEvent }) => {
     const textbox = canvas.getByRole('textbox', { name: 'New card' })
-    await userEvent.type(textbox, 'A draft worth keeping')
+    fireEvent.change(textbox, {
+      target: { value: 'A draft worth keeping' },
+    })
     await userEvent.click(
       canvas.getByRole('button', { name: 'Outside composer' }),
     )
