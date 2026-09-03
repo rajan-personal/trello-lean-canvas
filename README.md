@@ -11,6 +11,7 @@ A strict TypeScript Lean Canvas workspace with Trello-style editing. Start with 
 - Download the current canvas as a portable YAML file
 - Upload additional YAML canvases
 - Responsive sidebar and horizontally scrollable canvas on small screens
+- Installable progressive web app with an offline-ready application shell
 
 The YAML files in [`examples/`](examples/) are retrospective reconstructions rather than official company documents. Their starting assumptions were adapted from [Railsware’s Lean Canvas examples](https://railsware.com/blog/5-lean-canvas-examples/), with Facebook’s multi-sided model cross-checked against [Ash Maurya’s Facebook Lean Canvas](https://medium.com/lean-stack/how-to-model-a-multi-sided-business-60f2d7613e39).
 
