@@ -1,12 +1,13 @@
+import { TopBarHarness } from './TopBar.story-support'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn } from 'storybook/test'
 import { TopBar } from './TopBar'
 import { favoriteCanvas, storyCanvas } from './component-story-fixtures'
-
 const meta = {
   title: 'Lean Canvas/TopBar',
   component: TopBar,
   tags: ['autodocs'],
+  render: (args) => <TopBarHarness {...args} />,
   parameters: { layout: 'fullscreen' },
   decorators: [
     (Story) => (
@@ -34,10 +35,8 @@ const meta = {
     onDownload: fn(),
   },
 } satisfies Meta<typeof TopBar>
-
 export default meta
 type Story = StoryObj<typeof meta>
-
 export const Desktop: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Collapse sidebar' }))
@@ -45,13 +44,16 @@ export const Desktop: Story = {
     await userEvent.click(
       canvas.getByRole('button', { name: /^New$/ }),
     )
+    await expect(canvas.getByRole('dialog', { name: 'Create canvas' })).toBeVisible()
+    await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }))
     await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
+    await expect(canvas.getByRole('button', { name: 'Notepad' })).toHaveAttribute('aria-expanded', 'true')
     await expect(args.onToggleSidebar).toHaveBeenCalledOnce()
+    await expect(canvas.getByRole('button', { name: 'Expand sidebar' })).toBeVisible()
     await expect(args.onNewCanvas).toHaveBeenCalledOnce()
     await expect(args.onToggleNotepad).toHaveBeenCalledOnce()
   },
 }
-
 export const ActiveTools: Story = {
   args: {
     canvas: favoriteCanvas,
@@ -72,7 +74,6 @@ export const ActiveTools: Story = {
     )
   },
 }
-
 export const NoCanvas: Story = {
   args: { canvas: undefined },
   play: async ({ canvas, userEvent }) => {
@@ -82,7 +83,6 @@ export const NoCanvas: Story = {
     await expect(canvas.queryByRole('heading')).not.toBeInTheDocument()
   },
 }
-
 export const Mobile: Story = {
   args: { sidebarOpen: true },
   globals: { viewport: { value: 'mobile1', isRotated: false } },

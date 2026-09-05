@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
+import { CanvasSectionHarness } from './CanvasSection.story-harness'
 import { CanvasCardSlot } from './CanvasCardSlot'
 import { storySectionProps } from './component-story-fixtures'
 
@@ -11,6 +12,13 @@ const meta = {
   decorators: [
     (Story) => <div className="w-[300px] text-[#172b4d]"><Story /></div>,
   ],
+  render: (args) => <CanvasSectionHarness {...args.sectionProps} section={{
+    ...args.sectionProps.section,
+    cards: args.sectionProps.section.cards.map((card, index) => index === args.index ? args.card : card),
+  }}>
+    {(props) => props.section.cards[args.index] === undefined ? <p>Card deleted</p> :
+      <CanvasCardSlot {...args} card={props.section.cards[args.index]} sectionProps={props} />}
+  </CanvasSectionHarness>,
   args: {
     card: storySectionProps.section.cards[0],
     index: 0,
@@ -45,18 +53,6 @@ export const Editing: Story = {
 }
 
 export const Dragged: Story = {
-  parameters: {
-    a11y: {
-      config: {
-        rules: [
-          { id: 'color-contrast', enabled: false },
-          { id: 'landmark-one-main', enabled: false },
-          { id: 'page-has-heading-one', enabled: false },
-          { id: 'region', enabled: false },
-        ],
-      },
-    },
-  },
   args: {
     sectionProps: {
       ...storySectionProps,
@@ -69,7 +65,7 @@ export const Dragged: Story = {
   play: async ({ canvasElement }) => {
     await expect(
       canvasElement.querySelector('.canvas-card-drop-slot'),
-    ).toHaveStyle({ opacity: '0.35' })
+    ).toHaveStyle({ opacity: '0.8' })
   },
 }
 

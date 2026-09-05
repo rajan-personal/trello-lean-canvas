@@ -35,7 +35,7 @@ export function CardComposer({ value, setValue, onSave, onCancel }: CardComposer
       className="card-composer min-w-0 flex-none"
       onSubmit={(event) => {
         event.preventDefault()
-        onSave()
+        if (value.trim()) onSave()
       }}
     >
       <textarea

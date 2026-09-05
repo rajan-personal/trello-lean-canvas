@@ -26,7 +26,7 @@ export function CanvasCard({ text, sectionId, index, onEdit, onDelete, onDragSta
     >
       <button
         type="button"
-        className="card-content block min-h-8 w-full cursor-[inherit] rounded-[inherit] border-0 bg-transparent py-[7px] ps-2.5 pe-8 text-left font-[inherit] leading-[inherit] text-[inherit] focus-visible:outline-none"
+        className="card-content block [overflow-wrap:anywhere] min-h-8 w-full cursor-[inherit] rounded-[inherit] border-0 bg-transparent py-[7px] ps-2.5 pe-8 text-left font-[inherit] leading-[inherit] text-[inherit] focus-visible:outline-none"
         onClick={(event) => {
           if (event.detail === 0) onEdit(sectionId, index, text)
         }}

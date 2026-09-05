@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { LeanCanvas } from '../data/types'
 
 const PREFIX = 'Lean Canvas — '
@@ -18,6 +18,12 @@ export function BoardTitle({
   const shown = displayTitle(canvas)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(shown)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const returnFocus = useRef(false)
+  useLayoutEffect(() => {
+    if (!editing && returnFocus.current) buttonRef.current?.focus()
+    returnFocus.current = false
+  }, [editing])
   const commit = () => {
     const name = draft.trim()
     setEditing(false)
@@ -42,10 +48,12 @@ export function BoardTitle({
           onKeyDown={(event) => {
             if (event.key === 'Enter') {
               event.preventDefault()
+              returnFocus.current = true
               event.currentTarget.blur()
             }
             if (event.key === 'Escape') {
               event.preventDefault()
+              returnFocus.current = true
               setDraft(shown)
               setEditing(false)
             }
@@ -53,6 +61,7 @@ export function BoardTitle({
         />
       ) : (
         <button
+          ref={buttonRef}
           type="button"
           className="board-title-button ms-[-6px] min-w-0 max-w-[min(52vw,620px)] overflow-hidden text-ellipsis whitespace-nowrap rounded-sm border-0 bg-transparent px-1.5 py-0.5 font-[inherit] leading-[inherit] tracking-[inherit] text-[inherit] hover:bg-white/17 focus-visible:bg-white/17 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white"
           title="Rename canvas"

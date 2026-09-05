@@ -43,7 +43,7 @@ for (const remaining of [true, false]) test(`remote deletion retains read-only d
   await second.goto('/tests/support/remote-workspace.html')
   await expect(second.getByRole('heading', { name: 'Test canvas', exact: true })).toBeVisible()
   second.once('dialog', dialog => dialog.accept())
-  await second.getByRole('button', { name: 'Delete board', exact: true }).click()
+  await second.getByRole('button', { name: 'Delete canvas', exact: true }).click()
   await expect(modal.getByRole('alert')).toContainText('canvas was deleted elsewhere')
   await expect(modal.getByLabel('Description')).toHaveValue('Unsaved description to copy')
   await expect(modal.getByLabel('New comment')).toHaveValue('Unsaved comment to copy')

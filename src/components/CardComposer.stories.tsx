@@ -1,3 +1,4 @@
+import { canvasStoryAct } from './canvas-story-act'
 import { expect, fireEvent } from 'storybook/test'
 import {
   cardComposerMeta,
@@ -28,15 +29,17 @@ export const Editing: Story = {
     )
     await userEvent.type(textbox, '{enter}')
     await expect(args.onSave).toHaveBeenCalledOnce()
+    await expect(canvas.getByText('Automatic blocker digest')).toBeVisible()
+    await expect(canvas.queryByRole('textbox')).not.toBeInTheDocument()
   },
 }
 
 export const CancelWithEscape: Story = {
   play: async ({ args, canvas, userEvent }) => {
-    await userEvent.type(
-      canvas.getByRole('textbox', { name: 'New card' }),
-      'Draft hypothesis{escape}',
-    )
+    await canvasStoryAct(async () => {
+      await userEvent.type(canvas.getByRole('textbox', { name: 'New card' }), 'Draft hypothesis')
+      await userEvent.keyboard('{Escape}')
+    })
     await expect(args.onCancel).toHaveBeenCalledOnce()
     await expect(
       canvas.getByRole('button', { name: 'Resume draft' }),
@@ -75,5 +78,15 @@ export const DismissAndResumeDraft: Story = {
       'selectionStart',
       'A draft worth keeping'.length,
     )
+  },
+}
+
+export const RejectWhitespace: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByRole('textbox', { name: 'New card' })
+    await userEvent.type(input, '   {Enter}')
+    await userEvent.click(canvas.getByRole('button', { name: 'Add card' }))
+    await expect(args.onSave).not.toHaveBeenCalled()
+    await expect(input).toHaveValue('   ')
   },
 }

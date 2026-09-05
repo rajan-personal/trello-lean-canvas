@@ -11,6 +11,7 @@ export const SubmitCard: CanvasSectionStory = {
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Add card' }))
     await expect(args.addCard).toHaveBeenCalledWith('problem')
+    await expect(canvas.getByRole('button', { name: '＋ Add a card' })).toHaveFocus()
     await expect(
       canvas.getByRole('button', { name: 'A concise customer problem' }),
     ).toBeInTheDocument()

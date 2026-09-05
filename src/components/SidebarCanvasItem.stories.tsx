@@ -50,18 +50,6 @@ export const ActiveFavorite: Story = {
 }
 
 export const Dragged: Story = {
-  parameters: {
-    a11y: {
-      config: {
-        rules: [
-          { id: 'color-contrast', enabled: false },
-          { id: 'landmark-one-main', enabled: false },
-          { id: 'page-has-heading-one', enabled: false },
-          { id: 'region', enabled: false },
-        ],
-      },
-    },
-  },
   args: { draggedId: storyCanvas.id },
 }
 
@@ -76,5 +64,14 @@ export const DropAfter: Story = {
   args: {
     draggedId: 'another-canvas',
     dropTarget: { canvasId: storyCanvas.id, edge: 'after' },
+  },
+}
+
+export const ActiveDragged: Story = {
+  args: { activeId: storyCanvas.id, draggedId: storyCanvas.id },
+  play: async ({ canvas }) => {
+    const item = canvas.getByRole('button', { name: 'Team alignment' })
+    await expect(item).toHaveAttribute('aria-current', 'page')
+    await expect(item).toHaveStyle({ opacity: '1', outlineStyle: 'dashed' })
   },
 }

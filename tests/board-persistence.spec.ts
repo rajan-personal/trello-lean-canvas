@@ -26,7 +26,7 @@ test('imports, reloads, exports and deletes board records without changing Lean 
   expect(data.canvas.id).not.toBe(original.id)
   expect(data.board).toEqual(populatedBoard())
   page.once('dialog', (dialog) => dialog.accept())
-  await page.getByRole('button', { name: 'Delete board' }).click()
+  await page.getByRole('button', { name: 'Delete canvas' }).click()
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:boards:v1') ?? '{}'))).toEqual({})
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Board transfer' })).toHaveCount(0)

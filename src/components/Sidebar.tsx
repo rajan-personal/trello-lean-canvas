@@ -1,4 +1,5 @@
 import { useState, type DragEvent } from 'react'
+import { useSidebarVisibility } from './useSidebarVisibility'
 import { X } from 'lucide-react'
 import type { AppUser } from '../auth/auth-context'
 import type { LeanCanvas } from '../data/types'
@@ -12,12 +13,13 @@ interface Props {
   onSelect: (id: string) => void
   onMove: (id: string, index: number) => void
   user: AppUser
-  onSignOut: () => void
+  onSignOut: () => void | Promise<void>
   open: boolean
   collapsed: boolean
   onClose: () => void
 }
 export function Sidebar(p: Props) {
+  const { ref: sidebarRef, hidden, mobile } = useSidebarVisibility(p.open, p.collapsed)
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [target, setTarget] = useState<DropTarget | null>(null)
   const drop = (event: DragEvent<HTMLElement>, targetId: string) => {
@@ -43,6 +45,12 @@ export function Sidebar(p: Props) {
       )}
       <aside
         id="canvas-sidebar"
+        ref={sidebarRef}
+        inert={hidden}
+        aria-hidden={hidden}
+        onKeyDown={(event) => {
+          if (mobile && event.key === 'Escape') { event.preventDefault(); p.onClose() }
+        }}
         className={`sidebar relative z-10 flex h-full w-[248px] basis-[248px] flex-col overflow-hidden bg-[#07558f] px-2.5 py-3.5 text-white shadow-[1px_0_0_rgba(255,255,255,0.14)] transition-[flex-basis,width,padding] duration-180 ease-out max-[760px]:fixed max-[760px]:top-12 max-[760px]:bottom-0 max-[760px]:left-0 max-[760px]:z-60 max-[760px]:h-auto max-[760px]:shadow-[8px_0_24px_rgba(9,30,66,0.35)] max-[760px]:transition-transform ${p.open ? 'max-[760px]:translate-x-0' : 'max-[760px]:translate-x-[-102%]'} ${p.collapsed ? 'min-[761px]:w-0 min-[761px]:basis-0 min-[761px]:px-0 min-[761px]:shadow-none' : ''}`}
       >
         <div className="sidebar-heading hidden min-h-[34px] justify-end max-[760px]:mb-1.5 max-[760px]:flex">

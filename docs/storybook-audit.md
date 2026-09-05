@@ -1,5 +1,7 @@
 # Storybook and screen reliability audit
 
+Ticket 2 follow-up: the Lean Canvas findings below are resolved and validated in [the component audit](lean-canvas-audit.md). This document retains the original ticket 1 evidence and results.
+
 This finishes the restored audit patch. Authentication, reconciliation, and persistence implementations are unchanged. Fixtures use synthetic users, local storage, and deterministic transports; no real sign-in or production data was used. No commit, push, deployment, or PR was made.
 
 ## Fixes and validation boundaries
