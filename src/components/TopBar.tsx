@@ -1,4 +1,5 @@
 import type { ChangeEvent, ReactNode } from 'react'
+import './topbar.css'
 import { Menu } from 'lucide-react'
 import type { LeanCanvas } from '../data/types'
 import { BoardTitle } from './BoardTitle'
@@ -64,17 +65,19 @@ export function TopBar(props: Props) {
             onRename={props.onRename}
           />
         )}
-        {props.tabs}
         <span className="toolbar-spacer flex-1" />
         {canvas && (
-          <CanvasToolbarActions
-            canvas={canvas}
-            notepadOpen={props.notepadOpen}
-            onFavorite={props.onFavorite}
-            onToggleNotepad={props.onToggleNotepad}
-            onDelete={props.onDelete}
-            onDownload={props.onDownload}
-          />
+          <div className="topbar-actions flex shrink-0 items-center">
+            {props.tabs}
+            <CanvasToolbarActions
+              canvas={canvas}
+              notepadOpen={props.notepadOpen}
+              onFavorite={props.onFavorite}
+              onToggleNotepad={props.onToggleNotepad}
+              onDelete={props.onDelete}
+              onDownload={props.onDownload}
+            />
+          </div>
         )}
       </div>
     </header>
