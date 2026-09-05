@@ -9,6 +9,7 @@ import { BoardInlineComposer } from './BoardInlineComposer'
 import { KanbanColumn } from './KanbanColumn'
 import type { RunBoardCommand } from './board-ui'
 import { useBoardDrag } from './useBoardDrag'
+import { useComposerFocus } from './useComposerFocus'
 import './kanban.css'
 
 type Editor = { type: 'card'; card: BoardCard } | { type: 'rename-column'; column: BoardColumn }
@@ -19,6 +20,7 @@ interface Props {
 export function KanbanBoard({ board, user, pending, deleted, error, run, register }: Props) {
   const [editor, setEditor] = useState<Editor | null>(null)
   const [addingColumn, setAddingColumn] = useState(false)
+  const composer = useComposerFocus(addingColumn)
   const [composingColumns, setComposingColumns] = useState<BoardColumn[]>([])
   const removedColumns = composingColumns.filter((column) => !board.columns.some((item) => item.id === column.id))
   const drag = useBoardDrag(board, pending || !!deleted, run)
@@ -35,7 +37,7 @@ export function KanbanBoard({ board, user, pending, deleted, error, run, registe
         register={register} run={run} drag={drag}
         onOpen={(card) => setEditor({ type: 'card', card })}
         onRename={() => setEditor({ type: 'rename-column', column })} />)}
-      <div className="kanban-add-column">
+      <div ref={composer} className="kanban-add-column">
         {addingColumn ? <BoardInlineComposer kind="column" pending={pending} deleted={deleted} error={error}
           register={register} onClose={() => setAddingColumn(false)}
           onSave={(id, title) => run({ type: 'create-column', id, title })} /> :
@@ -47,7 +49,8 @@ export function KanbanBoard({ board, user, pending, deleted, error, run, registe
       card={board.cards.find((card) => card.id === editor.card.id) ?? editor.card}
       board={board} user={user} pending={pending} deleted={deleted} error={error} run={run} register={register} onClose={close} />}
     {editor?.type === 'rename-column' && <BoardTitleDialog heading="Rename column" initial={editor.column.title}
-      pending={pending} deleted={deleted} error={error} register={register}
+      pending={pending} deleted={deleted} missing={!board.columns.some(({ id }) => id === editor.column.id)}
+      error={error} register={register}
       onSave={(title) => run({ type: 'rename-column', id: editor.column.id, title })} onClose={close} />}
   </>
 }

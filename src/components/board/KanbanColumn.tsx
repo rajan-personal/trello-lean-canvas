@@ -3,6 +3,7 @@ import type { RegisterDraftGuard } from '../../app/useNavigationGuard'
 import { BoardInlineComposer } from './BoardInlineComposer'
 import type { BoardCard, BoardColumn } from '../../data/board'
 import { BoardColumnMenu } from './BoardColumnMenu'
+import { useComposerFocus } from './useComposerFocus'
 import type { RunBoardCommand } from './board-ui'
 import type { useBoardDrag } from './useBoardDrag'
 
@@ -16,6 +17,7 @@ interface Props {
 export function KanbanColumn({ column, cards, index, count, pending, deleted, error, register, run, drag,
   onOpen, onRename, adding, onAddingChange }: Props) {
   const label = useId()
+  const composer = useComposerFocus(adding)
   return <section className="kanban-column" aria-labelledby={label}
     data-drop-target={drag.target === column.id || undefined}
     onDragOver={(event) => drag.over(event, column.id)}
@@ -33,8 +35,8 @@ export function KanbanColumn({ column, cards, index, count, pending, deleted, er
           onClick={() => onOpen(card)}>{card.title}</button>
       </li>)}
     </ol>
-    {adding ? <BoardInlineComposer kind="card" pending={pending} deleted={deleted} error={error} register={register}
+    <div ref={composer}>{adding ? <BoardInlineComposer kind="card" pending={pending} deleted={deleted} error={error} register={register}
       onClose={() => onAddingChange(false)} onSave={(id, title) => run({ type: 'create-card', id, columnId: column.id, title })} /> :
-      <button className="kanban-add-card" disabled={pending || deleted} onClick={() => onAddingChange(true)}>+ Add a card</button>}
+      <button className="kanban-add-card" disabled={pending || deleted} onClick={() => onAddingChange(true)}>+ Add a card</button>}</div>
   </section>
 }

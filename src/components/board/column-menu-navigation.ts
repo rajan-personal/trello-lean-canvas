@@ -8,10 +8,13 @@ export function columnMenuKeydown(
     trigger.focus()
     return
   }
-  if (event.key !== 'Tab' || !panel.contains(document.activeElement)) return
+  if (event.key !== 'Tab') return
   const actions = [...panel.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')]
-  const boundary = event.shiftKey ? actions[0] : actions.at(-1)
-  if (document.activeElement !== boundary) return
+  const active = document.activeElement
+  if (!actions.length && active === trigger) { close(); return }
+  if (!active || !panel.contains(active)) return
+  const direction = event.shiftKey ? Node.DOCUMENT_POSITION_PRECEDING : Node.DOCUMENT_POSITION_FOLLOWING
+  if (actions.some((action) => active.compareDocumentPosition(action) & direction)) return
   close()
   trigger.focus()
   // Forward Tab continues naturally from the trigger to the next board control.

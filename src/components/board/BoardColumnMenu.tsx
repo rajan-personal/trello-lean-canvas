@@ -31,7 +31,7 @@ export function BoardColumnMenu({ column, index, count, empty, pending, rename, 
       const top = rect.bottom + 6 + height <= window.innerHeight - 8
         ? rect.bottom + 6 : Math.max(8, rect.top - height - 6)
       element.style.left = `${left}px`
-      element.style.top = `${top}px`
+      element.style.top = `${Math.max(8, Math.min(top, window.innerHeight - height - 8))}px`
     }
     if (nativePopover) element.showPopover()
     position()

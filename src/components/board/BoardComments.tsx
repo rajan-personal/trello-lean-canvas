@@ -8,7 +8,7 @@ interface Props {
 export function BoardComments({ comments, text, onText, pending, readOnly, onAdd }: Props) {
   return <section className="kanban-comments" aria-label="Comments">
     <h3><MessageSquare size={18} aria-hidden="true" /> Comments</h3>
-    <form onSubmit={(event) => { event.preventDefault(); if (!readOnly) void onAdd() }}>
+    <form onSubmit={(event) => { event.preventDefault(); if (!pending && !readOnly && text.trim()) void onAdd() }}>
       <fieldset disabled={pending}>
         <label>New comment<textarea name="comment" placeholder="Write a comment…" maxLength={10000} readOnly={readOnly} value={text}
           onChange={(event) => onText(event.target.value)} rows={3} /></label>
