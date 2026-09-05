@@ -42,7 +42,7 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
     <div className="app-shell h-dvh min-h-[640px] overflow-hidden bg-linear-[130deg,#0c66e4_0%,#338bfa_100%] max-[760px]:min-h-0">
       <WorkspaceHeader state={state} commands={commands} panels={panels} allow={guard.allow}
         setDialog={setDialog} view={view} setView={setView} />
-      <div className={`workspace-layout flex h-[calc(100dvh-48px)] min-h-[592px] max-[760px]:min-h-0 ${state.activeCanvas ? 'max-[760px]:pt-11' : ''}`}>
+      <div className={`workspace-layout flex h-[calc(100dvh-48px)] min-h-[592px] max-[760px]:min-h-0 ${state.activeCanvas ? 'max-[760px]:h-[calc(100dvh-92px)]' : ''}`}>
         <Sidebar
           canvases={state.canvases}
           activeId={state.activeCanvas?.id ?? null}

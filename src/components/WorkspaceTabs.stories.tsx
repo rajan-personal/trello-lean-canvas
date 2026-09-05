@@ -56,3 +56,18 @@ export const RejectedNavigation: Story = {
     await expect(canvas.getByRole('tab', { name: 'Board' })).toHaveAttribute('tabindex', '-1')
   },
 }
+
+export const BoardSelected: Story = {
+  args: { view: 'board' },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('tab', { name: 'Board' })).toHaveAttribute('aria-selected', 'true')
+    await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Board')
+    const tabs = canvas.getByRole('tablist').getBoundingClientRect()
+    await expect(tabs.width).toBeLessThan(220)
+    await expect(tabs.bottom).toBeLessThanOrEqual(canvas.getByRole('tabpanel').getBoundingClientRect().top)
+  },
+}
+export const MobileBoard: Story = {
+  ...BoardSelected,
+  globals: { viewport: { value: 'mobile1', isRotated: false } },
+}

@@ -1,0 +1,28 @@
+/* Reserve the action row in standalone headers as well as the workspace. */
+@media (max-width: 760px) {
+  .topbar:has(.workspace-tabs) {
+    height: 92px;
+    align-items: flex-start;
+  }
+
+  .topbar:has(.workspace-tabs) .mobile-sidebar-button {
+    margin-top: 8px;
+  }
+
+  .topbar:has(.workspace-tabs) :is(.topbar-brand, .board-toolbar) {
+    height: 48px;
+  }
+
+  .topbar-actions:has(.workspace-tabs) {
+    position: absolute;
+    inset: 48px 0 auto;
+    height: 44px;
+    justify-content: flex-end;
+    padding: 0 6px;
+    background: #0b4a6f;
+  }
+
+  .topbar-actions:has(.workspace-tabs) .toolbar-icon {
+    height: 40px;
+  }
+}
