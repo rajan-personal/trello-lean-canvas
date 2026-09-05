@@ -10,6 +10,11 @@ test('moves cards by drag within and across columns, preserving stable IDs and r
   await backlog.getByRole('button', { name: 'Gamma', exact: true }).dragTo(
     backlog.getByRole('button', { name: 'Alpha', exact: true }), { targetPosition: { x: 20, y: 3 } })
   await expect(backlog.locator('.kanban-card')).toHaveText(['Gamma', 'Alpha', 'Beta'])
+  const gamma = backlog.getByRole('button', { name: 'Gamma', exact: true })
+  const gammaBox = (await gamma.boundingBox())!
+  await backlog.getByRole('button', { name: 'Beta', exact: true }).dragTo(gamma,
+    { targetPosition: { x: 20, y: gammaBox.height - 3 } })
+  await expect(backlog.locator('.kanban-card')).toHaveText(['Gamma', 'Beta', 'Alpha'])
   await backlog.getByRole('button', { name: 'Alpha', exact: true }).dragTo(column(page, 'Todo'))
   await expect(column(page, 'Todo').locator('.kanban-card')).toHaveText(['Alpha'])
   await page.reload()
