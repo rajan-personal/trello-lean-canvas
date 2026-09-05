@@ -30,11 +30,13 @@ export function LoginScreen({ busy, error, onSignIn }: Props) {
           type="button"
           onClick={onSignIn}
           disabled={busy}
+          aria-busy={busy}
           className="mt-8 inline-flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#c7d1e0] bg-white px-5 font-semibold text-[#172b4d] shadow-sm transition hover:bg-[#f7f8f9] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4] disabled:cursor-wait disabled:opacity-65"
         >
           <GoogleMark />
           {busy ? 'Connecting to Google…' : 'Continue with Google'}
         </button>
+        <p role="status" aria-atomic="true" className="sr-only">{busy ? 'Connecting to Google…' : ''}</p>
         {error && <p className="mt-4 text-sm font-medium text-[#ae2e24]" role="alert">{error}</p>}
         <p className="mt-7 text-xs leading-5 text-[#626f86]">Your canvases are private and synced to your Google account.</p>
       </section>

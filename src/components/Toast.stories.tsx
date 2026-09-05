@@ -24,6 +24,21 @@ export const Visible: Story = {
 export const Hidden: Story = {
   args: { notice: '' },
   play: async ({ canvas }) => {
-    await expect(canvas.queryByRole('status')).not.toBeInTheDocument()
+    await expect(canvas.getByRole('status')).toBeEmptyDOMElement()
+    await expect(canvas.getByRole('status').getBoundingClientRect().height).toBe(0)
+    await expect(canvas.getByRole('status')).toHaveAttribute('aria-atomic', 'true')
+  },
+}
+
+export const MobileLongMessage: Story = {
+  globals: { viewport: { value: 'mobile1', isRotated: false } },
+  args: { notice: `Saved ${'synthetic-identifier'.repeat(20)}` },
+  play: async ({ canvas }) => {
+    const status = canvas.getByRole('status')
+    await expect(window.innerWidth).toBe(320)
+    await expect(status).toBeVisible()
+    await expect(status.scrollWidth).toBeLessThanOrEqual(status.clientWidth)
+    await expect(status.getBoundingClientRect().left).toBeGreaterThanOrEqual(0)
+    await expect(status.getBoundingClientRect().right).toBeLessThanOrEqual(window.innerWidth)
   },
 }

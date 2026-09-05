@@ -15,7 +15,7 @@ export function WorkspaceHeader({ state, commands, panels, allow, setDialog, vie
   return <TopBar canvas={state.activeCanvas} sidebarOpen={panels.sidebarOpen}
     sidebarCollapsed={panels.sidebarCollapsed} onToggleSidebar={panels.toggleSidebar}
     onOpenSidebar={panels.openSidebar}
-    tabs={state.activeCanvas && <WorkspaceTabs view={view} onChange={(next) => {
+    tabs={state.activeCanvas && <WorkspaceTabs idPrefix="" view={view} onChange={(next) => {
       if (next === view) return true
       if (!allow()) return false
       setView(next)

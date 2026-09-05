@@ -27,6 +27,7 @@
     "playwright.config.ts",
     "vite.config.ts",
     "vitest.config.ts",
+    "vitest.storybook.config.ts",
     "vitest.emulator.config.ts"
   ]
 }

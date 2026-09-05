@@ -17,7 +17,7 @@ export function WorkspaceViewPanel({ canvas, view, board, sectionProps, user, bl
   const inactive = view === 'canvas' ? 'board' : 'canvas'
   return <main className="flex min-w-0 flex-1" aria-label={view === 'board' ? 'Kanban board' : 'Lean canvas'}>
     <div id={`${inactive}-panel`} role="tabpanel" aria-labelledby={`${inactive}-tab`} hidden />
-    <div id={`${view}-panel`} role="tabpanel" aria-labelledby={`${view}-tab`} className="flex min-w-0 flex-1">
+    <div id={`${view}-panel`} role="tabpanel" aria-labelledby={`${view}-tab`} tabIndex={0} className="flex min-w-0 flex-1">
       {view === 'canvas' ? <CanvasBoard sections={canvas.sections} sectionProps={sectionProps} /> :
         <Suspense fallback={<p role="status" className="p-3 text-white">Loading board…</p>}>
           <WorkspaceBoard key={canvas.id} state={board} user={user}

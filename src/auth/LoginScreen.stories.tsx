@@ -30,9 +30,11 @@ export const Error: Story = {
 
 export const Busy: Story = {
   args: { busy: true },
-  play: async ({ canvas }) => {
-    await expect(
-      canvas.getByRole('button', { name: 'Connecting to Google…' }),
-    ).toBeDisabled()
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByRole('button', { name: 'Connecting to Google…' })
+    await expect(button).toBeDisabled()
+    await userEvent.click(button)
+    await expect(args.onSignIn).not.toHaveBeenCalled()
+    await expect(canvas.getByRole('status')).toHaveTextContent('Connecting to Google…')
   },
 }

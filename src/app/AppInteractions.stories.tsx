@@ -6,6 +6,7 @@ export const MobileSidebar: AppStory = {
   globals: { viewport: { value: 'mobile1', isRotated: false } },
   render: () => <SeededApp canvases={[blankCanvas]} />,
   play: async ({ canvasElement, userEvent }) => {
+    await expect(window.innerWidth).toBe(320)
     const canvas = within(canvasElement)
     const open = await canvas.findByRole('button', { name: 'Open sidebar' })
     await expect(open).toBeVisible()
@@ -19,11 +20,10 @@ export const MobileSidebar: AppStory = {
       .toBeInTheDocument()
     const notes = await canvas.findByRole('textbox', { name: 'Canvas notes' })
     await waitFor(() => expect(notes).toBeVisible())
-    const notepadBounds = canvas.getByRole('complementary', { name: 'Notepad' })
-      .getBoundingClientRect()
-    await expect([notepadBounds.left, notepadBounds.right]).toEqual([
-      0, window.innerWidth,
-    ])
+    await waitFor(() => {
+      const bounds = canvas.getByRole('complementary', { name: 'Notepad' }).getBoundingClientRect()
+      expect([bounds.left, bounds.right]).toEqual([0, window.innerWidth])
+    })
   },
 }
 export const CollapsedSidebar: AppStory = {
