@@ -25,7 +25,10 @@ export function Dialog({ dialog, setDialog, onSubmit }: DialogProps) {
     const element = dialogRef.current
     if (!open || !element) return
     const closeFromBackdrop = (event: MouseEvent) => {
-      if (event.target === element) setDialog(null)
+      const bounds = element.getBoundingClientRect()
+      const outside = event.clientX < bounds.left || event.clientX > bounds.right ||
+        event.clientY < bounds.top || event.clientY > bounds.bottom
+      if (event.target === element && outside) setDialog(null)
     }
     element.addEventListener('mousedown', closeFromBackdrop)
     element.showModal()

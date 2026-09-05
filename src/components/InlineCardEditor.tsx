@@ -34,7 +34,7 @@ export function InlineCardEditor({ value, setValue, onSave, onCancel }: InlineCa
         onKeyDown={(event) => {
           if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
             event.preventDefault()
-            onSave()
+            if (value.trim()) onSave()
           }
           if (event.key === 'Escape') onCancel()
         }}

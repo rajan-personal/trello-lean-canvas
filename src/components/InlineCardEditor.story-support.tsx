@@ -17,20 +17,26 @@ function Harness({
 }: Props) {
   const [value, setValue] = useState(initialValue)
   const [open, setOpen] = useState(true)
+  const [saved, setSaved] = useState(initialValue)
   return (
     <div className="storybook-inline-editor-frame grid w-[300px] gap-3 rounded-xl bg-[#f1f2f4] p-3 text-[#172b4d]">
       {open ? (
         <InlineCardEditor
           value={value}
           setValue={setValue}
-          onSave={onSave}
+          onSave={() => {
+            onSave()
+            if (!value.trim()) return
+            setSaved(value.trim())
+            setOpen(false)
+          }}
           onCancel={() => {
             onCancel()
             setOpen(false)
           }}
         />
       ) : (
-        <p>Editor closed</p>
+        <div><p>Editor closed</p><p>{saved}</p></div>
       )}
       {showOutsideTarget && (
         <button

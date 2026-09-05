@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react'
 import { CanvasCard } from './CanvasCard'
 import { InlineCardEditor } from './InlineCardEditor'
 import type { CanvasSectionProps } from './CanvasSection.types'
@@ -22,6 +23,15 @@ export function CanvasCardSlot({ card, index, sectionProps }: Props) {
   } = sectionProps
   const isEditing =
     editingCard?.sectionId === section.id && editingCard.index === index
+
+  const slotRef = useRef<HTMLDivElement>(null)
+  const wasEditing = useRef(false)
+  useLayoutEffect(() => {
+    if (wasEditing.current && !isEditing && document.activeElement === document.body) {
+      slotRef.current?.querySelector<HTMLButtonElement>('.card-content')?.focus()
+    }
+    wasEditing.current = isEditing
+  }, [isEditing])
 
   if (isEditing) {
     return (
@@ -53,7 +63,8 @@ export function CanvasCardSlot({ card, index, sectionProps }: Props) {
 
   return (
     <div
-      className={`canvas-card-drop-slot relative min-w-0 transition-[transform,opacity] duration-180 ease-out motion-reduce:transition-none ${isDragged ? 'opacity-35' : 'opacity-100'}`}
+      ref={slotRef}
+      className={`canvas-card-drop-slot relative min-w-0 transition-[transform,opacity] duration-180 ease-out motion-reduce:transition-none ${isDragged ? 'opacity-80' : 'opacity-100'}`}
       style={
         shift === 0 ? undefined : { transform: `translate3d(0, ${shift}px, 0)` }
       }

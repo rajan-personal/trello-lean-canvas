@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react'
 import { CanvasCardList } from './CanvasCardList'
 import type { CanvasSectionProps } from './CanvasSection.types'
 
@@ -20,6 +21,14 @@ export function CanvasSection(props: CanvasSectionProps) {
   } = props
   const isAdding = addingSectionId === section.id
   const hasHint = section.cards.length === 0 && !isAdding
+  const addButtonRef = useRef<HTMLButtonElement>(null)
+  const wasAdding = useRef(false)
+  useLayoutEffect(() => {
+    if (wasAdding.current && !isAdding && document.activeElement === document.body) {
+      addButtonRef.current?.focus()
+    }
+    wasAdding.current = isAdding
+  }, [isAdding])
   return (
     <section
       className={`canvas-cell flex min-h-0 min-w-0 flex-[1_0_auto] flex-col px-[9px] pt-[11px] pb-[9px] ${bottom ? 'bottom-cell min-h-[150px] w-full' : 'min-h-[200px]'}`}
@@ -43,6 +52,7 @@ export function CanvasSection(props: CanvasSectionProps) {
       <CanvasCardList {...props} />
       {!isAdding && (
         <button
+          ref={addButtonRef}
           className="add-card-button mt-[7px] min-h-7 w-full rounded-md border-0 bg-transparent px-[7px] py-1 text-left text-xs leading-[18px] text-[#44546f] hover:bg-[#dcdfe4] hover:text-[#172b4d]"
           onClick={() => startAddingCard(section.id)}
         >

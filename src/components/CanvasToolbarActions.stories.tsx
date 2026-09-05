@@ -1,3 +1,4 @@
+import { CanvasToolbarHarness } from './CanvasToolbarActions.story-support'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn } from 'storybook/test'
 import { CanvasToolbarActions } from './CanvasToolbarActions'
@@ -7,6 +8,7 @@ const meta = {
   title: 'Lean Canvas/CanvasToolbarActions',
   component: CanvasToolbarActions,
   tags: ['autodocs'],
+  render: (args) => <CanvasToolbarHarness {...args} />,
   parameters: { layout: 'centered' },
   decorators: [
     (Story) => (
@@ -32,11 +34,14 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Favorite canvas' }))
+    await expect(canvas.getByRole('button', { name: 'Favorite canvas' })).toHaveAttribute('aria-pressed', 'true')
     await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
-    await userEvent.click(canvas.getByRole('button', { name: 'Delete board' }))
+    await expect(canvas.getByRole('button', { name: 'Notepad' })).toHaveAttribute('aria-expanded', 'true')
+    await userEvent.click(canvas.getByRole('button', { name: 'Delete canvas' }))
     await expect(args.onFavorite).toHaveBeenCalledOnce()
     await expect(args.onToggleNotepad).toHaveBeenCalledOnce()
     await expect(args.onDelete).toHaveBeenCalledOnce()
+    await expect(canvas.getByText('Canvas deleted')).toBeVisible()
   },
 }
 

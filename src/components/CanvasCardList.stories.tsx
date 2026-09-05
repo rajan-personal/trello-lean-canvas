@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
+import { CanvasSectionHarness } from './CanvasSection.story-harness'
 import { CanvasCardList } from './CanvasCardList'
 import {
   storySectionProps,
@@ -19,6 +20,7 @@ const meta = {
     ),
   ],
   args: storySectionProps,
+  render: (args) => <CanvasSectionHarness {...args}>{(props) => <CanvasCardList {...props} />}</CanvasSectionHarness>,
 } satisfies Meta<typeof CanvasCardList>
 
 export default meta

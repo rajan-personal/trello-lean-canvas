@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect } from 'storybook/test'
+import { CanvasBoardHarness } from './CanvasBoard.story-support'
 import { CanvasBoard } from './CanvasBoard'
 import {
   storyBoardSectionProps,
@@ -18,6 +19,7 @@ const meta = {
       </div>
     ),
   ],
+  render: (args) => <CanvasBoardHarness {...args} />,
   args: {
     sections: storySections,
     sectionProps: storyBoardSectionProps,

@@ -17,7 +17,6 @@ function NotepadHarness(args: Props) {
     />
   )
 }
-
 const meta = {
   title: 'Lean Canvas/NotepadPanel',
   component: NotepadPanel,
@@ -50,6 +49,7 @@ export const Open: Story = {
     fireEvent.change(notes, {
       target: { value: 'A concise research note' },
     })
+    await expect(notes).toHaveValue('A concise research note')
     await expect(args.onChange).toHaveBeenLastCalledWith(
       'A concise research note',
     )
@@ -91,8 +91,9 @@ export const Mobile: Story = {
     await expect([bounds.left, bounds.right, bounds.bottom]).toEqual([
       0, window.innerWidth, window.innerHeight,
     ])
-    await expect(canvas.getByRole('separator', { name: 'Resize notepad' }))
-      .not.toBeVisible()
+    const separator = canvas.getByLabelText('Resize notepad')
+    await expect(separator).toBeInTheDocument()
+    await expect(separator).not.toBeVisible()
     await expect(canvas.getByRole('textbox', { name: 'Canvas notes' }))
       .toBeVisible()
   },

@@ -1,3 +1,4 @@
+import { CanvasCardHarness } from './CanvasCard.story-support'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn } from 'storybook/test'
 import { CanvasCard } from './CanvasCard'
@@ -5,6 +6,7 @@ import { CanvasCard } from './CanvasCard'
 const meta = {
   title: 'Lean Canvas/CanvasCard',
   component: CanvasCard,
+  render: (args) => <CanvasCardHarness {...args} />,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -39,6 +41,7 @@ export const Plain: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.dblClick(canvas.getByRole('button', { name: args.text }))
     await expect(args.onEdit).toHaveBeenCalledWith('problem', 0, args.text)
+    await expect(canvas.getByRole('textbox', { name: 'Edit card' })).toHaveValue(args.text)
   },
 }
 
@@ -58,6 +61,8 @@ export const DeleteInteraction: Story = {
     await expect(deleteButton).toHaveStyle({ opacity: '1' })
     await userEvent.click(deleteButton)
     await expect(args.onDelete).toHaveBeenCalledWith('problem', 0)
+    await expect(canvas.getByText('Card deleted')).toBeVisible()
+    await expect(canvas.queryByTitle('Double-click to edit; drag to move')).not.toBeInTheDocument()
   },
 }
 
@@ -67,5 +72,6 @@ export const KeyboardEdit: Story = {
     canvas.getByRole('button', { name: args.text }).focus()
     await userEvent.keyboard('{enter}')
     await expect(args.onEdit).toHaveBeenCalledWith('problem', 0, args.text)
+    await expect(canvas.getByRole('textbox', { name: 'Edit card' })).toHaveValue(args.text)
   },
 }

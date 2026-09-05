@@ -10,6 +10,13 @@ export function useCardEditing(
   const [addingSectionId, setAddingSectionId] = useState<SectionId | null>(null)
   const [cardDraft, setCardDraft] = useState('')
   const [editingCard, setEditingCard] = useState<EditingCard | null>(null)
+  const [ownerId, setOwnerId] = useState(state.activeCanvas?.id)
+  if (ownerId !== state.activeCanvas?.id) {
+    setOwnerId(state.activeCanvas?.id)
+    setAddingSectionId(null)
+    setCardDraft('')
+    setEditingCard(null)
+  }
   const updateSection = (
     id: SectionId,
     update: (section: CanvasSectionData) => CanvasSectionData,

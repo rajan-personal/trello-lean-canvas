@@ -17,13 +17,20 @@ function Harness({
 }: Props) {
   const [value, setValue] = useState(initialValue)
   const [open, setOpen] = useState(true)
+  const [saved, setSaved] = useState<string[]>([])
   return (
     <div className="storybook-composer-harness grid gap-3 [&>button]:justify-self-start [&>button]:rounded-[5px] [&>button]:border [&>button]:border-[#b7bec8] [&>button]:bg-white [&>button]:px-2 [&>button]:py-[5px] [&>button]:text-xs [&>button]:text-[#44546f]">
       {open ? (
         <CardComposer
           value={value}
           setValue={setValue}
-          onSave={onSave}
+          onSave={() => {
+            onSave()
+            if (!value.trim()) return
+            setSaved((cards) => [...cards, value.trim()])
+            setValue('')
+            setOpen(false)
+          }}
           onCancel={() => {
             onCancel()
             setOpen(false)
@@ -34,6 +41,7 @@ function Harness({
           Resume draft
         </button>
       )}
+      {saved.map((card, index) => <p key={index}>{card}</p>)}
       {showOutsideTarget && (
         <button type="button" className="storybook-outside-target">
           Outside composer

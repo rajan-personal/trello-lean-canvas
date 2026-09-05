@@ -1,3 +1,4 @@
+import { BoardTitleHarness } from './BoardTitle.story-support'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fireEvent, fn } from 'storybook/test'
 import { BoardTitle } from './BoardTitle'
@@ -6,6 +7,7 @@ import { storyCanvas } from './component-story-fixtures'
 const meta = {
   title: 'Lean Canvas/BoardTitle',
   component: BoardTitle,
+  render: (args) => <BoardTitleHarness {...args} />,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },
   decorators: [
@@ -27,8 +29,9 @@ export const Default: Story = {
     const input = canvas.getByRole('textbox', { name: 'Rename canvas' })
     await expect(input).toHaveFocus()
     fireEvent.change(input, { target: { value: 'Customer discovery' } })
-    fireEvent.focusOut(input)
+    await userEvent.tab()
     await expect(args.onRename).toHaveBeenCalledWith('Customer discovery')
+    await expect(canvas.getByRole('heading', { name: 'Customer discovery' })).toBeVisible()
   },
 }
 

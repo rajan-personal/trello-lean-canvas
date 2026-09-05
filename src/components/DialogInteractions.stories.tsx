@@ -46,7 +46,8 @@ export const BackdropDismiss: DialogStory = {
     if (!(backdrop instanceof HTMLElement)) {
       throw new Error('Dialog backdrop is missing')
     }
-    fireEvent.mouseDown(backdrop)
+    const bounds = backdrop.getBoundingClientRect()
+    fireEvent.mouseDown(backdrop, { clientX: bounds.left - 1, clientY: bounds.top - 1 })
     await waitFor(() =>
       expect(canvas.queryByRole('dialog')).not.toBeInTheDocument(),
     )

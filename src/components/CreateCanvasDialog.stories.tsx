@@ -12,12 +12,13 @@ const initialDialog: CanvasDialogState = {
 
 function Harness({ onCreate }: { onCreate: (name: string) => void }) {
   const [dialog, setDialog] = useState<CanvasDialogState | null>(initialDialog)
+  const [created, setCreated] = useState('')
   return (
-    <CreateCanvasDialog
+    <><p className="text-white">{created}</p><CreateCanvasDialog
       dialog={dialog}
       setDialog={setDialog}
-      onCreate={onCreate}
-    />
+      onCreate={(name) => { onCreate(name); setCreated(name) }}
+    /></>
   )
 }
 
@@ -39,6 +40,7 @@ export const SubmitTrimmedName: Story = {
     fireEvent.change(input, { target: { value: '  Customer research  ' } })
     await userEvent.click(canvas.getByRole('button', { name: 'Create canvas' }))
     await expect(args.onCreate).toHaveBeenCalledWith('Customer research')
+    await expect(canvas.getByText('Customer research')).toBeVisible()
     await expect(canvas.queryByRole('dialog')).not.toBeInTheDocument()
   },
 }

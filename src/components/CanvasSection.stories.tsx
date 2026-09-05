@@ -34,7 +34,7 @@ export const DraggingDown: CanvasSectionStory = {
       '.canvas-card-drop-slot',
     )
     await expect(slots).toHaveLength(3)
-    await expect(slots[0]).toHaveStyle({ opacity: '0.35' })
+    await expect(slots[0]).toHaveStyle({ opacity: '0.8' })
     await expect(slots[1].style.transform).toBe(
       'translate3d(0px, -48px, 0px)',
     )

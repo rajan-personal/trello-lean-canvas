@@ -20,7 +20,9 @@ export const Save: Story = {
       target: { value: 'Updated customer problem' },
     })
     await userEvent.click(canvas.getByRole('button', { name: 'Save' }))
+    await expect(canvas.getByText('Updated customer problem')).toBeVisible()
     await expect(args.onSave).toHaveBeenCalledOnce()
+    await expect(canvas.queryByRole('textbox')).not.toBeInTheDocument()
   },
 }
 
@@ -31,14 +33,20 @@ export const SaveWithKeyboardShortcut: Story = {
       target: { value: 'Saved from the keyboard' },
     })
     await userEvent.keyboard('{Control>}{Enter}{/Control}')
+    await expect(canvas.getByText('Saved from the keyboard')).toBeVisible()
     await expect(args.onSave).toHaveBeenCalledOnce()
+    await expect(canvas.queryByRole('textbox')).not.toBeInTheDocument()
   },
 }
 
 export const EmptyDisablesSave: Story = {
   args: { initialValue: '' },
-  play: async ({ canvas }) => {
+  play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByRole('button', { name: 'Save' })).toBeDisabled()
+    await userEvent.type(canvas.getByRole('textbox', { name: 'Edit card' }), '   ')
+    await userEvent.keyboard('{Control>}{Enter}{/Control}')
+    await expect(args.onSave).not.toHaveBeenCalled()
+    await expect(canvas.getByRole('textbox', { name: 'Edit card' })).toHaveValue('   ')
   },
 }
 

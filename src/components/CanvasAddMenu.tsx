@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useId, useRef, useState, type ChangeEvent } from 'react'
 import { Plus } from 'lucide-react'
 import { brandActionButtonClass } from './workspace-classes'
 
@@ -12,6 +12,7 @@ const itemClass =
   'flex min-h-9 w-full items-center rounded-md border-0 bg-transparent px-3 text-left text-sm font-medium text-[#172b4d] hover:bg-[#f1f2f4] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#0c66e4]'
 
 export function CanvasAddMenu({ onNew, onImport, onLoadSamples }: Props) {
+  const menuId = useId()
   const triggerRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -37,16 +38,16 @@ export function CanvasAddMenu({ onNew, onImport, onLoadSamples }: Props) {
         type="button"
         className={`${brandActionButtonClass} new-canvas-button ms-auto`}
         aria-label="Add canvas"
-        aria-controls="canvas-add-menu"
+        aria-controls={menuId}
         aria-expanded={open}
-        popoverTarget="canvas-add-menu"
+        popoverTarget={menuId}
         onClick={positionMenu}
       >
         <Plus size={20} />
       </button>
       <div
         ref={menuRef}
-        id="canvas-add-menu"
+        id={menuId}
         popover="auto"
         role="group"
         aria-label="Add canvas options"
