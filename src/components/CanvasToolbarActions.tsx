@@ -1,6 +1,5 @@
 import { Download, NotebookPen, Star, Trash2 } from 'lucide-react'
 import type { LeanCanvas } from '../data/types'
-import { downloadYaml } from '../data/download'
 import { ToolbarIconButton } from './ToolbarIconButton'
 
 interface Props {
@@ -9,7 +8,7 @@ interface Props {
   onFavorite: () => void
   onToggleNotepad: () => void
   onDelete: () => void
-  onNotify: (text: string) => void
+  onDownload: () => void
 }
 
 export function CanvasToolbarActions({
@@ -18,7 +17,7 @@ export function CanvasToolbarActions({
   onFavorite,
   onToggleNotepad,
   onDelete,
-  onNotify,
+  onDownload,
 }: Props) {
   return (
     <>
@@ -43,10 +42,7 @@ export function CanvasToolbarActions({
       <ToolbarIconButton
         label="Download canvas data as YAML"
         title="Download YAML"
-        onClick={() => {
-          downloadYaml(canvas)
-          onNotify(`${canvas.name}.yaml downloaded`)
-        }}
+        onClick={onDownload}
       >
         <Download size={17} />
       </ToolbarIconButton>

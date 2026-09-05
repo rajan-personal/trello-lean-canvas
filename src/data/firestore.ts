@@ -6,11 +6,13 @@ import { parseResult, workspaceSchema } from './canvas-schema'
 import { initializeWorkspace } from './firestore-migration'
 import { canvasesPath, decodeCanvas, workspacePath, type WorkspaceValue } from './firestore-model'
 import { saveCanvasDiff } from './firestore-writes'
+import type { BoardData } from './board'
+import type { PendingImport } from './board-storage'
 import type { LeanCanvas } from './types'
 
 const db = getFirestore(firebaseApp)
-export async function prepareWorkspace(uid: string, local: LeanCanvas[]) {
-  return initializeWorkspace(db, uid, local)
+export async function prepareWorkspace(uid: string, local: LeanCanvas[], localBoards: Record<string, BoardData> = {}) {
+  return initializeWorkspace(db, uid, local, localBoards)
 }
 export function subscribeToWorkspace(
   uid: string, onValue: (value: WorkspaceValue) => void,
@@ -53,7 +55,7 @@ export function subscribeToWorkspace(
   return () => { stopParent(); stopChildren() }
 }
 export function saveWorkspaceDiff(
-  uid: string, previous: WorkspaceValue, next: LeanCanvas[],
+  uid: string, previous: WorkspaceValue, next: LeanCanvas[], imports: PendingImport[] = [],
 ): Promise<WorkspaceValue> {
-  return saveCanvasDiff(db, uid, previous, next)
+  return saveCanvasDiff(db, uid, previous, next, imports)
 }

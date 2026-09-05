@@ -1,4 +1,4 @@
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
 import { Menu } from 'lucide-react'
 import type { LeanCanvas } from '../data/types'
 import { BoardTitle } from './BoardTitle'
@@ -7,6 +7,7 @@ import { CanvasToolbarActions } from './CanvasToolbarActions'
 import { toolbarButtonClass } from './workspace-classes'
 
 interface Props {
+  tabs?: ReactNode
   canvas?: LeanCanvas
   sidebarOpen: boolean
   sidebarCollapsed: boolean
@@ -20,7 +21,7 @@ interface Props {
   onToggleNotepad: () => void
   onDelete: () => void
   onImport: (event: ChangeEvent<HTMLInputElement>) => void
-  onNotify: (text: string) => void
+  onDownload: () => void
 }
 
 export function TopBar(props: Props) {
@@ -63,6 +64,7 @@ export function TopBar(props: Props) {
             onRename={props.onRename}
           />
         )}
+        {props.tabs}
         <span className="toolbar-spacer flex-1" />
         {canvas && (
           <CanvasToolbarActions
@@ -71,7 +73,7 @@ export function TopBar(props: Props) {
             onFavorite={props.onFavorite}
             onToggleNotepad={props.onToggleNotepad}
             onDelete={props.onDelete}
-            onNotify={props.onNotify}
+            onDownload={props.onDownload}
           />
         )}
       </div>

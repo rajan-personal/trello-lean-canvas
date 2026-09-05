@@ -1,6 +1,8 @@
-import { useState, type Dispatch, type SetStateAction } from 'react'
+import { type Dispatch, type SetStateAction } from 'react'
 import type { LeanCanvas } from '../data/types'
 import { usePersistedCanvases } from './usePersistedCanvases'
+import { useCanvasSelection } from './useCanvasSelection'
+import type { BoardRepository } from '../data/board-repository'
 
 export interface CanvasState {
   canvases: LeanCanvas[]
@@ -8,22 +10,25 @@ export interface CanvasState {
   activeId: string | null
   setActiveId: Dispatch<SetStateAction<string | null>>
   activeCanvas: LeanCanvas | undefined
+  deleted?: boolean
   loading: boolean
   error: string | null
+  pending: boolean
+  boards: BoardRepository
+  flushCanvases: () => Promise<void>
   updateActiveCanvas: (updater: (canvas: LeanCanvas) => LeanCanvas) => void
 }
 
 export function useCanvasState(
   uid: string,
   persistence: 'firestore' | 'local' = 'firestore',
+  retainDeleted = false,
 ): CanvasState {
-  const { canvases, setCanvases, loading, error } = usePersistedCanvases(
+  const { canvases, setCanvases, loading, error, pending, boards, flushCanvases } = usePersistedCanvases(
     uid,
     persistence,
   )
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const activeCanvas =
-    canvases.find((canvas) => canvas.id === activeId) ?? canvases[0]
+  const { activeId, setActiveId, activeCanvas, deleted } = useCanvasSelection(canvases, retainDeleted)
   const updateActiveCanvas = (updater: (canvas: LeanCanvas) => LeanCanvas) => {
     if (!activeCanvas) return
     setCanvases((current) =>
@@ -33,7 +38,7 @@ export function useCanvasState(
     )
   }
   return {
-    canvases, setCanvases, activeId, setActiveId, activeCanvas,
-    loading, error, updateActiveCanvas,
+    canvases, setCanvases, activeId, setActiveId, activeCanvas, deleted,
+    loading, error, pending, boards, flushCanvases, updateActiveCanvas,
   }
 }

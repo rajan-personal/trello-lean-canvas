@@ -54,11 +54,85 @@ service cloud.firestore {
           && ((!exists(/databases/$(database)/documents/users/$(userId)/workspaces/default))
             || !get(/databases/$(database)/documents/users/$(userId)/workspaces/default).data.keys().hasAny(['schemaVersion'])
             || canvasId in getAfter(/databases/$(database)/documents/users/$(userId)/workspaces/default).data.canvasOrder);
+        function boardRef() {
+          return /databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId)/boards/default;
+        }
         allow update: if owner(userId) && workspaceId == 'default'
           && validCanvas(request.resource.data)
+          && (!exists(boardRef()) || get(boardRef()).data.status != 'deleting')
           && request.resource.data.revision == resource.data.revision + 1;
         allow delete: if owner(userId) && workspaceId == 'default'
-          && !(canvasId in getAfter(/databases/$(database)/documents/users/$(userId)/workspaces/default).data.canvasOrder);
+          && !(canvasId in getAfter(/databases/$(database)/documents/users/$(userId)/workspaces/default).data.canvasOrder)
+          && !existsAfter(boardRef());
+        match /boards/{boardId} {
+          function ownsBoard() { return owner(userId) && workspaceId == 'default' && boardId == 'default'; }
+          function canvasRef() {
+            return /databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId);
+          }
+          function validBoard(data) {
+            return data.keys().hasOnly(['schemaVersion', 'canvasId', 'revision', 'columns',
+                'status', 'importId', 'deletingCardId', 'updatedAt'])
+              && data.schemaVersion == 1 && data.canvasId == canvasId
+              && data.revision is int && data.revision > 0
+              && data.columns is list && data.columns.size() <= 100
+              && data.status in ['active', 'importing', 'deleting', 'deleting-card']
+              && data.importId is string && data.deletingCardId is string
+              && data.updatedAt == request.time;
+          }
+          function writable() {
+            let before = get(boardRef()).data;
+            let after = getAfter(boardRef()).data;
+            return existsAfter(canvasRef()) && (
+              (before.status == 'active' && after.status == 'active' && after.revision == before.revision + 1)
+              || (before.status == 'importing' && after.status == 'importing'));
+          }
+          function validCard(data) {
+            return data.keys().hasOnly(['schemaVersion', 'canvasId', 'columnId', 'title', 'description', 'rank', 'updatedAt'])
+              && data.schemaVersion == 1 && data.canvasId == canvasId
+              && data.columnId is string && data.columnId.size() > 0
+              && data.title is string && data.title.size() > 0 && data.title.size() <= 500
+              && data.description is string && data.description.size() <= 100000
+              && data.rank is string && data.rank.matches('^[0-9a-z]*[1-9a-z]$') && data.rank.size() <= 2048
+              && data.updatedAt == request.time;
+          }
+          function canDeleteCard(cardId) {
+            let board = get(boardRef()).data;
+            return board.status == 'deleting' ||
+              (board.status == 'deleting-card' && board.deletingCardId == cardId);
+          }
+          allow read: if ownsBoard();
+          allow create: if ownsBoard() && existsAfter(canvasRef())
+            && validBoard(request.resource.data) && request.resource.data.revision == 1
+            && request.resource.data.status in ['active', 'importing', 'deleting'];
+          allow update: if ownsBoard() && existsAfter(canvasRef()) && validBoard(request.resource.data)
+            && request.resource.data.revision == resource.data.revision + 1
+            && request.resource.data.importId == resource.data.importId
+            && resource.data.status != 'deleting';
+          allow delete: if ownsBoard() && resource.data.status == 'deleting' && !existsAfter(canvasRef());
+          match /cards/{cardId} {
+            allow read: if ownsBoard();
+            allow create, update: if ownsBoard() && writable() && validCard(request.resource.data);
+            allow delete: if ownsBoard() && canDeleteCard(cardId);
+          }
+          match /comments/{commentId} {
+            function validComment(data) {
+              return data.keys().hasOnly(['schemaVersion', 'canvasId', 'cardId', 'authorId', 'authorName', 'text', 'createdAt', 'updatedAt'])
+                && data.schemaVersion == 1 && data.canvasId == canvasId
+                && data.cardId is string
+                && existsAfter(/databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId)/boards/default/cards/$(data.cardId))
+                && data.authorId is string && data.authorId.size() > 0
+                && (get(boardRef()).data.status == 'importing' || data.authorId == request.auth.uid)
+                && data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 500
+                && data.text is string && data.text.size() > 0 && data.text.size() <= 10000
+                && data.createdAt is string && data.createdAt.size() <= 40 && data.updatedAt == request.time;
+            }
+            allow read: if ownsBoard();
+            allow create: if ownsBoard() && writable() && validComment(request.resource.data);
+            allow update: if ownsBoard() && get(boardRef()).data.status == 'importing'
+              && writable() && validComment(request.resource.data);
+            allow delete: if ownsBoard() && canDeleteCard(resource.data.cardId);
+          }
+        }
       }
     }
   }
