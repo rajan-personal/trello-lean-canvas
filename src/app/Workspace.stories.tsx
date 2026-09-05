@@ -1,11 +1,10 @@
-import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, waitFor, within } from 'storybook/test'
 import type { LeanCanvas } from '../data/types'
 import { storyCanvas } from '../components/component-story-fixtures'
 import { Workspace } from './Workspace'
+import { WorkspaceSeed } from './SeededWorkspace.story-support'
 
-const STORAGE_KEY = 'lean-canvas:v2'
 const user = {
   uid: 'storybook-user',
   displayName: 'Storybook User',
@@ -14,20 +13,16 @@ const user = {
 }
 
 function SeededWorkspace({ canvases }: { canvases: LeanCanvas[] }) {
-  const [ready] = useState(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(canvases))
-    return true
-  })
-  return ready ? (
+  return <WorkspaceSeed canvases={canvases}>
     <Workspace user={user} onSignOut={() => {}} persistence="local" />
-  ) : null
+  </WorkspaceSeed>
 }
 
 const meta = {
   title: 'Screens/Workspace',
   component: Workspace,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false } } },
   args: { user, onSignOut: () => {}, persistence: 'local' },
 } satisfies Meta<typeof Workspace>
 
@@ -39,7 +34,7 @@ export const Populated: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     await expect(
-      canvas.getByRole('heading', { name: 'Team alignment' }),
+      await canvas.findByRole('heading', { name: 'Team alignment' }),
     ).toBeInTheDocument()
     await userEvent.click(
       canvas.getByRole('button', { name: /^Notepad$/ }),
@@ -56,6 +51,7 @@ export const Empty: Story = {
   render: () => <SeededWorkspace canvases={[]} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
+    await canvas.findByRole('button', { name: 'Add canvas' })
     await expect(canvas.queryByRole('heading')).not.toBeInTheDocument()
     await expect(
       canvas.getByRole('button', { name: 'Add canvas' }),

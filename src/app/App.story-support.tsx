@@ -7,7 +7,6 @@ import { loadExampleCanvases } from '../data/examples'
 import { sectionTemplate } from '../data/sections'
 import type { LeanCanvas } from '../data/types'
 
-const STORAGE_KEY = 'lean-canvas:v2'
 const previewUser: AppUser = {
   uid: 'storybook-user',
   displayName: 'Storybook User',
@@ -22,6 +21,7 @@ export const blankCanvas: LeanCanvas = {
   notes: '',
   sections: sectionTemplate.map((section) => ({ ...section, cards: [] })),
 }
+const emptyCanvases: LeanCanvas[] = []
 
 interface SeededAppProps {
   canvases?: LeanCanvas[]
@@ -30,24 +30,24 @@ interface SeededAppProps {
 }
 
 export function SeededApp({
-  canvases = [],
+  canvases = emptyCanvases,
   samples = false,
   reordered = false,
 }: SeededAppProps) {
-  const [ready, setReady] = useState(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(canvases))
-    return !samples
-  })
+  const [ready, setReady] = useState(false)
   useEffect(() => {
-    if (!samples) return
-    void loadExampleCanvases().then((loaded) => {
-      const canvases = reordered
+    let active = true
+    void (samples ? loadExampleCanvases() : Promise.resolve(canvases)).then((loaded) => {
+      if (!active) return
+      const seed = reordered
         ? [loaded[1], loaded[0], ...loaded.slice(2)]
         : loaded
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(canvases))
+      localStorage.setItem('lean-canvas:v2', JSON.stringify(seed))
+      localStorage.setItem('lean-canvas:boards:v1', '{}')
       setReady(true)
     })
-  }, [reordered, samples])
+    return () => { active = false }
+  }, [canvases, reordered, samples])
   return ready ? <App previewUser={previewUser} /> : null
 }
 
@@ -58,6 +58,7 @@ export const appMeta = {
   parameters: {
     layout: 'fullscreen',
     docs: {
+      story: { inline: false },
       description: {
         component:
           'The authenticated Trello-style workspace with independent Lean Canvases.',

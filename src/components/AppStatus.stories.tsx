@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fn } from 'storybook/test'
+import { expect, fn, mocked, waitFor } from 'storybook/test'
 import { AppStatus } from './AppStatus'
 
 const meta = {
@@ -7,7 +7,7 @@ const meta = {
   component: AppStatus,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
-  args: { onSignOut: fn() },
+  args: { onSignOut: fn(), onRetry: fn() },
 } satisfies Meta<typeof AppStatus>
 
 export default meta
@@ -20,6 +20,23 @@ export const Loading: Story = {
       'Opening your workspace…',
     )
     await expect(canvas.queryByRole('button')).not.toBeInTheDocument()
+  },
+}
+
+export const PendingRetry: Story = {
+  args: { message: 'The workspace could not be synchronized.' },
+  play: async ({ args, canvas, userEvent }) => {
+    let finish!: () => void
+    mocked(args.onRetry!).mockImplementationOnce(() => new Promise<void>((resolve) => { finish = resolve }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Retry' }))
+    const retry = canvas.getByRole('button', { name: 'Retrying…' })
+    await expect(retry).toBeDisabled()
+    await expect(retry).toHaveAttribute('aria-busy', 'true')
+    await expect(canvas.getByRole('button', { name: 'Sign out' })).toBeDisabled()
+    await userEvent.click(retry)
+    await expect(args.onRetry).toHaveBeenCalledOnce()
+    finish()
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Retry' })).toBeEnabled())
   },
 }
 

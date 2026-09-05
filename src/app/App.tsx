@@ -3,6 +3,7 @@ import { AuthProvider } from '../auth/AuthProvider'
 import { LoginScreen } from '../auth/LoginScreen'
 import { type AppUser, useAuth } from '../auth/auth-context'
 import { AppStatus } from '../components/AppStatus'
+import { SyncError } from '../components/SyncError'
 
 const Workspace = lazy(() =>
   import('./Workspace').then((module) => ({ default: module.Workspace })),
@@ -26,7 +27,7 @@ function WorkspaceScreen({
 }: {
   user: AppUser
   local?: boolean
-  onSignOut: () => void
+  onSignOut: () => void | Promise<void>
 }) {
   return (
     <Suspense fallback={<AppStatus />}>
@@ -39,7 +40,7 @@ function WorkspaceScreen({
   )
 }
 
-function AuthenticatedApp() {
+export function AuthenticatedApp({ local = false }: { local?: boolean }) {
   const auth = useAuth()
   if (auth.loading) return <AppStatus />
   if (!auth.user)
@@ -51,11 +52,13 @@ function AuthenticatedApp() {
       />
     )
   return (
-    <WorkspaceScreen
+    <><WorkspaceScreen
       key={auth.user.uid}
       user={auth.user}
-      onSignOut={() => void auth.signOut()}
+      local={local}
+      onSignOut={() => auth.signOut()}
     />
+    {auth.error && <SyncError message={auth.error} />}</>
   )
 }
 

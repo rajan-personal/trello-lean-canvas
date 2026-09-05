@@ -20,7 +20,7 @@ import { WorkspaceHeader } from './WorkspaceHeader'
 import { WorkspaceViewPanel } from './WorkspaceViewPanel'
 interface Props {
   user: AppUser
-  onSignOut: () => void
+  onSignOut: () => void | Promise<void>
   persistence?: 'firestore' | 'local'
 }
 export function Workspace({ user, onSignOut, persistence }: Props) {
@@ -35,7 +35,7 @@ export function Workspace({ user, onSignOut, persistence }: Props) {
   const panels = useWorkspacePanels()
   const [dialog, setDialog] = useState<CanvasDialogState | null>(null)
   const sectionProps = { ...cards, dragHandlers }
-  const signOut = () => { if (guard.allow()) onSignOut() }
+  const signOut = () => { if (guard.allow()) return onSignOut() }
   if (state.loading) return <AppStatus />
   if (state.error && !state.activeCanvas) return <AppStatus message={state.error} onSignOut={signOut} />
   return (

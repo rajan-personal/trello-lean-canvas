@@ -20,3 +20,16 @@ export const Visible: Story = {
     )
   },
 }
+
+export const MobileLongMessage: Story = {
+  globals: { viewport: { value: 'mobile1', isRotated: false } },
+  args: { message: `Cannot synchronize ${'synthetic-identifier'.repeat(25)}. Please try again.` },
+  play: async ({ canvas }) => {
+    const alert = canvas.getByRole('alert')
+    await expect(window.innerWidth).toBe(320)
+    await expect(alert).toBeVisible()
+    await expect(alert.getBoundingClientRect().left).toBeGreaterThanOrEqual(0)
+    await expect(alert.getBoundingClientRect().right).toBeLessThanOrEqual(window.innerWidth)
+    await expect(alert.scrollWidth).toBeLessThanOrEqual(alert.clientWidth)
+  },
+}

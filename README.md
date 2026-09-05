@@ -55,6 +55,15 @@ npm run storybook
 
 Open `http://127.0.0.1:6006` to browse components and run their interaction and accessibility checks locally.
 
+Run all real Chromium story interactions and accessibility checks with:
+
+```bash
+npx playwright install --with-deps chromium # first-time browser setup
+npm run test:storybook
+```
+
+The Storybook 10 Vitest addon discovers the same stories as the workbench, applies preview hooks and viewport globals, and executes plays and axe checks. `build-storybook` only compiles the workbench; it is not an interaction-test pass. Storybook has an isolated Vite configuration so production PWA precaching never includes its manager assets. See [the audit and ticket handoff](docs/storybook-audit.md) for exact validation commands, results, and outstanding defects.
+
 ## Verify
 
 ```bash
@@ -65,6 +74,7 @@ npm run test:firestore
 npm run build
 npm run test:e2e
 npm run build-storybook
+npm run test:storybook
 ```
 
 The Firestore test command starts the local emulator and requires Java 21 or newer; on macOS the runner selects the newest installed JDK automatically. It covers owner isolation, malformed writes, per-canvas documents, and repeatable legacy migration. Playwright builds in Vite's `test` mode and uses the test-only local persistence seam from [`.env.test`](.env.test); production builds always use Firebase Authentication and Firestore.
