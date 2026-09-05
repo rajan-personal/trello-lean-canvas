@@ -1,5 +1,6 @@
 import type { LeanCanvas } from './types'
 import { canvasToYaml } from './yaml'
+import type { BoardData } from './board'
 
 function canvasFileName(name: string): string {
   return (
@@ -10,8 +11,8 @@ function canvasFileName(name: string): string {
   )
 }
 
-export function downloadYaml(canvas: LeanCanvas): void {
-  const blob = new Blob([canvasToYaml(canvas)], {
+export function downloadYaml(canvas: LeanCanvas, board?: BoardData): void {
+  const blob = new Blob([canvasToYaml(canvas, board)], {
     type: 'application/yaml;charset=utf-8',
   })
   const url = URL.createObjectURL(blob)

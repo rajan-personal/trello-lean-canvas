@@ -1,29 +1,33 @@
-import {
-  doc, getDocFromServer, runTransaction, serverTimestamp, type Firestore,
-} from 'firebase/firestore'
+import { doc, getDocFromServer, runTransaction, serverTimestamp, type Firestore } from 'firebase/firestore'
 import { legacyWorkspaceSchema, parseResult, workspaceSchema } from './canvas-schema'
 import {
   canvasPayload, canvasesPath, decodeCanvas, equalCanvas, isLegacy,
   migrationCanvases, workspacePath,
 } from './firestore-model'
+import type { BoardData } from './board'
+import type { PendingImport } from './board-storage'
+import { prepareImportReservations } from './board-import-reservation'
 import type { LeanCanvas } from './types'
-
 const CHUNK_SIZE = 400
 const sameSource = (data: unknown, source: string | null) =>
   source === null ? data === undefined : isLegacy(data as Record<string, unknown>) &&
     JSON.stringify((data as { canvases: unknown }).canvases) === source
-
 async function copyChildren(
-  db: Firestore, uid: string, canvases: LeanCanvas[], source: string | null,
+  db: Firestore, uid: string, canvases: LeanCanvas[], source: string | null, imports: PendingImport[],
 ) {
   const parent = doc(db, workspacePath(uid))
-  for (let start = 0; start < canvases.length; start += CHUNK_SIZE) {
-    const chunk = canvases.slice(start, start + CHUNK_SIZE)
+  // Board reservations add rule reads and writes; bound these transactions accordingly.
+  const chunkSize = imports.length ? 8 : CHUNK_SIZE
+  for (let start = 0; start < canvases.length; start += chunkSize) {
+    const chunk = canvases.slice(start, start + chunkSize)
     await runTransaction(db, async (transaction) => {
-      const current = await transaction.get(parent)
+      const [current, snapshots, reserveImports] = await Promise.all([
+        transaction.get(parent),
+        Promise.all(chunk.map((canvas) => transaction.get(doc(db, canvasesPath(uid), canvas.id)))),
+        prepareImportReservations(db, uid, transaction, imports.filter(({ canvas }) => chunk.some(({ id }) => id === canvas.id))),
+      ])
       if (!sameSource(current.data(), source)) throw new Error('Migration source changed; retry.')
-      const snapshots = await Promise.all(chunk.map((canvas) =>
-        transaction.get(doc(db, canvasesPath(uid), canvas.id))))
+      reserveImports()
       chunk.forEach((canvas, index) => {
         const existing = snapshots[index]
         if (existing.exists()) {
@@ -63,7 +67,7 @@ async function finalize(
   })
 }
 export async function initializeWorkspace(
-  db: Firestore, uid: string, localCanvases: LeanCanvas[],
+  db: Firestore, uid: string, localCanvases: LeanCanvas[], localBoards: Record<string, BoardData> = {},
 ): Promise<{ consumedLocal: boolean }> {
   const snapshot = await getDocFromServer(doc(db, workspacePath(uid)))
   const data = snapshot.data()
@@ -85,7 +89,11 @@ export async function initializeWorkspace(
     source = JSON.stringify((data as { canvases: unknown }).canvases)
   }
   const migrated = await migrationCanvases(sourceCanvases)
-  await copyChildren(db, uid, migrated, source)
+  const imports = source === null ? migrated.flatMap((canvas, index) => {
+    const board = localBoards[localCanvases[index].id]
+    return board ? [{ canvas, board, importId: `local-migration-${canvas.id}` }] : []
+  }) : []
+  await copyChildren(db, uid, migrated, source, imports)
   if (!await childrenMatch(db, uid, migrated)) throw new Error('Migration verification failed.')
   await finalize(db, uid, migrated, source)
   return { consumedLocal: !snapshot.exists() && localCanvases.length > 0 }

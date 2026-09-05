@@ -1,13 +1,11 @@
 import { dump, load } from 'js-yaml'
 import type { LeanCanvas } from './types'
 import { sectionTemplate } from './sections'
-
+import { boardDataSchema, createBoard, type BoardData } from './board'
 type UnknownRecord = Record<string, unknown>
-
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === 'object' && value !== null
 }
-
 function normalizeCard(card: unknown): string {
   if (typeof card === 'string') return card
   if (isRecord(card)) {
@@ -17,7 +15,6 @@ function normalizeCard(card: unknown): string {
   }
   return String(card ?? '')
 }
-
 function normalizeCards(cards: unknown): string[] {
   if (!Array.isArray(cards)) return []
   return cards.reduce<string[]>((normalized, card) => {
@@ -26,11 +23,11 @@ function normalizeCards(cards: unknown): string[] {
     return normalized
   }, [])
 }
-
-export function canvasToYaml(canvas: LeanCanvas): string {
+export function canvasToYaml(canvas: LeanCanvas, board?: BoardData): string {
   return dump(
     {
-      version: 1,
+      version: board ? 2 : 1,
+      ...(board ? { board: boardDataSchema.parse(board) } : {}),
       canvas: {
         id: canvas.id,
         name: canvas.name,
@@ -48,6 +45,12 @@ export function canvasToYaml(canvas: LeanCanvas): string {
     },
     { noRefs: true, lineWidth: 100, quotingType: '"', forceQuotes: false },
   )
+}
+export function yamlToCanvasBundle(source: string, fallbackCanvas: LeanCanvas): { canvas: LeanCanvas; board: BoardData } {
+  const parsed: unknown = load(source)
+  const board = isRecord(parsed) && parsed.board !== undefined
+    ? boardDataSchema.parse(parsed.board) : createBoard()
+  return { canvas: yamlToCanvas(source, fallbackCanvas), board }
 }
 
 export function yamlToCanvas(

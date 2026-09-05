@@ -31,7 +31,7 @@ const meta = {
     onToggleNotepad: fn(),
     onDelete: fn(),
     onImport: fn(),
-    onNotify: fn(),
+    onDownload: fn(),
   },
 } satisfies Meta<typeof TopBar>
 

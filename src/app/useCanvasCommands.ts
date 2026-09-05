@@ -1,7 +1,6 @@
-import type { ChangeEvent } from 'react'
 import { loadExampleCanvases } from '../data/examples'
 import { createBlankCanvas } from '../data/factories'
-import { yamlToCanvas } from '../data/yaml'
+import { canvasTransfer } from './canvas-transfer'
 import type { CanvasState } from './useCanvasState'
 
 export function useCanvasCommands(
@@ -60,26 +59,7 @@ export function useCanvasCommands(
     clearEditing()
     notify('Canvas deleted')
   }
-  const importYaml = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-    try {
-      const fallbackName =
-        file.name.replace(/\.ya?ml$/i, '') || 'Imported canvas'
-      const imported = yamlToCanvas(
-        await file.text(),
-        createBlankCanvas(fallbackName),
-      )
-      state.setCanvases((current) => [...current, imported])
-      state.setActiveId(imported.id)
-      clearEditing()
-      notify(`Imported ${file.name}`)
-    } catch (error) {
-      notify(error instanceof Error ? error.message : 'Could not import YAML')
-    } finally {
-      event.target.value = ''
-    }
-  }
+  const { importYaml, exportYaml } = canvasTransfer(state, clearEditing, notify)
   const selectCanvas = (id: string) => {
     state.setActiveId(id)
     clearEditing()
@@ -91,6 +71,7 @@ export function useCanvasCommands(
     renameCanvas,
     deleteCanvas,
     importYaml,
+    exportYaml,
     selectCanvas,
   }
 }
