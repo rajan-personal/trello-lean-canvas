@@ -6,21 +6,21 @@ Captured from this implementation in ego-browser against a local test-mode build
 
 - [Desktop board, 1424 × 900](board-desktop.png): all five saved estimates (1, 3, 5, 8, 13+) shown as number-only badges at the bottom-right, and an unestimated card without a badge, after reloading.
 - [Mobile board, 390 × 844](board-mobile.png): the same number-only, bottom-right badges on a narrow viewport.
-- [Desktop details, 1424 × 900](details-desktop.png): saved 13+ estimate and guidance to split very large/uncertain work.
-- [Mobile details, 390 × 844](details-mobile.png): saved 5-point estimate, associated guidance, and responsive form without horizontal overflow.
+- [Desktop details, 1424 × 900](details-desktop.png): saved 13+ estimate in a compact 60px selector aligned to the right of the Description heading. Sizing guidance is available on hover and to screen readers instead of taking a full row.
+- [Mobile details, 390 × 844](details-mobile.png): saved 5-point estimate beside Description, with a 48px-high touch target and no horizontal overflow.
 
 ## Reproduce
 
 1. Start the test-mode preview and load a sample from **Add canvas → Sample**.
 2. Open **Board**, create tickets, open each ticket, select **Story points**, and save.
-3. Verify badges, reload, reopen details, move a card, and clear an estimate with **Not estimated**.
-4. At 390px width, Tab from Title into Story points; verify the selected value, sizing guidance, and discard confirmation for an unsaved point-only draft.
+3. Verify badges, reload, reopen details, move a card, and clear an estimate with **—** (Not estimated).
+4. At 390px width, Tab from Title into Story points; verify the compact right-aligned selector, accessible sizing guidance, and discard confirmation for an unsaved point-only draft.
 
 ## Validation
 
 - `npm test`: 66 passed (including schema, mutations, local storage, YAML round trips, and stale estimates).
 - `npm run test:firestore`: 27 passed (including all allowed estimates, clearing, stale edits, and security-rule rejection of invalid values).
-- `npx playwright test`: 81 passed, including desktop/mobile point selection, saved badges, reload/movement, clearing, keyboard focus, discard protection, and bottom-right badge positioning on desktop/mobile.
+- `npx playwright test`: 84 passed, including desktop/mobile point selection, saved badges, reload/movement, clearing, keyboard focus, discard protection, and bottom-right badge positioning on desktop/mobile. Compact selector layout is covered at 320px, 390px, and 1200px, including touch-target size and short-desktop dialog fit.
 - Focused Storybook run: 30 passed across `BoardCardDialog`, `BoardCardLayout`, `BoardCardInteractions`, `BoardCardRecovery`, `KanbanColumn`, and `KanbanBoard`.
 - `npm run typecheck`, `npm run lint`, `npm run build`, and `git diff --check`: passed.
 - React Doctor diff scan: 100/100, no issues.

@@ -18,10 +18,14 @@ interface Props {
 }
 export function BoardCardDialog({ card, board, user, pending, deleted, error, run, onClose, register }: Props) {
   const titleId = useId()
+  const descriptionId = useId()
   const pointsId = useId()
   const pointsHelpId = useId()
   const editor = useBoardCardDraft(card, user, run)
   const { draft, setDraft } = editor
+  const pointsHelp = draft.storyPoints == null
+    ? 'Not estimated. Optional estimate of effort, complexity, and uncertainty.'
+    : storyPointGuidance[draft.storyPoints]
   const descriptionRef = useGrowingDescription(draft.description)
   const close = useDraftGuard(editor.dirty, pending, onClose, register)
   const exists = !deleted && board.cards.some((item) => item.id === card.id)
@@ -49,23 +53,26 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
               event.preventDefault(); event.currentTarget.form?.requestSubmit()
             }
           }} onChange={(event) => setDraft({ ...draft, title: event.target.value.replace(/\r?\n/g, ' ') })} /></div>
-        <div className="kanban-story-points-field">
-          <label htmlFor={pointsId}>Story points</label>
-          <select id={pointsId} name="storyPoints" aria-describedby={pointsHelpId} disabled={!exists}
-            value={draft.storyPoints ?? ''} onChange={(event) => setDraft({ ...draft,
-              storyPoints: event.target.value === '' ? null : storyPointsSchema.parse(Number(event.target.value)),
-            })}>
-            <option value="">Not estimated</option>
-            {storyPointValues.map((value) => <option key={value} value={value}>
-              {storyPointLabel(value)} {value === 1 ? 'point' : 'points'}
-            </option>)}
-          </select>
-          <p id={pointsHelpId} className="kanban-story-points-help">{draft.storyPoints == null
-            ? 'Optional estimate of effort, complexity, and uncertainty.'
-            : storyPointGuidance[draft.storyPoints]}</p>
+        <div className="kanban-description-field">
+          <div className="kanban-description-heading">
+            <label htmlFor={descriptionId}><AlignLeft size={17} aria-hidden="true" /> Description</label>
+            <div className="kanban-story-points-field">
+              <label htmlFor={pointsId}>Story points</label>
+              <select id={pointsId} name="storyPoints" aria-describedby={pointsHelpId} title={pointsHelp} disabled={!exists}
+                value={draft.storyPoints ?? ''} onChange={(event) => setDraft({ ...draft,
+                  storyPoints: event.target.value === '' ? null : storyPointsSchema.parse(Number(event.target.value)),
+                })}>
+                <option value="" aria-label="Not estimated">—</option>
+                {storyPointValues.map((value) => <option key={value} value={value} title={storyPointGuidance[value]}>
+                  {storyPointLabel(value)}
+                </option>)}
+              </select>
+              <span id={pointsHelpId} className="sr-only">{pointsHelp}</span>
+            </div>
+          </div>
+          <textarea id={descriptionId} ref={descriptionRef} name="description" rows={14} placeholder="Add a more detailed description…" maxLength={100000} readOnly={!exists} value={draft.description}
+            onChange={(event) => setDraft({ ...draft, description: event.target.value })} />
         </div>
-        <label className="kanban-description-field"><span><AlignLeft size={17} aria-hidden="true" /> Description</span><textarea ref={descriptionRef} name="description" rows={14} placeholder="Add a more detailed description…" maxLength={100000} readOnly={!exists} value={draft.description}
-          onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
         <div className="kanban-actions">
           <button type="submit" className="kanban-primary" disabled={!exists || !draft.title.trim()}>Save</button>
           <button type="button" onClick={close}>Cancel</button>

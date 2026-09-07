@@ -17,7 +17,7 @@ test('estimates persist on cards and in details after reload and movement, and c
   const modal = page.getByRole('dialog', { name: 'Card details' })
   const points = modal.getByRole('combobox', { name: 'Story points' })
   await expect(points).toHaveValue('')
-  await expect(points.locator('option')).toHaveText(['Not estimated', '1 point', '3 points', '5 points', '8 points', '13+ points'])
+  await expect(points.locator('option')).toHaveText(['—', '1', '3', '5', '8', '13+'])
   for (const [value, guidance] of [['1', 'Tiny, clear change'], ['3', 'Small standard task'], ['5', 'Moderate complexity'], ['8', 'Complex or risky'], ['13', 'split it']]) {
     await points.selectOption(value)
     await expect(points).toHaveAccessibleDescription(new RegExp(guidance))
@@ -64,7 +64,7 @@ test('point-only drafts are keyboard accessible and protected by discard confirm
   await openBoardCard(page, 'Change button text')
   await expect(points).toHaveValue('')
   const bounds = await points.boundingBox()
-  expect(bounds!.width).toBeGreaterThan(100)
+  expect(bounds!.width).toBe(60)
   expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(390)
   await points.selectOption('1')
   await modal.getByRole('button', { name: 'Save', exact: true }).click()
