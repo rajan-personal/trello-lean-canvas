@@ -19,6 +19,11 @@
 .kanban-card { display: block; width: 100%; margin-bottom: 8px; padding: 11px 12px; border: 0; border-radius: 8px; background: white; color: #172b4d; box-shadow: 0 1px 2px #091e4230, 0 0 0 1px #091e420a; cursor: grab; font-size: 14px; line-height: 1.45; text-align: left; overflow-wrap: anywhere; white-space: pre-wrap; transition: box-shadow 120ms ease, background-color 120ms ease; }
 .kanban-card:hover { background: #fafbfc; box-shadow: 0 2px 4px #091e4226, 0 0 0 2px #0c66e4; }
 .kanban-card:active { cursor: grabbing; }
+.kanban-story-points-badge { display: block; width: fit-content; margin-top: 8px; margin-inline-start: auto; padding: 2px 7px; border-radius: 5px; background: #e9f2ff; color: #0747a6; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.kanban-story-points-field { display: flex; align-items: center; gap: 6px; margin-inline-start: auto; flex-shrink: 0; }
+.kanban-dialog .kanban-story-points-field label { font-size: 12px; color: #44546f; }
+.kanban-dialog .kanban-story-points-field select { width: 60px; min-height: 32px; padding: 4px 6px; font-size: 16px; }
+@media (pointer: coarse) { .kanban-dialog .kanban-story-points-field select { min-height: 48px; } }
 .kanban-add-card { width: 100%; min-height: 36px; padding: 8px; border-radius: 7px; color: #44546f; text-align: left; }
 .kanban-add-column { flex: 0 0 272px; min-height: 48px; border-radius: 12px; padding: 12px 16px; background: #ffffffd9; box-shadow: 0 1px 2px #091e421a; text-align: left; }
 .kanban-add-card:hover { background: #dcdfe4; color: #172b4d; }
@@ -55,7 +60,9 @@ button.kanban-add-column:hover { background: #fff; }
 .kanban-dialog .kanban-title-field label { margin: 0; }
 /* Two textarea rows remain usable when content-based field sizing is unsupported. */
 .kanban-dialog .kanban-title-field textarea { field-sizing: content; min-height: 48px; max-height: 160px; font-size: 22px; font-weight: 650; line-height: 1.3; padding: 9px 10px; background: #fff; border-color: #b3b9c4; }
-.kanban-description-field > span { display: flex; align-items: center; gap: 7px; }
+.kanban-description-field { margin-bottom: 18px; }
+.kanban-description-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.kanban-dialog .kanban-description-heading label { display: flex; align-items: center; gap: 7px; margin: 0; white-space: nowrap; }
 .kanban-dialog .kanban-description-field textarea { field-sizing: content; height: auto; min-height: 320px; max-height: none; width: 100%; line-height: 1.6; overflow-y: hidden; resize: none; }
 .kanban-card-layout { align-items: start; }
 .kanban-comments { min-width: 0; border-left: 1px solid #dcdfe4; padding-left: 24px; }

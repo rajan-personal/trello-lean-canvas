@@ -1,7 +1,7 @@
 import { useId } from 'react'
 import type { RegisterDraftGuard } from '../../app/useNavigationGuard'
 import { BoardInlineComposer } from './BoardInlineComposer'
-import type { BoardCard, BoardColumn } from '../../data/board'
+import { storyPointLabel, type BoardCard, type BoardColumn } from '../../data/board'
 import { BoardColumnMenu } from './BoardColumnMenu'
 import { useComposerFocus } from './useComposerFocus'
 import type { RunBoardCommand } from './board-ui'
@@ -30,9 +30,13 @@ export function KanbanColumn({ column, cards, index, count, pending, deleted, er
     <ol className="kanban-cards" aria-label={`${column.title} cards`}>
       {cards.map((card) => <li key={card.id}>
         <button className="kanban-card" type="button" disabled={pending || deleted} draggable={!pending && !deleted}
+          aria-label={card.storyPoints == null ? undefined : `${card.title} ${storyPointLabel(card.storyPoints)} story ${card.storyPoints === 1 ? 'point' : 'points'}`}
           onDragStart={(event) => drag.start(event, card.id)} onDragEnd={drag.end}
           onDrop={(event) => drag.drop(event, column.id, card.id)}
-          onClick={() => onOpen(card)}>{card.title}</button>
+          onClick={() => onOpen(card)}>{card.title}{card.storyPoints != null &&
+            <span className="kanban-story-points-badge" aria-hidden="true">
+              {storyPointLabel(card.storyPoints)}
+            </span>}</button>
       </li>)}
     </ol>
     <div ref={composer}>{adding ? <BoardInlineComposer kind="card" pending={pending} deleted={deleted} error={error} register={register}

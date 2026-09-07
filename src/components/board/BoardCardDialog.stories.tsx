@@ -18,7 +18,7 @@ const meta = {
     await expect(canvas.getByRole('textbox', { name: 'Description' })).toHaveValue(args.card.description)
     await expect(modal.querySelectorAll('form')).toHaveLength(2)
     await expect(modal.querySelectorAll('form form')).toHaveLength(0)
-    await expect(canvas.queryByRole('combobox')).not.toBeInTheDocument()
+    await expect(canvas.getByRole('combobox', { name: 'Story points' })).toHaveValue(String(args.card.storyPoints ?? ''))
     await expect(modal.querySelectorAll('li')).toHaveLength(args.board.comments.filter(({ cardId }) => cardId === args.card.id).length)
     if (args.pending || args.deleted) for (const name of ['Save', 'Delete card', 'Add comment'])
       await expect(canvas.getByRole('button', { name })).toBeDisabled()
@@ -29,6 +29,8 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Discussion: Story = {}
+export const Estimated: Story = { args: { card: { ...boardStoryData.cards[0], storyPoints: 5 } } }
+export const NeedsSplitting: Story = { args: { card: { ...boardStoryData.cards[0], storyPoints: 13 } } }
 export const EmptyDiscussion: Story = { args: { card: boardStoryData.cards[1] } }
 export const MobileDiscussion: Story = { globals: { viewport: { value: 'mobile1', isRotated: false } } }
 export const LongDiscussion: Story = { args: { board: { ...boardStoryData,

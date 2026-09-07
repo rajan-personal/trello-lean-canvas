@@ -31,7 +31,7 @@ test('mobile card details omit movement controls and preserve the column when sa
   await addBoardCard(page, 'First')
   await openBoardCard(page, 'First')
   const modal = page.getByRole('dialog')
-  await expect(modal.getByRole('combobox')).toHaveCount(0)
+  await expect(modal.getByRole('combobox', { name: 'Story points' })).toHaveValue('')
   await expect(modal.getByText('Move card', { exact: true })).toHaveCount(0)
   await modal.getByLabel('Description').fill('Details only; drag the card to move it.')
   await modal.getByRole('button', { name: 'Save', exact: true }).click()

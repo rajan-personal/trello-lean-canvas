@@ -12,7 +12,7 @@ export const ExpandingPlainDescription: Story = { play: async ({ canvas, userEve
   await expect(description.getBoundingClientRect().height).toBeGreaterThanOrEqual(320)
   await expect(modal.querySelectorAll('form')).toHaveLength(2)
   await expect(modal.querySelectorAll('form form')).toHaveLength(0)
-  await expect(canvas.queryByRole('combobox')).not.toBeInTheDocument()
+  await expect(canvas.getByRole('combobox', { name: 'Story points' })).toHaveValue('')
   await expect(canvas.queryByText('Move card', { exact: true })).not.toBeInTheDocument()
   const text = '<strong>Plain text</strong>\n' + 'A long unbroken description: '.repeat(200)
   await setBoardInput(description, text)
