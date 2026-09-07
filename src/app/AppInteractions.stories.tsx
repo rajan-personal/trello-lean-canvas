@@ -12,7 +12,7 @@ export const MobileSidebar: AppStory = {
     await expect(open).toBeVisible()
     await userEvent.click(open)
     await expect(
-      canvas.getByRole('navigation', { name: 'Lean canvases' }),
+      canvas.getByRole('navigation', { name: 'Workspace navigation' }),
     ).toBeVisible()
     await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
     await expect(open).toHaveAttribute('aria-expanded', 'false')

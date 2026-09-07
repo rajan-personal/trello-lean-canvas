@@ -6,7 +6,7 @@ test('shows favorited canvases in the sidebar', async ({ page }) => {
 
   const favoriteButton = page.getByRole('button', { name: 'Favorite canvas' })
   const airbnbSidebarItem = page
-    .getByRole('navigation', { name: 'Lean canvases' })
+    .getByRole('navigation', { name: 'Workspace navigation' })
     .getByRole('button', { name: 'Airbnb', exact: true })
 
   await expect(airbnbSidebarItem.locator('.canvas-nav-favorite')).toHaveCount(0)
@@ -23,7 +23,7 @@ test('reorders sidebar canvases with drag and drop and persists the order', asyn
 }) => {
   await loadSamples(page)
 
-  const navigation = page.getByRole('navigation', { name: 'Lean canvases' })
+  const navigation = page.getByRole('navigation', { name: 'Workspace navigation' })
   const airbnb = navigation.getByRole('button', {
     name: 'Airbnb',
     exact: true,
@@ -40,18 +40,18 @@ test('reorders sidebar canvases with drag and drop and persists the order', asyn
   })
 
   await expect(page.getByRole('status')).toHaveText('Canvas moved')
-  await expect(navigation.getByRole('button').nth(0)).toHaveAccessibleName(
+  await expect(navigation.locator('.canvas-nav-item').nth(0)).toHaveAccessibleName(
     'Facebook',
   )
-  await expect(navigation.getByRole('button').nth(1)).toHaveAccessibleName(
+  await expect(navigation.locator('.canvas-nav-item').nth(1)).toHaveAccessibleName(
     'Airbnb',
   )
 
   await page.reload()
-  await expect(navigation.getByRole('button').nth(0)).toHaveAccessibleName(
+  await expect(navigation.locator('.canvas-nav-item').nth(0)).toHaveAccessibleName(
     'Facebook',
   )
-  await expect(navigation.getByRole('button').nth(1)).toHaveAccessibleName(
+  await expect(navigation.locator('.canvas-nav-item').nth(1)).toHaveAccessibleName(
     'Airbnb',
   )
 })
@@ -61,15 +61,15 @@ test('moves a focused sidebar canvas with Alt and arrow keys', async ({
 }) => {
   await loadSamples(page)
 
-  const navigation = page.getByRole('navigation', { name: 'Lean canvases' })
+  const navigation = page.getByRole('navigation', { name: 'Workspace navigation' })
   await navigation
     .getByRole('button', { name: 'Airbnb', exact: true })
     .press('Alt+ArrowDown')
 
-  await expect(navigation.getByRole('button').nth(0)).toHaveAccessibleName(
+  await expect(navigation.locator('.canvas-nav-item').nth(0)).toHaveAccessibleName(
     'Facebook',
   )
-  await expect(navigation.getByRole('button').nth(1)).toHaveAccessibleName(
+  await expect(navigation.locator('.canvas-nav-item').nth(1)).toHaveAccessibleName(
     'Airbnb',
   )
 })

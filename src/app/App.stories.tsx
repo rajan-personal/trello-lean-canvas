@@ -50,9 +50,9 @@ export const ReorderedSidebar: AppStory = {
   render: () => <SeededApp samples reordered />,
   play: async ({ canvasElement }) => {
     const navigation = await within(canvasElement).findByRole('navigation', {
-      name: 'Lean canvases',
+      name: 'Workspace navigation',
     })
-    const buttons = await within(navigation).findAllByRole('button')
+    const buttons = [...navigation.querySelectorAll('.canvas-nav-item')]
     await expect(buttons[0]).toHaveAccessibleName('Facebook')
     await expect(buttons[1]).toHaveAccessibleName('Airbnb')
   },

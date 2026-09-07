@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, fn, waitFor } from 'storybook/test'
 import { Sidebar } from './Sidebar'
 import { favoriteCanvas, storyCanvas } from './component-story-fixtures'
-
 const meta = {
   title: 'Lean Canvas/Sidebar',
   component: Sidebar,
@@ -20,6 +19,8 @@ const meta = {
   args: {
     canvases: [storyCanvas, favoriteCanvas],
     activeId: storyCanvas.id,
+    allTicketsActive: false,
+    onAllTickets: fn(),
     onSelect: fn(),
     onMove: fn(),
     user: {
@@ -37,7 +38,6 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
-
 export const Desktop: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Team alignment' }))
@@ -51,7 +51,14 @@ export const Desktop: Story = {
     await expect(canvas.getByText('Signed out')).toBeVisible()
   },
 }
-
+export const AllTickets: Story = {
+  args: { allTicketsActive: true },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByRole('button', { name: 'All tickets' })).toHaveAttribute('aria-current', 'page')
+    await userEvent.click(canvas.getByRole('button', { name: 'All tickets' }))
+    await expect(args.onAllTickets).toHaveBeenCalledOnce()
+  },
+}
 export const Collapsed: Story = {
   args: { collapsed: true },
   play: async ({ canvasElement }) => {
@@ -63,7 +70,6 @@ export const Collapsed: Story = {
     )
   },
 }
-
 export const MobileOpen: Story = {
   args: { open: true },
   globals: { viewport: { value: 'mobile1', isRotated: false } },

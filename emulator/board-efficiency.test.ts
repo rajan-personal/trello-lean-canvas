@@ -1,6 +1,6 @@
 import * as firestore from 'firebase/firestore'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { importBoard, mutateBoard, readBoard, subscribeBoard } from '../src/data/board-firestore'
+import { importBoard, mutateBoard, readBoard, readBoardSummary, subscribeBoard } from '../src/data/board-firestore'
 import { createBoardRemoteCache } from '../src/data/board-remote-cache'
 import { comment, populatedBoard } from '../unit/board-fixtures'
 import { boardTestEnvironment } from './board-fixtures'
@@ -37,6 +37,16 @@ describe('Firestore efficiency and concurrency', () => {
     expect(pages.map((page) => page.size)).toEqual([200, 5])
     expect(pages.flatMap((page) => page.docs).every((item) => item.data().cardId === 'card-a')).toBe(true)
     expect((await readBoard(test.db, 'alice', 'a')).data.comments).toEqual([comment('keep', 'card-b')])
+  })
+  it('loads summaries from cards only and omits comments', async () => {
+    await importBoard(test.db, 'alice', 'a', populatedBoard(), 'import-a')
+    const reads = vi.mocked(firestore.getDocsFromServer).mockClear()
+    const summary = await readBoardSummary(test.db, 'alice', 'a')
+    expect(summary.data.cards).toHaveLength(2)
+    expect(summary.data).not.toHaveProperty('comments')
+    expect(reads).toHaveBeenCalledTimes(1)
+    const target = reads.mock.calls[0][0] as unknown as { _query: { path: { toString: () => string } } }
+    expect(target._query.path.toString()).toMatch(/\/cards$/)
   })
   it('handles real listener acknowledgments without rereading collections after an edit', async () => {
     await importBoard(test.db, 'alice', 'a', populatedBoard(), 'import-a')

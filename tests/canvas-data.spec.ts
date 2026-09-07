@@ -18,7 +18,7 @@ test('loads fresh sample data without removing custom canvases or creating dupli
   ).toBeVisible()
   await expect(page.getByRole('status')).toHaveText('Sample data loaded')
   await expect(
-    page.getByRole('navigation', { name: 'Lean canvases' }).getByRole('button'),
+    page.getByRole('navigation', { name: 'Workspace navigation' }).locator('.canvas-nav-item'),
   ).toHaveCount(5)
   await expect(
     page.getByRole('button', { name: 'My startup', exact: true }),
@@ -27,7 +27,7 @@ test('loads fresh sample data without removing custom canvases or creating dupli
   await page.getByRole('button', { name: 'Add canvas' }).click()
   await page.getByRole('button', { name: 'Sample' }).click()
   await expect(
-    page.getByRole('navigation', { name: 'Lean canvases' }).getByRole('button'),
+    page.getByRole('navigation', { name: 'Workspace navigation' }).locator('.canvas-nav-item'),
   ).toHaveCount(5)
 })
 
@@ -93,7 +93,7 @@ test('opens the canvas sidebar on mobile', async ({ page }) => {
   await openSampleCanvas(page)
   await page.getByRole('button', { name: 'Open sidebar' }).click()
   await expect(
-    page.getByRole('navigation', { name: 'Lean canvases' }),
+    page.getByRole('navigation', { name: 'Workspace navigation' }),
   ).toBeVisible()
   await page.getByRole('button', { name: 'Team alignment' }).click()
   await expect(page.getByRole('heading', { name: 'Pulse' })).toBeVisible()

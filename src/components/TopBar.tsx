@@ -1,6 +1,6 @@
 import type { ChangeEvent, ReactNode } from 'react'
 import './topbar.css'
-import { Menu } from 'lucide-react'
+import { List, Menu } from 'lucide-react'
 import type { LeanCanvas } from '../data/types'
 import { BoardTitle } from './BoardTitle'
 import { CanvasAddMenu } from './CanvasAddMenu'
@@ -10,6 +10,8 @@ import { toolbarButtonClass } from './workspace-classes'
 interface Props {
   tabs?: ReactNode
   canvas?: LeanCanvas
+  heading?: string
+  onOpenAllTickets?: () => void
   sidebarOpen: boolean
   sidebarCollapsed: boolean
   onToggleSidebar: () => void
@@ -58,25 +60,24 @@ export function TopBar(props: Props) {
         />
       </div>
       <div className="board-toolbar flex h-full min-w-0 flex-1 items-center border-s border-white/14 px-3 text-white max-[760px]:px-1.5">
-        {canvas && (
-          <BoardTitle
-            key={canvas.id}
-            canvas={canvas}
-            onRename={props.onRename}
-          />
+        {canvas ? <BoardTitle key={canvas.id} canvas={canvas} onRename={props.onRename} /> : props.heading && (
+          <h1 className="truncate text-base font-semibold" aria-label={props.heading}>{props.heading}</h1>
         )}
         <span className="toolbar-spacer flex-1" />
-        {canvas && (
+        {(canvas || props.onOpenAllTickets) && (
           <div className="topbar-actions flex shrink-0 items-center">
-            {props.tabs}
-            <CanvasToolbarActions
+            {props.onOpenAllTickets && <button type="button" className={`${toolbarButtonClass} topbar-all-tickets max-[340px]:hidden`} onClick={props.onOpenAllTickets} aria-label="All tickets" title="All tickets">
+              <List size={17} aria-hidden="true" />
+            </button>}
+            {canvas && props.tabs}
+            {canvas && <CanvasToolbarActions
               canvas={canvas}
               notepadOpen={props.notepadOpen}
               onFavorite={props.onFavorite}
               onToggleNotepad={props.onToggleNotepad}
               onDelete={props.onDelete}
               onDownload={props.onDownload}
-            />
+            />}
           </div>
         )}
       </div>

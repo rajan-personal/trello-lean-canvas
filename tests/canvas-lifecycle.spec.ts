@@ -10,7 +10,7 @@ test('starts with researched examples, creates, uploads, edits, switches, and ex
 }) => {
   await loadSamples(page)
   await expect(
-    page.getByRole('navigation', { name: 'Lean canvases' }).getByRole('button'),
+    page.getByRole('navigation', { name: 'Workspace navigation' }).locator('.canvas-nav-item'),
   ).toHaveCount(4)
   await expect(page.locator('.canvas-cell')).toHaveCount(12)
   await expect(page.getByText('Booking fees from travellers')).toBeVisible()
