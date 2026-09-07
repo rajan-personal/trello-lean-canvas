@@ -2,7 +2,7 @@ import { useId } from 'react'
 import { AlignLeft, Trash2 } from 'lucide-react'
 import type { AppUser } from '../../auth/auth-context'
 import type { RegisterDraftGuard } from '../../app/useNavigationGuard'
-import type { BoardCard, BoardData } from '../../data/board'
+import { storyPointValues, storyPointLabel, storyPointGuidance, storyPointsSchema, type BoardCard, type BoardData } from '../../data/board'
 import { orderedComments } from '../../data/board-mutations'
 import { BoardDialog } from './BoardDialog'
 import { BoardComments } from './BoardComments'
@@ -18,6 +18,8 @@ interface Props {
 }
 export function BoardCardDialog({ card, board, user, pending, deleted, error, run, onClose, register }: Props) {
   const titleId = useId()
+  const pointsId = useId()
+  const pointsHelpId = useId()
   const editor = useBoardCardDraft(card, user, run)
   const { draft, setDraft } = editor
   const descriptionRef = useGrowingDescription(draft.description)
@@ -47,6 +49,21 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
               event.preventDefault(); event.currentTarget.form?.requestSubmit()
             }
           }} onChange={(event) => setDraft({ ...draft, title: event.target.value.replace(/\r?\n/g, ' ') })} /></div>
+        <div className="kanban-story-points-field">
+          <label htmlFor={pointsId}>Story points</label>
+          <select id={pointsId} name="storyPoints" aria-describedby={pointsHelpId} disabled={!exists}
+            value={draft.storyPoints ?? ''} onChange={(event) => setDraft({ ...draft,
+              storyPoints: event.target.value === '' ? null : storyPointsSchema.parse(Number(event.target.value)),
+            })}>
+            <option value="">Not estimated</option>
+            {storyPointValues.map((value) => <option key={value} value={value}>
+              {storyPointLabel(value)} {value === 1 ? 'point' : 'points'}
+            </option>)}
+          </select>
+          <p id={pointsHelpId} className="kanban-story-points-help">{draft.storyPoints == null
+            ? 'Optional estimate of effort, complexity, and uncertainty.'
+            : storyPointGuidance[draft.storyPoints]}</p>
+        </div>
         <label className="kanban-description-field"><span><AlignLeft size={17} aria-hidden="true" /> Description</span><textarea ref={descriptionRef} name="description" rows={14} placeholder="Add a more detailed description…" maxLength={100000} readOnly={!exists} value={draft.description}
           onChange={(event) => setDraft({ ...draft, description: event.target.value })} /></label>
         <div className="kanban-actions">

@@ -27,11 +27,10 @@ export type BoardCommand =
   | { type: 'move-column'; id: string; index: number }
   | { type: 'delete-column'; id: string }
   | { type: 'create-card'; id: string; columnId: string; title: string }
-  | { type: 'edit-card'; id: string; title: string; description: string; columnId: string; expected: Pick<BoardCard, 'title' | 'description' | 'columnId'> }
+  | { type: 'edit-card'; id: string; title: string; description: string; columnId: string; storyPoints?: BoardCard['storyPoints']; expected: Pick<BoardCard, 'title' | 'description' | 'columnId' | 'storyPoints'> }
   | { type: 'move-card'; id: string; columnId: string; index: number }
   | { type: 'delete-card'; id: string }
   | { type: 'add-comment'; comment: BoardComment }
-
 export function applyBoardCommand(source: BoardData, command: BoardCommand): BoardData {
   const board = structuredClone(source)
   const column = (columnId: string) => {
@@ -78,10 +77,11 @@ export function applyBoardCommand(source: BoardData, command: BoardCommand): Boa
     case 'edit-card': {
       const item = card(command.id)
       if (item.title !== command.expected.title || item.description !== command.expected.description ||
-        item.columnId !== command.expected.columnId)
+        item.columnId !== command.expected.columnId || (item.storyPoints ?? null) !== (command.expected.storyPoints ?? null))
         throw new Error('This card changed elsewhere. Copy your draft, then close and reopen to review it.')
       item.title = command.title
       item.description = command.description
+      if (command.storyPoints !== undefined) item.storyPoints = command.storyPoints
       if (item.columnId !== command.columnId) move(item, command.columnId, board.cards.length)
       break
     }

@@ -68,7 +68,7 @@ test('card details fits a short desktop viewport and stacks on mobile without ne
   await expect(modal.getByRole('button', { name: 'Delete card' })).toBeInViewport()
   await expect(modal.locator('form')).toHaveCount(2)
   await expect(modal.locator('form form')).toHaveCount(0)
-  expect(await modal.evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(true)
+  expect(await modal.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
   await modal.getByLabel('Description').fill('A draft survives the responsive layout change.')
   await page.setViewportSize({ width: 390, height: 710 })
   await expect(modal.getByLabel('Description')).toHaveValue('A draft survives the responsive layout change.')

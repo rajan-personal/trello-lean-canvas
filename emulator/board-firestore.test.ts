@@ -1,5 +1,5 @@
 import { assertFails } from '@firebase/rules-unit-testing'
-import { doc, getDocFromServer, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDocFromServer, serverTimestamp, setDoc, updateDoc, writeBatch } from 'firebase/firestore'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { boardPath, importBoard, initializeBoard, mutateBoard, readBoard } from '../src/data/board-firestore'
 import { orderedCards } from '../src/data/board-mutations'
@@ -12,6 +12,28 @@ beforeEach(async () => { await test.seed() })
 afterAll(async () => { await test.cleanup() })
 
 describe('board Firestore records', () => {
+  it('persists all estimates, rejects stale edits, and clears an estimate', async () => {
+    await importBoard(test.db, 'alice', 'a', populatedBoard(), 'import-a')
+    const stale = (await readBoard(test.db, 'alice', 'a')).data.cards[0]
+    for (const storyPoints of [1, 3, 5, 8, 13, null] as const) {
+      const baseline = (await readBoard(test.db, 'alice', 'a')).data.cards[0]
+      await mutateBoard(test.db, 'alice', 'a', { ...baseline, type: 'edit-card', expected: baseline, storyPoints })
+      expect((await readBoard(test.db, 'alice', 'a')).data.cards[0].storyPoints).toBe(storyPoints)
+      if (storyPoints === 5) {
+        await expect(mutateBoard(test.db, 'alice', 'a', { ...stale, type: 'edit-card', expected: stale }))
+          .rejects.toThrow('changed elsewhere')
+      }
+    }
+  })
+  it.each([0, 2, -1, 5.5, 21, '5', '13+', true])('rules reject invalid story points %s in an otherwise valid write', async (storyPoints) => {
+    await importBoard(test.db, 'alice', 'a', populatedBoard(), 'import-a')
+    const path = boardPath('alice', 'a')
+    const board = await readBoard(test.db, 'alice', 'a')
+    const batch = writeBatch(test.db)
+    batch.update(doc(test.db, path), { revision: board.revision + 1, updatedAt: serverTimestamp() })
+    batch.update(doc(test.db, `${path}/cards/card-a`), { storyPoints, updatedAt: serverTimestamp() })
+    await assertFails(batch.commit())
+  })
   it.each(['title', 'description'] as const)('rejects stale %s baseline at the persistence boundary', async (field) => {
     await importBoard(test.db, 'alice', 'a', populatedBoard(), 'import-a')
     const baseline = (await readBoard(test.db, 'alice', 'a')).data.cards[0]

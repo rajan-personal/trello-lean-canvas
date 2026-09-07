@@ -3,9 +3,21 @@ import { safeCanvasId } from './firestore-model'
 
 const id = z.string().refine(safeCanvasId, 'Unsafe record id')
 const title = z.string().trim().min(1).max(500)
+export const storyPointValues = [1, 3, 5, 8, 13] as const
+export const storyPointsSchema = z.union(storyPointValues.map((value) => z.literal(value)))
+export type StoryPoints = z.infer<typeof storyPointsSchema>
+export const storyPointLabel = (value: StoryPoints) => value === 13 ? '13+' : String(value)
+export const storyPointGuidance: Record<StoryPoints, string> = {
+  1: 'Tiny, clear change — e.g., change button text.',
+  3: 'Small standard task — e.g., add a profile-edit form.',
+  5: 'Moderate complexity — e.g., add image upload.',
+  8: 'Complex or risky — e.g., integrate payments.',
+  13: 'Very large or uncertain — e.g., replace authentication; split it.',
+}
 export const boardColumnSchema = z.strictObject({ id, title })
 export const boardCardSchema = z.strictObject({
   id, columnId: id, title, description: z.string().max(100000),
+  storyPoints: storyPointsSchema.nullable().optional(),
   rank: z.string().regex(/^[0-9a-z]*[1-9a-z]$/).max(2048),
 })
 export const boardCommentSchema = z.strictObject({

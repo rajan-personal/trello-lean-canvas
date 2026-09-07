@@ -14,7 +14,7 @@ test('creates title-only cards, saves plain text details and real comments, relo
   const modal = page.getByRole('dialog')
   await modal.getByLabel('Title', { exact: true }).fill('Plan launch')
   await modal.getByLabel('Description', { exact: true }).fill('<b>Plain text only</b>\nSecond line')
-  await expect(modal.getByRole('combobox')).toHaveCount(0)
+  await expect(modal.getByRole('combobox', { name: 'Story points' })).toHaveValue('')
   await expect(modal.getByText('Move card', { exact: true })).toHaveCount(0)
   await modal.getByLabel('New comment').fill('A real discussion')
   await modal.getByRole('button', { name: 'Add comment' }).click()
