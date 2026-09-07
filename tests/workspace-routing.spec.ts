@@ -7,14 +7,14 @@ test('selecting projects and views updates history, including Back/Forward and r
   await loadSamples(page)
   const first = new URL(page.url()).pathname
   expect(first).toMatch(/^\/project\/[^/]+$/)
-  await page.getByRole('tab', { name: 'Board', exact: true }).click()
+  await page.getByRole('tab', { name: 'Tickets', exact: true }).click()
   await expect(page).toHaveURL(`${first}/ticket`)
   await page.getByRole('button', { name: 'Facebook', exact: true }).click()
   const second = page.url()
   expect(second).not.toContain(first)
   await page.goBack()
   await expect(page).toHaveURL(`${first}/ticket`)
-  await expect(page.getByRole('tab', { name: 'Board', exact: true })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByRole('tab', { name: 'Tickets', exact: true })).toHaveAttribute('aria-selected', 'true')
   await page.goBack()
   await expect(page).toHaveURL(first)
   await expect(page.getByRole('tab', { name: 'Canvas', exact: true })).toHaveAttribute('aria-selected', 'true')
@@ -23,7 +23,7 @@ test('selecting projects and views updates history, including Back/Forward and r
   await expect(page).toHaveURL(second)
   await page.reload()
   await expect(page.getByRole('heading', { name: 'Facebook — 2004' })).toBeVisible()
-  await expect(page.getByRole('tab', { name: 'Board', exact: true })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByRole('tab', { name: 'Tickets', exact: true })).toHaveAttribute('aria-selected', 'true')
 })
 
 test('ticket URL loads directly, survives refresh, closes to parent, and restores with history', async ({ page }) => {

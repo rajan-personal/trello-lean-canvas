@@ -50,7 +50,7 @@ export const MobilePanels: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
     const notes = canvas.getByRole('textbox', { name: 'Canvas notes' })
     fireEvent.change(notes, { target: { value: 'First canvas notes' } })
-    const board = canvas.getByRole('tab', { name: 'Board' })
+    const board = canvas.getByRole('tab', { name: 'Tickets' })
     await waitFor(() => {
       const rect = board.getBoundingClientRect()
       expect(board.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2))).toBe(true)

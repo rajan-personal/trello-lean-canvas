@@ -31,7 +31,7 @@ test('mobile notes leave the Canvas and Board tabs clickable', async ({ page }) 
   await page.setViewportSize({ width: 320, height: 700 })
   await openSampleCanvas(page)
   await page.getByRole('button', { name: 'Notepad', exact: true }).click()
-  const board = page.getByRole('tab', { name: 'Board', exact: true })
+  const board = page.getByRole('tab', { name: 'Tickets', exact: true })
   await expect.poll(() => board.evaluate((tab) => {
     const box = tab.getBoundingClientRect()
     return tab.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2))

@@ -34,7 +34,7 @@ for (const remaining of [true, false]) test(`remote deletion retains read-only d
     localStorage.setItem('lean-canvas:boards:v1', JSON.stringify({ a: board }))
   }, { canvases: remaining ? [canvas('a'), { ...canvas('b'), name: 'Other', title: 'Other' }] : [canvas('a')], board: populatedBoard() })
   await first.goto('/tests/support/remote-workspace.html')
-  await first.getByRole('tab', { name: 'Board', exact: true }).click()
+  await first.getByRole('tab', { name: 'Tickets', exact: true }).click()
   await first.locator('.kanban-card').first().click()
   const modal = first.getByRole('dialog')
   await modal.getByLabel('Description').fill('Unsaved description to copy')

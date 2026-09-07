@@ -53,10 +53,10 @@ During rollout, migrated metadata retains a compatibility `canvases` snapshot so
 ## Shareable workspace routes
 
 - `/project/{projectId}` opens the Canvas view.
-- `/project/{projectId}/ticket` opens the existing **Board** view.
+- `/project/{projectId}/ticket` opens the **Tickets** view (the Kanban board).
 - `/project/{projectId}/ticket/{ticketId}` opens a ticket dialog.
 
-Root selects the first available project after loading. Unavailable links never silently select another project. Signing in preserves the requested URL; Back/Forward restores project, view, and ticket selection. Closing a directly loaded ticket navigates to its parent Board route without leaving the app. Board drafts and pending saves guard navigation. Canvas inline editors retain their existing outside-click dismissal behavior; browser Back/Forward and unload protect their unsaved drafts.
+Root selects the first available project after loading. Unavailable links never silently select another project. Signing in preserves the requested URL; Back/Forward restores project, view, and ticket selection. Closing a directly loaded ticket navigates to its parent Tickets route without leaving the app. Board drafts and pending saves guard navigation. Canvas inline editors retain their existing outside-click dismissal behavior; browser Back/Forward and unload protect their unsaved drafts.
 
 ## Component workbench and UI review
 
