@@ -32,7 +32,7 @@ export function Workspace({ user, onSignOut, persistence, browserRouting = false
     id: projectId,
     setId: (id) => history.navigate(id ? projectPath(id, view) : '/'),
   })
-  const board = useBoard(state.boards, state.activeCanvas?.id)
+  const board = useBoard(state.boards, view === 'board' ? state.activeCanvas?.id : undefined)
   const { notice, notify } = useNotice()
   const guard = useNavigationGuard(board.pending || state.pending, notify)
   const cards = useCardEditing(state, notify)

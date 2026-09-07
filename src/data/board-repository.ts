@@ -4,6 +4,7 @@ import { getFirestore } from 'firebase/firestore'
 import { firebaseApp } from '../firebase'
 import { createBoard, type BoardData } from './board'
 import * as remote from './board-firestore'
+import { createRemoteBoardAccess } from './board-remote-access'
 import type { LeanCanvas } from './types'
 
 export interface BoardRepository {
@@ -13,7 +14,7 @@ export interface BoardRepository {
   subscribe(canvasId: string, changed: () => void, error: (cause: Error) => void): () => void
   stageImport(canvas: LeanCanvas, board: BoardData, importId?: string): void
   pendingImports(): PendingImport[]
-  sync(canvases: LeanCanvas[]): Promise<void>
+  sync(canvases: LeanCanvas[], createdIds?: string[]): Promise<void>
   removeLocal(canvasIds: string[]): void
   deletingCanvasIds(canvasIds: string[]): Promise<string[]>
 }
@@ -22,6 +23,8 @@ export function createBoardRepository(uid: string, persistence: 'local' | 'fires
   const db = () => getFirestore(firebaseApp)
   const pendingKey = `lean-canvas:board-imports:${isLocal ? 'local' : uid}`
   const initialized = new Set<string>()
+  const initializing = new Map<string, Promise<void>>()
+  const access = createRemoteBoardAccess(db, uid, (id) => repository.initialize(id))
   const pendingImports = () => readPendingImports(storage, pendingKey)
   const writeLocal = (boards: Record<string, BoardData>) => writeLocalBoards(storage, boards)
   const repository: BoardRepository = {
@@ -29,29 +32,31 @@ export function createBoardRepository(uid: string, persistence: 'local' | 'fires
     stageImport: (canvas, board, importId) => stageBoardImport(storage, pendingKey, canvas, board, importId),
     async initialize(canvasId) {
       if (initialized.has(canvasId)) return
-      if (!isLocal) await remote.initializeBoard(db(), uid, canvasId)
-      else {
+      if (!isLocal) {
+        const work = initializing.get(canvasId) ?? remote.initializeBoard(db(), uid, canvasId)
+        initializing.set(canvasId, work)
+        try { await work } finally { initializing.delete(canvasId) }
+      } else {
         const boards = readLocalBoards(storage)
         if (!Object.hasOwn(boards, canvasId)) writeLocal({ ...boards, [canvasId]: createBoard() })
       }
       initialized.add(canvasId)
     },
     async load(canvasId) {
-      if (!isLocal) return (await remote.readBoard(db(), uid, canvasId)).data
+      if (!isLocal) return access.load(canvasId)
       const board = readLocalBoards(storage)[canvasId]
       if (!board) throw new Error('Board has not been initialized.')
       return board
     },
     async dispatch(canvasId, command) {
-      if (command.type === 'add-comment' && command.comment.authorId !== uid)
-        throw new Error('Comments must use the current author.')
-      if (!isLocal) return remote.mutateBoard(db(), uid, canvasId, command)
+      if (command.type === 'add-comment' && command.comment.authorId !== uid) throw new Error('Comments must use the current author.')
+      if (!isLocal) return access.dispatch(canvasId, command)
       const boards = readLocalBoards(storage)
       if (!boards[canvasId]) throw new Error('Board has not been initialized.')
       writeLocal({ ...boards, [canvasId]: applyBoardCommand(boards[canvasId], command) })
     },
     subscribe(canvasId, changed, error) {
-      if (!isLocal) return remote.subscribeBoard(db(), uid, canvasId, changed, error)
+      if (!isLocal) return access.subscribe(canvasId, changed, error)
       const listener = () => changed()
       changed()
       globalThis.addEventListener?.('storage', listener)
@@ -61,14 +66,15 @@ export function createBoardRepository(uid: string, persistence: 'local' | 'fires
         globalThis.removeEventListener?.(LOCAL_BOARD_EVENT, listener)
       }
     },
-    async sync(canvases) {
+    async sync(canvases, createdIds = []) {
+      const created = new Set(createdIds)
       if (isLocal) {
         const ids = new Set(canvases.map(({ id }) => id))
         repository.removeLocal(Object.keys(readLocalBoards(storage)).filter((id) => !ids.has(id)))
       }
       await Promise.all(canvases.map(async (canvas) => {
         const pending = pendingImports().find((entry) => entry.canvas.id === canvas.id)
-        if (!pending) { await repository.initialize(canvas.id); return }
+        if (!pending) { if (isLocal || created.has(canvas.id)) await repository.initialize(canvas.id); return }
         if (isLocal) writeLocal({ ...readLocalBoards(storage), [canvas.id]: pending.board })
         else await remote.importBoard(db(), uid, canvas.id, pending.board, pending.importId)
         initialized.add(canvas.id)

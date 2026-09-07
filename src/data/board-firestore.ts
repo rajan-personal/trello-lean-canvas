@@ -1,5 +1,6 @@
 import { doc, getDocFromServer, onSnapshot, runTransaction, type Firestore } from 'firebase/firestore'
 import { createBoard } from './board'
+import type { BoardVersion } from './board-remote-cache'
 import { canvasesPath } from './firestore-model'
 import { boardPath, boardRecord, boardRecordSchema } from './board-firestore-model'
 export { boardPath } from './board-firestore-model'
@@ -19,8 +20,16 @@ export async function initializeBoard(db: Firestore, uid: string, canvasId: stri
   })
 }
 
-export function subscribeBoard(db: Firestore, uid: string, canvasId: string, changed: () => void, error: (cause: Error) => void) {
-  return onSnapshot(doc(db, boardPath(uid, canvasId)), () => changed(), error)
+export function subscribeBoard(db: Firestore, uid: string, canvasId: string, changed: (version: BoardVersion | undefined) => void, error: (cause: Error) => void) {
+  return onSnapshot(doc(db, boardPath(uid, canvasId)), { includeMetadataChanges: true }, (snapshot) => {
+    // Ignore optimistic echoes, but request metadata events so the commit acknowledgment is delivered.
+    if (snapshot.metadata.hasPendingWrites) return
+    try {
+      const record = snapshot.exists() ? boardRecordSchema.parse(snapshot.data()) : undefined
+      if (record && record.canvasId !== canvasId) throw new Error('Board belongs to a different canvas.')
+      changed(record)
+    } catch (cause) { error(cause instanceof Error ? cause : new Error('Invalid board.')) }
+  }, error)
 }
 
 export async function deletingBoardIds(db: Firestore, uid: string, canvasIds: string[]): Promise<string[]> {
