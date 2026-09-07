@@ -1,16 +1,18 @@
 import { doc, runTransaction, serverTimestamp, type Firestore } from 'firebase/firestore'
 import { applyBoardCommand, type BoardCommand } from './board-mutations'
 import { boardPath, boardRecordSchema, childPayload } from './board-firestore-model'
-import { readBoard } from './board-firestore-read'
+import { readBoard, type BoardSnapshot } from './board-firestore-read'
 import { startCardDeletion, finishCardDeletion } from './board-firestore-delete'
 
-export async function mutateBoard(db: Firestore, uid: string, canvasId: string, command: BoardCommand): Promise<void> {
+export async function mutateBoard(
+  db: Firestore, uid: string, canvasId: string, command: BoardCommand, baseline?: BoardSnapshot,
+): Promise<BoardSnapshot | undefined> {
   if (command.type === 'delete-card') {
     await startCardDeletion(db, uid, canvasId, command.id)
     await finishCardDeletion(db, uid, canvasId, command.id)
     return
   }
-  const source = await readBoard(db, uid, canvasId)
+  const source = baseline ?? await readBoard(db, uid, canvasId)
   const next = applyBoardCommand(source.data, command)
   const path = boardPath(uid, canvasId)
   await runTransaction(db, async (tx) => {
@@ -27,4 +29,5 @@ export async function mutateBoard(db: Firestore, uid: string, canvasId: string, 
       }
     }
   })
+  return { data: next, revision: source.revision + 1 }
 }

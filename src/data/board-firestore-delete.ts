@@ -1,15 +1,17 @@
-import { collection, doc, getDocsFromServer, runTransaction, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore'
+import { collection, doc, getDocsFromServer, limit, query, runTransaction, serverTimestamp, where, writeBatch, type Firestore } from 'firebase/firestore'
 import { createBoard } from './board'
 import { boardPath, boardRecordSchema, boardRecord } from './board-firestore-model'
 
 // Chunked deletes are safe only behind a durable tombstone; every child write rule checks it.
 async function drain(db: Firestore, path: string, cardId?: string): Promise<void> {
-  const snapshots = await getDocsFromServer(collection(db, path))
-  const matches = snapshots.docs.filter((item) => !cardId || item.data().cardId === cardId)
-  for (let start = 0; start < matches.length; start += 200) {
+  const target = query(collection(db, path), ...(cardId ? [where('cardId', '==', cardId)] : []), limit(200))
+  for (;;) {
+    const snapshots = await getDocsFromServer(target)
+    if (snapshots.empty) return
     const batch = writeBatch(db)
-    matches.slice(start, start + 200).forEach((item) => batch.delete(item.ref))
+    snapshots.docs.forEach((item) => batch.delete(item.ref))
     await batch.commit()
+    if (snapshots.size < 200) return
   }
 }
 export async function startCardDeletion(db: Firestore, uid: string, canvasId: string, cardId: string) {

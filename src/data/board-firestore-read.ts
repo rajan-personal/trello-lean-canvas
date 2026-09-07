@@ -11,7 +11,9 @@ async function readRecord(db: Firestore, uid: string, canvasId: string) {
   return value
 }
 
-export async function readBoard(db: Firestore, uid: string, canvasId: string): Promise<{ data: BoardData; revision: number }> {
+export interface BoardSnapshot { data: BoardData; revision: number }
+
+export async function readBoard(db: Firestore, uid: string, canvasId: string): Promise<BoardSnapshot> {
   // Every writer changes the board revision. The sandwich rejects mixed collection snapshots.
   for (let attempt = 0; attempt < 4; attempt++) {
     const before = await readRecord(db, uid, canvasId)

@@ -57,8 +57,9 @@ export function usePersistedCanvases(uid: string, persistence: 'firestore' | 'lo
         }
         const nextIds = new Set(target.map(({ id }) => id))
         boards.removeLocal(previous.flatMap(({ id }) => nextIds.has(id) ? [] : [id]))
-        // A board may only be created after its canvas save succeeds.
-        await boards.sync(target)
+        // Wake a board opened before its new canvas finished saving, without touching old boards.
+        const previousIds = new Set(previous.map(({ id }) => id))
+        await boards.sync(target, target.flatMap(({ id }) => previousIds.has(id) ? [] : [id]))
         setError(null)
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : 'Changes could not be synced.')
