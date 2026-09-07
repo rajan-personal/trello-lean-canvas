@@ -34,7 +34,7 @@ for (const fallback of [false, true]) test(`description grows with long text and
   await expect.poll(async () => (await description.boundingBox())!.height).toBeLessThan(narrowHeight)
   await modal.getByRole('button', { name: 'Save', exact: true }).click()
   await page.reload()
-  await page.getByRole('tab', { name: 'Board', exact: true }).click()
+  await page.getByRole('tab', { name: 'Tickets', exact: true }).click()
   await openBoardCard(page, 'Room for the full plan')
   await expect(description).toHaveCSS('field-sizing', fallback ? 'fixed' : 'content')
   await expect(description).toHaveValue(text)

@@ -7,7 +7,7 @@ test('debounced and in-flight canvas saves block project/view changes, sign-out,
   await page.getByRole('button', { name: 'Other', exact: true }).click()
   await expect(page).toHaveURL('/project/b')
   await page.getByRole('button', { name: 'Favorite canvas' }).click()
-  await page.getByRole('tab', { name: 'Board', exact: true }).click()
+  await page.getByRole('tab', { name: 'Tickets', exact: true }).click()
   await expect(page).toHaveURL('/project/b')
   await expect(page.getByRole('status')).toContainText('Wait for the current save')
   await page.getByRole('button', { name: 'Test canvas', exact: true }).click()

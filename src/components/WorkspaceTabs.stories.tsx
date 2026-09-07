@@ -27,7 +27,7 @@ type Story = StoryObj<typeof meta>
 export const KeyboardRouting: Story = {
   play: async ({ canvas, userEvent, args }) => {
     const first = canvas.getByRole('tab', { name: 'Canvas' })
-    const second = canvas.getByRole('tab', { name: 'Board' })
+    const second = canvas.getByRole('tab', { name: 'Tickets' })
     await userEvent.click(first)
     for (const key of ['{ArrowRight}', '{ArrowLeft}', '{End}', '{Home}']) {
       await userEvent.keyboard(key)
@@ -47,21 +47,21 @@ export const KeyboardRouting: Story = {
 export const RejectedNavigation: Story = {
   args: { onChange: fn(() => false) },
   play: async ({ canvas, userEvent, args }) => {
-    await userEvent.click(canvas.getByRole('tab', { name: 'Board' }))
+    await userEvent.click(canvas.getByRole('tab', { name: 'Tickets' }))
     await expect(args.onChange).toHaveBeenCalledWith('board')
     await expect(canvas.getByRole('tab', { name: 'Canvas' })).toHaveFocus()
     await expect(canvas.getByRole('tabpanel')).toHaveTextContent('Canvas content')
     await userEvent.keyboard('{End}')
     await expect(canvas.getByRole('tab', { name: 'Canvas' })).toHaveFocus()
-    await expect(canvas.getByRole('tab', { name: 'Board' })).toHaveAttribute('tabindex', '-1')
+    await expect(canvas.getByRole('tab', { name: 'Tickets' })).toHaveAttribute('tabindex', '-1')
   },
 }
 
 export const BoardSelected: Story = {
   args: { view: 'board' },
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole('tab', { name: 'Board' })).toHaveAttribute('aria-selected', 'true')
-    await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Board')
+    await expect(canvas.getByRole('tab', { name: 'Tickets' })).toHaveAttribute('aria-selected', 'true')
+    await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Tickets')
     const tabs = canvas.getByRole('tablist').getBoundingClientRect()
     await expect(tabs.width).toBeLessThan(220)
     await expect(tabs.bottom).toBeLessThanOrEqual(canvas.getByRole('tabpanel').getBoundingClientRect().top)

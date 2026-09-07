@@ -3,7 +3,7 @@ import { openSampleCanvas } from './canvas-fixtures'
 
 export async function openBoard(page: Page) {
   await openSampleCanvas(page)
-  await page.getByRole('tab', { name: 'Board', exact: true }).click()
+  await page.getByRole('tab', { name: 'Tickets', exact: true }).click()
   await expect(page.locator('.kanban-column')).toHaveCount(6)
 }
 export const column = (page: Page, name: string) => page.getByRole('region', { name, exact: true })

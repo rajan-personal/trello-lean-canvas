@@ -35,7 +35,7 @@ test('remote column deletion retains a read-only rename draft and restores the b
   await expect(modal.getByLabel('Title', { exact: true })).toHaveValue('Keep my rename')
   page.once('dialog', (dialog) => dialog.accept())
   await modal.getByRole('button', { name: 'Close dialog' }).click()
-  await expect(page.getByRole('tab', { name: 'Board', exact: true })).toBeFocused()
+  await expect(page.getByRole('tab', { name: 'Tickets', exact: true })).toBeFocused()
 })
 
 test('remote card deletion retains both drafts and restores focus after its trigger is removed', async ({ page }) => {
@@ -61,5 +61,5 @@ test('remote card deletion retains both drafts and restores focus after its trig
   await expect(modal.getByLabel('Description')).toHaveValue('Keep description')
   page.once('dialog', (dialog) => dialog.accept())
   await page.keyboard.press('Escape')
-  await expect(page.getByRole('tab', { name: 'Board', exact: true })).toBeFocused()
+  await expect(page.getByRole('tab', { name: 'Tickets', exact: true })).toBeFocused()
 })
