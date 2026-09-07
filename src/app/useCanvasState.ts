@@ -23,12 +23,13 @@ export function useCanvasState(
   uid: string,
   persistence: 'firestore' | 'local' = 'firestore',
   retainDeleted = false,
+  selection?: { id: string | null; setId: (id: string | null) => void },
 ): CanvasState {
   const { canvases, setCanvases, loading, error, pending, boards, flushCanvases } = usePersistedCanvases(
     uid,
     persistence,
   )
-  const { activeId, setActiveId, activeCanvas, deleted } = useCanvasSelection(canvases, retainDeleted)
+  const { activeId, setActiveId, activeCanvas, deleted } = useCanvasSelection(canvases, retainDeleted, selection?.id)
   const updateActiveCanvas = (updater: (canvas: LeanCanvas) => LeanCanvas) => {
     if (!activeCanvas) return
     setCanvases((current) =>
@@ -38,7 +39,9 @@ export function useCanvasState(
     )
   }
   return {
-    canvases, setCanvases, activeId, setActiveId, activeCanvas, deleted,
+    canvases, setCanvases, activeId,
+    setActiveId: selection ? (update) => selection.setId(typeof update === 'function' ? update(activeId) : update) : setActiveId,
+    activeCanvas, deleted,
     loading, error, pending, boards, flushCanvases, updateActiveCanvas,
   }
 }

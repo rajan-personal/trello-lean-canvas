@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { CanvasSectionData, SectionId } from '../data/types'
 import type { EditingCard } from '../components/CanvasSection'
+import { useCanvasDraftNavigation } from './useCanvasDraftNavigation'
 import type { CanvasState } from './useCanvasState'
 
 export function useCardEditing(
@@ -17,6 +18,8 @@ export function useCardEditing(
     setCardDraft('')
     setEditingCard(null)
   }
+  const dirty = (!!addingSectionId && cardDraft.length > 0) || (!!editingCard &&
+    editingCard.value !== state.activeCanvas?.sections.find(({ id }) => id === editingCard.sectionId)?.cards[editingCard.index])
   const updateSection = (
     id: SectionId,
     update: (section: CanvasSectionData) => CanvasSectionData,
@@ -70,7 +73,12 @@ export function useCardEditing(
     setAddingSectionId(null)
     setEditingCard(null)
   }
+  const allowBrowserNavigation = useCanvasDraftNavigation(dirty, () => {
+    clearCardEditing()
+    setCardDraft('')
+  })
   return {
+    allowBrowserNavigation,
     addingSectionId,
     setAddingSectionId,
     cardDraft,

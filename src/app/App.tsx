@@ -11,6 +11,7 @@ const Workspace = lazy(() =>
 
 interface Props {
   previewUser?: AppUser
+  browserRouting?: boolean
 }
 
 const testUser: AppUser = {
@@ -23,16 +24,19 @@ const testUser: AppUser = {
 function WorkspaceScreen({
   user,
   local = false,
+  browserRouting = false,
   onSignOut,
 }: {
   user: AppUser
   local?: boolean
+  browserRouting?: boolean
   onSignOut: () => void | Promise<void>
 }) {
   return (
     <Suspense fallback={<AppStatus />}>
       <Workspace
         user={user}
+        browserRouting={browserRouting}
         onSignOut={onSignOut}
         persistence={local ? 'local' : 'firestore'}
       />
@@ -40,7 +44,7 @@ function WorkspaceScreen({
   )
 }
 
-export function AuthenticatedApp({ local = false }: { local?: boolean }) {
+export function AuthenticatedApp({ local = false, browserRouting = false }: { local?: boolean; browserRouting?: boolean }) {
   const auth = useAuth()
   if (auth.loading) return <AppStatus />
   if (!auth.user)
@@ -56,13 +60,14 @@ export function AuthenticatedApp({ local = false }: { local?: boolean }) {
       key={auth.user.uid}
       user={auth.user}
       local={local}
+      browserRouting={browserRouting}
       onSignOut={() => auth.signOut()}
     />
     {auth.error && <SyncError message={auth.error} />}</>
   )
 }
 
-export default function App({ previewUser }: Props) {
+export default function App({ previewUser, browserRouting = false }: Props) {
   const loopback = ['localhost', '127.0.0.1', '::1'].includes(
     globalThis.location?.hostname,
   )
@@ -74,10 +79,10 @@ export default function App({ previewUser }: Props) {
       : undefined
   const localUser = previewUser ?? e2eUser
   if (localUser)
-    return <WorkspaceScreen user={localUser} local onSignOut={() => {}} />
+    return <WorkspaceScreen browserRouting={browserRouting} user={localUser} local onSignOut={() => {}} />
   return (
     <AuthProvider>
-      <AuthenticatedApp />
+      <AuthenticatedApp browserRouting={browserRouting} />
     </AuthProvider>
   )
 }

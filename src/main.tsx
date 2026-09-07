@@ -12,7 +12,7 @@ if (!rootElement) throw new Error('Root element was not found.')
 
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <App browserRouting />
     {Agentation && (
       <Suspense fallback={null}>
         <Agentation />

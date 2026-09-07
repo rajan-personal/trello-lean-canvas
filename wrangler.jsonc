@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "trello-lean-canvas",
+  "compatibility_date": "2026-09-07",
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "lean.addorimprove.com", "custom_domain": true }
+  ],
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
