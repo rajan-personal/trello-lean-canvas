@@ -43,7 +43,7 @@ export function useWorkspaceTicketList(enabled: boolean, canvases: LeanCanvas[],
     return () => { generation.current = scope + 1; stops.forEach((stop) => stop()); currentReloaders.clear() }
   }, [canvases, enabled, repository])
   const retry = useCallback((id: string) => reloaders.current.get(id)?.(), [])
-  const projects = canvases.map((canvas) => ({ canvas, loading: entries[canvas.id]?.loading ?? false,
+  const projects = canvases.map((canvas) => ({ canvas, loading: entries[canvas.id]?.loading ?? true,
     summary: entries[canvas.id]?.summary, error: entries[canvas.id]?.error ?? null }))
   return { projects, retry }
 }
