@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createBoardRepository } from '../src/data/board-repository'
 import { readLocalBoards } from '../src/data/board-storage'
 import { orderedCards } from '../src/data/board-mutations'
@@ -61,6 +61,25 @@ describe('local board repository', () => {
     await repo.sync([canvas('a'), canvas('b')])
     await createBoardRepository('alice', 'local', storage).sync([canvas('b')])
     expect(Object.keys(readLocalBoards(storage))).toEqual(['b'])
+  })
+  it('loads comment-free summaries and cleans up summary subscriptions', async () => {
+    const storage = new MemoryStorage()
+    const repo = createBoardRepository('alice', 'local', storage)
+    repo.stageImport(canvas('a'), populatedBoard())
+    await repo.sync([canvas('a')])
+    const summary = await repo.loadSummary('a')
+    expect(summary.cards).toHaveLength(2)
+    expect(summary.cards[0]).not.toHaveProperty('description')
+    expect(summary).not.toHaveProperty('comments')
+    let changes = 0
+    const stop = repo.subscribeSummary('a', () => { changes++ }, vi.fn())
+    expect(changes).toBe(1)
+    await repo.dispatch('a', { type: 'create-card', id: 'card-c', columnId: 'backlog', title: 'Card' })
+    expect(await repo.loadSummary('a')).toHaveProperty('cards.length', 3)
+    expect(changes).toBe(1)
+    stop()
+    await repo.dispatch('a', { type: 'create-card', id: 'card-d', columnId: 'backlog', title: 'Another card' })
+    expect(changes).toBe(1)
   })
   it('separates account-scoped pending sources', () => {
     const storage = new MemoryStorage()

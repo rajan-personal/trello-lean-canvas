@@ -9,17 +9,10 @@ const meta = {
   tags: ['autodocs'],
   render: (args) => <TopBarHarness {...args} />,
   parameters: { layout: 'fullscreen' },
-  decorators: [
-    (Story) => (
-      <>
-        <Story />
-        <aside id="canvas-sidebar" hidden />
-        <aside id="canvas-notepad" hidden />
-      </>
-    ),
-  ],
+  decorators: [(Story) => <><Story /><aside id="canvas-sidebar" hidden /><aside id="canvas-notepad" hidden /></>],
   args: {
     canvas: storyCanvas,
+    onOpenAllTickets: fn(),
     sidebarOpen: false,
     sidebarCollapsed: false,
     notepadOpen: false,
@@ -41,9 +34,7 @@ export const Desktop: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Collapse sidebar' }))
     await userEvent.click(canvas.getByRole('button', { name: 'Add canvas' }))
-    await userEvent.click(
-      canvas.getByRole('button', { name: /^New$/ }),
-    )
+    await userEvent.click(canvas.getByRole('button', { name: /^New$/ }))
     await expect(canvas.getByRole('dialog', { name: 'Create canvas' })).toBeVisible()
     await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }))
     await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
@@ -72,6 +63,14 @@ export const ActiveTools: Story = {
     await expect(getComputedStyle(notepad).backgroundColor).not.toBe(
       'rgba(0, 0, 0, 0)',
     )
+  },
+}
+export const AllTickets: Story = {
+  args: { canvas: undefined, heading: 'All tickets' },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByRole('heading', { name: 'All tickets' })).toBeVisible()
+    await userEvent.click(canvas.getByRole('button', { name: 'All tickets' }))
+    await expect(args.onOpenAllTickets).toHaveBeenCalledOnce()
   },
 }
 export const NoCanvas: Story = {

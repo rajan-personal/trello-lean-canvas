@@ -9,7 +9,7 @@ const meta = {
   args: {
     canvases: [storyCanvas], activeId: storyCanvas.id, open: false, collapsed: false,
     user: { uid: 'sidebar-reviewer', displayName: 'Sidebar reviewer', email: 'reviewer@example.test', photoURL: null },
-    onSelect: fn(), onMove: fn(), onClose: fn(), onSignOut: fn(),
+    allTicketsActive: false, onAllTickets: fn(), onSelect: fn(), onMove: fn(), onClose: fn(), onSignOut: fn(),
   },
 } satisfies Meta<typeof SidebarHarness>
 export default meta

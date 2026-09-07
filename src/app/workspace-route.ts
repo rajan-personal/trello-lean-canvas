@@ -1,10 +1,12 @@
 export type WorkspaceRoute =
   | { kind: 'root' }
+  | { kind: 'tickets' }
   | { kind: 'project'; projectId: string; view: 'canvas' | 'board'; ticketId?: string }
   | { kind: 'missing' }
 
 export function parseWorkspaceRoute(pathname: string): WorkspaceRoute {
   if (pathname === '/') return { kind: 'root' }
+  if (/^\/tickets\/?$/.test(pathname)) return { kind: 'tickets' }
   const match = /^\/project\/([^/]+)(?:\/(ticket)(?:\/([^/]+))?)?\/?$/.exec(pathname)
   if (!match) return { kind: 'missing' }
   try {
@@ -15,6 +17,8 @@ export function parseWorkspaceRoute(pathname: string): WorkspaceRoute {
     return { kind: 'project', projectId, view: match[2] ? 'board' : 'canvas', ...(ticketId ? { ticketId } : {}) }
   } catch { return { kind: 'missing' } }
 }
+
+export function ticketsPath(): string { return '/tickets' }
 
 export function projectPath(projectId: string, view: 'canvas' | 'board' = 'canvas', ticketId?: string): string {
   return `/project/${encodeURIComponent(projectId)}${view === 'board' ? `/ticket${ticketId ? `/${encodeURIComponent(ticketId)}` : ''}` : ''}`

@@ -8,11 +8,14 @@ import type { useWorkspacePanels } from './useWorkspacePanels'
 interface Props {
   state: CanvasState; commands: ReturnType<typeof useCanvasCommands>
   panels: ReturnType<typeof useWorkspacePanels>; allow: () => boolean
+  allTickets: boolean; onOpenAllTickets: () => void
   setDialog: (dialog: CanvasDialogState) => void; view: WorkspaceView
   setView: (view: WorkspaceView) => void
 }
-export function WorkspaceHeader({ state, commands, panels, allow, setDialog, view, setView }: Props) {
-  return <TopBar canvas={state.activeCanvas} sidebarOpen={panels.sidebarOpen}
+export function WorkspaceHeader({ state, commands, panels, allow, allTickets, onOpenAllTickets, setDialog, view, setView }: Props) {
+  return <TopBar canvas={state.activeCanvas} heading={allTickets ? 'All tickets' : undefined}
+    onOpenAllTickets={!allTickets && view === 'board' ? onOpenAllTickets : undefined}
+    sidebarOpen={panels.sidebarOpen}
     sidebarCollapsed={panels.sidebarCollapsed} onToggleSidebar={panels.toggleSidebar}
     onOpenSidebar={panels.openSidebar}
     tabs={state.activeCanvas && <WorkspaceTabs idPrefix="" view={view} onChange={(next) => {

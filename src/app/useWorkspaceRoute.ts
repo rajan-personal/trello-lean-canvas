@@ -84,7 +84,7 @@ export function useWorkspaceRoute(browser: boolean) {
   const [history] = useState(() => new WorkspaceHistory(browser))
   const pathname = useSyncExternalStore(history.subscribe, history.snapshot)
   const route = parseWorkspaceRoute(pathname)
-  return { history, route,
+  return { history, route, allTickets: route.kind === 'tickets',
     view: route.kind === 'project' ? route.view : 'canvas',
     projectId: route.kind === 'project' ? route.projectId : null,
     ticketId: route.kind === 'project' ? route.ticketId ?? null : null,

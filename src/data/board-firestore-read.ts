@@ -1,5 +1,5 @@
 import { collection, doc, getDocFromServer, getDocsFromServer, type Firestore } from 'firebase/firestore'
-import { boardCardSchema, boardCommentSchema, boardDataSchema, type BoardData } from './board'
+import { boardCardSchema, boardCommentSchema, boardDataSchema, boardSummarySchema, type BoardData, type BoardSummary } from './board'
 import { boardPath, boardRecordSchema } from './board-firestore-model'
 import { finishCardDeletion } from './board-firestore-delete'
 
@@ -12,6 +12,7 @@ async function readRecord(db: Firestore, uid: string, canvasId: string) {
 }
 
 export interface BoardSnapshot { data: BoardData; revision: number }
+export interface BoardSummarySnapshot { data: BoardSummary; revision: number }
 
 export async function readBoard(db: Firestore, uid: string, canvasId: string): Promise<BoardSnapshot> {
   // Every writer changes the board revision. The sandwich rejects mixed collection snapshots.
@@ -41,6 +42,32 @@ export async function readBoard(db: Firestore, uid: string, canvasId: string): P
       cards: cards.docs.map((item) => boardCardSchema.parse(decode(item.data(), item.id))),
       comments: comments.docs.map((item) => boardCommentSchema.parse(decode(item.data(), item.id))),
     }) }
+  }
+  throw new Error('Board changed while loading. Please retry.')
+}
+
+export async function readBoardSummary(db: Firestore, uid: string, canvasId: string): Promise<BoardSummarySnapshot> {
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const before = await readRecord(db, uid, canvasId)
+    if (before.status === 'deleting-card') {
+      await finishCardDeletion(db, uid, canvasId, before.deletingCardId)
+      continue
+    }
+    if (before.status !== 'active') throw new Error(`Board is ${before.status}; retry after recovery.`)
+    const path = boardPath(uid, canvasId)
+    const cards = await getDocsFromServer(collection(db, `${path}/cards`))
+    const after = await readRecord(db, uid, canvasId)
+    if (before.revision !== after.revision) continue
+    const summaryCards = cards.docs.map((item) => {
+      const value = item.data()
+      if (value.canvasId !== canvasId || value.schemaVersion !== 1)
+        throw new Error('Invalid board record linkage.')
+      const { canvasId: _canvasId, schemaVersion: _version, updatedAt: _time, ...data } = value
+      void _canvasId; void _version; void _time
+      const card = boardCardSchema.parse({ ...data, id: item.id })
+      return { id: card.id, columnId: card.columnId, title: card.title, ...(card.storyPoints === undefined ? {} : { storyPoints: card.storyPoints }), rank: card.rank }
+    })
+    return { revision: after.revision, data: boardSummarySchema.parse({ columns: after.columns, cards: summaryCards }) }
   }
   throw new Error('Board changed while loading. Please retry.')
 }

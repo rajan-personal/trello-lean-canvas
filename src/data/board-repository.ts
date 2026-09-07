@@ -2,16 +2,17 @@ import { readLocalBoards, readPendingImports, stageBoardImport, writeLocalBoards
 import { applyBoardCommand, type BoardCommand } from './board-mutations'
 import { getFirestore } from 'firebase/firestore'
 import { firebaseApp } from '../firebase'
-import { createBoard, type BoardData } from './board'
+import { createBoard, type BoardData, type BoardSummary } from './board'
 import * as remote from './board-firestore'
 import { createRemoteBoardAccess } from './board-remote-access'
 import type { LeanCanvas } from './types'
-
+import { createLocalBoardSummaryAccess } from './board-summary-local'
 export interface BoardRepository {
   load(canvasId: string): Promise<BoardData>
-  initialize(canvasId: string): Promise<void>
+  loadSummary(canvasId: string): Promise<BoardSummary>; initialize(canvasId: string): Promise<void>
   dispatch(canvasId: string, command: BoardCommand): Promise<void>
   subscribe(canvasId: string, changed: () => void, error: (cause: Error) => void): () => void
+  subscribeSummary(canvasId: string, changed: () => void, error: (cause: Error) => void): () => void
   stageImport(canvas: LeanCanvas, board: BoardData, importId?: string): void
   pendingImports(): PendingImport[]
   sync(canvases: LeanCanvas[], createdIds?: string[]): Promise<void>
@@ -25,7 +26,7 @@ export function createBoardRepository(uid: string, persistence: 'local' | 'fires
   const initialized = new Set<string>()
   const initializing = new Map<string, Promise<void>>()
   const access = createRemoteBoardAccess(db, uid, (id) => repository.initialize(id))
-  const pendingImports = () => readPendingImports(storage, pendingKey)
+  const localSummary = createLocalBoardSummaryAccess(storage); const pendingImports = () => readPendingImports(storage, pendingKey)
   const writeLocal = (boards: Record<string, BoardData>) => writeLocalBoards(storage, boards)
   const repository: BoardRepository = {
     pendingImports,
@@ -48,6 +49,7 @@ export function createBoardRepository(uid: string, persistence: 'local' | 'fires
       if (!board) throw new Error('Board has not been initialized.')
       return board
     },
+    async loadSummary(canvasId) { return isLocal ? localSummary.load(canvasId) : access.loadSummary(canvasId) },
     async dispatch(canvasId, command) {
       if (command.type === 'add-comment' && command.comment.authorId !== uid) throw new Error('Comments must use the current author.')
       if (!isLocal) return access.dispatch(canvasId, command)
@@ -61,11 +63,9 @@ export function createBoardRepository(uid: string, persistence: 'local' | 'fires
       changed()
       globalThis.addEventListener?.('storage', listener)
       globalThis.addEventListener?.(LOCAL_BOARD_EVENT, listener)
-      return () => {
-        globalThis.removeEventListener?.('storage', listener)
-        globalThis.removeEventListener?.(LOCAL_BOARD_EVENT, listener)
-      }
+      return () => { globalThis.removeEventListener?.('storage', listener); globalThis.removeEventListener?.(LOCAL_BOARD_EVENT, listener) }
     },
+    subscribeSummary(canvasId, changed, error) { return isLocal ? localSummary.subscribe(canvasId, changed, error) : access.subscribeSummary(canvasId, changed, error) },
     async sync(canvases, createdIds = []) {
       const created = new Set(createdIds)
       if (isLocal) {

@@ -4,7 +4,7 @@ import { openSampleCanvas, uploadCanvas } from './support/canvas-fixtures'
 test('dismissed drafts stay local when switching or creating canvases', async ({ page }) => {
   await openSampleCanvas(page)
   await uploadCanvas(page, { name: 'Second canvas' })
-  const nav = page.getByRole('navigation', { name: 'Lean canvases' })
+  const nav = page.getByRole('navigation', { name: 'Workspace navigation' })
   await nav.getByRole('button', { name: 'Team alignment' }).click()
   const section = page.locator('.canvas-cell').first()
   await section.getByRole('button', { name: '＋ Add a card' }).click()

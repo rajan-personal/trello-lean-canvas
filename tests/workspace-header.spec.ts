@@ -32,7 +32,7 @@ test('renames the canvas inline from the board header', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Signal' })).toBeVisible()
   await expect(
     page
-      .getByRole('navigation', { name: 'Lean canvases' })
+      .getByRole('navigation', { name: 'Workspace navigation' })
       .getByRole('button', { name: 'Signal', exact: true }),
   ).toBeVisible()
 })
