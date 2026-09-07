@@ -19,7 +19,7 @@
 .kanban-card { display: block; width: 100%; margin-bottom: 8px; padding: 11px 12px; border: 0; border-radius: 8px; background: white; color: #172b4d; box-shadow: 0 1px 2px #091e4230, 0 0 0 1px #091e420a; cursor: grab; font-size: 14px; line-height: 1.45; text-align: left; overflow-wrap: anywhere; white-space: pre-wrap; transition: box-shadow 120ms ease, background-color 120ms ease; }
 .kanban-card:hover { background: #fafbfc; box-shadow: 0 2px 4px #091e4226, 0 0 0 2px #0c66e4; }
 .kanban-card:active { cursor: grabbing; }
-.kanban-story-points-badge { display: block; width: fit-content; margin-top: 8px; padding: 2px 7px; border-radius: 5px; background: #e9f2ff; color: #0747a6; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.kanban-story-points-badge { display: block; width: fit-content; margin-top: 8px; margin-inline-start: auto; padding: 2px 7px; border-radius: 5px; background: #e9f2ff; color: #0747a6; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .kanban-story-points-field { margin-block: 16px; }
 .kanban-dialog .kanban-story-points-field label { margin-bottom: 6px; }
 .kanban-dialog .kanban-story-points-field select { min-height: 48px; font-size: 16px; }

@@ -35,7 +35,7 @@ export function KanbanColumn({ column, cards, index, count, pending, deleted, er
           onDrop={(event) => drag.drop(event, column.id, card.id)}
           onClick={() => onOpen(card)}>{card.title}{card.storyPoints != null &&
             <span className="kanban-story-points-badge" aria-hidden="true">
-              {storyPointLabel(card.storyPoints)} {card.storyPoints === 1 ? 'pt' : 'pts'}
+              {storyPointLabel(card.storyPoints)}
             </span>}</button>
       </li>)}
     </ol>

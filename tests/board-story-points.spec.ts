@@ -1,5 +1,14 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Locator } from '@playwright/test'
 import { addBoardCard, column, openBoard, openBoardCard } from './support/board-fixtures'
+
+async function expectBottomRightBadge(card: Locator, value: string) {
+  const badge = card.locator('.kanban-story-points-badge')
+  await expect(badge).toHaveText(value)
+  const cardBox = (await card.boundingBox())!
+  const badgeBox = (await badge.boundingBox())!
+  expect(cardBox.x + cardBox.width - badgeBox.x - badgeBox.width).toBeCloseTo(12, 0)
+  expect(cardBox.y + cardBox.height - badgeBox.y - badgeBox.height).toBeCloseTo(11, 0)
+}
 
 test('estimates persist on cards and in details after reload and movement, and can be cleared', async ({ page }) => {
   await openBoard(page)
@@ -17,8 +26,9 @@ test('estimates persist on cards and in details after reload and movement, and c
   await modal.getByRole('button', { name: 'Save', exact: true }).click()
   const card = page.getByRole('button', { name: 'Add image upload 5 story points', exact: true })
   await expect(card).toBeVisible()
+  await expectBottomRightBadge(card, '5')
   await card.dragTo(column(page, 'Todo'))
-  await expect(column(page, 'Todo').locator('.kanban-story-points-badge')).toHaveText('5 pts')
+  await expect(column(page, 'Todo').locator('.kanban-story-points-badge')).toHaveText('5')
   await page.reload()
   await card.click()
   await expect(points).toHaveValue('5')
@@ -58,5 +68,7 @@ test('point-only drafts are keyboard accessible and protected by discard confirm
   expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(390)
   await points.selectOption('1')
   await modal.getByRole('button', { name: 'Save', exact: true }).click()
-  await expect(page.getByRole('button', { name: 'Change button text 1 story point', exact: true })).toBeVisible()
+  const card = page.getByRole('button', { name: 'Change button text 1 story point', exact: true })
+  await expect(card).toBeVisible()
+  await expectBottomRightBadge(card, '1')
 })
