@@ -18,6 +18,7 @@ type Story = StoryObj<typeof meta>
 
 export const IsolatedBoardsAndKeyboard: Story = {
   play: async ({ canvas, userEvent }) => {
+    const storyUrl = window.location.href
     await userEvent.click(await canvas.findByRole('tab', { name: 'Canvas' }))
     await userEvent.keyboard('{ArrowRight}')
     const boardTab = canvas.getByRole('tab', { name: 'Board' })
@@ -35,11 +36,13 @@ export const IsolatedBoardsAndKeyboard: Story = {
     await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Canvas')
     await userEvent.tab()
     await expect(canvas.getByRole('button', { name: 'Favorite canvas' })).toHaveFocus()
+    await expect(window.location.href).toBe(storyUrl)
   },
 }
 
 export const DirtyDraftNavigation: Story = {
   play: async ({ canvas, userEvent, args }) => {
+    const storyUrl = window.location.href
     const confirm = spyOn(window, 'confirm').mockReturnValue(false)
     try {
       await userEvent.click(await canvas.findByRole('tab', { name: 'Board' }))
@@ -56,6 +59,7 @@ export const DirtyDraftNavigation: Story = {
       await userEvent.click(canvas.getByRole('tab', { name: 'Canvas' }))
       await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Canvas')
       await expect(canvas.queryByRole('textbox', { name: 'Card title' })).not.toBeInTheDocument()
+      await expect(window.location.href).toBe(storyUrl)
     } finally { confirm.mockRestore() }
   },
 }

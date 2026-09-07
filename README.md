@@ -22,7 +22,7 @@ npm install
 npm run dev
 ```
 
-Then open `http://127.0.0.1:5173`. The checked-in Firebase web configuration targets `trello-lean-canvas-7kvrv`; it contains public client identifiers only. You can override it with `VITE_FIREBASE_*` variables in `.env.local`.
+Use Node.js 22.12 or newer (compatible with Vite and local Wrangler). Then open `http://127.0.0.1:5173`. The checked-in Firebase web configuration targets `trello-lean-canvas-7kvrv`; it contains public client identifiers only. You can override it with `VITE_FIREBASE_*` variables in `.env.local`.
 
 Google is the only enabled sign-in provider. Firestore stores ordering metadata at `users/{uid}/workspaces/default` and each canvas independently under its `canvases/{canvasId}` subcollection. Runtime Zod schemas reject malformed local or cloud data before it reaches application state.
 
@@ -30,22 +30,33 @@ On first sign-in after this schema upgrade, the app idempotently copies and veri
 
 ## Firebase backend and deployment
 
-The frontend remains on GitHub Pages (and the `lean.addorimprove.com` custom domain). Firebase supplies Authentication and Firestore only.
+The frontend is hosted on Cloudflare Workers Static Assets at `lean.addorimprove.com`, with SPA navigation fallback for clean project/ticket URLs. Firebase continues to supply Authentication and Firestore only; no backend Worker is needed. See [the deployment and rollback checklist](docs/cloudflare-hosting.md) before publishing.
 
 ```bash
 # Deploy Google Auth configuration, Firestore rules, and indexes
 npm run deploy:firebase
 
-# Build and publish the frontend to GitHub Pages
+# Validate the frontend without publishing
+npm run deploy:dry-run
+
+# Build and publish static assets to Workers (requires explicit release approval)
 npm run deploy
 
-# Run both in that order
-npm run deploy:all
+# Serve the built assets locally using the Workers routing configuration
+npm run preview:worker
 ```
 
-The Firebase CLI uses the project in [`.firebaserc`](.firebaserc). Security rules in [`firestore.rules`](firestore.rules) restrict every workspace to its matching authenticated UID, validate top-level document types and canonical section IDs, and couple topology changes to the workspace order. Full nested card validation remains in the Zod runtime boundary because Firestore Rules cannot iterate arbitrary list elements efficiently. Keep `localhost`, `rajan-personal.github.io`, and `lean.addorimprove.com` in Firebase Authentication's authorized domains.
+The Firebase CLI uses the project in [`.firebaserc`](.firebaserc). Security rules in [`firestore.rules`](firestore.rules) restrict every workspace to its matching authenticated UID, validate top-level document types and canonical section IDs, and couple topology changes to the workspace order. Full nested card validation remains in the Zod runtime boundary because Firestore Rules cannot iterate arbitrary list elements efficiently. Keep existing Firebase Authentication authorized domains during cutover. A release owner must authorize any new preview hostname before testing Google sign-in there; frontend deployment does not change Firebase configuration.
 
 During rollout, migrated metadata retains a compatibility `canvases` snapshot so already-open legacy clients do not suddenly render an empty workspace. It is not updated by the new client and legacy writes are rejected after migration. Remove this optional field and the transitional legacy-create/update rule in a later cleanup release after old browser sessions have expired.
+
+## Shareable workspace routes
+
+- `/project/{projectId}` opens the Canvas view.
+- `/project/{projectId}/ticket` opens the existing **Board** view.
+- `/project/{projectId}/ticket/{ticketId}` opens a ticket dialog.
+
+Root selects the first available project after loading. Unavailable links never silently select another project. Signing in preserves the requested URL; Back/Forward restores project, view, and ticket selection. Closing a directly loaded ticket navigates to its parent Board route without leaving the app. Board drafts and pending saves guard navigation. Canvas inline editors retain their existing outside-click dismissal behavior; browser Back/Forward and unload protect their unsaved drafts.
 
 ## Component workbench and UI review
 

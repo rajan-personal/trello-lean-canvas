@@ -19,6 +19,7 @@ export function usePersistedCanvases(uid: string, persistence: 'firestore' | 'lo
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+  const [scheduled, setScheduled] = useState(false)
   const base = useRef<WorkspaceValue | null>(null)
   const current = useRef(canvases)
   const localBase = useRef(canvases)
@@ -29,9 +30,16 @@ export function usePersistedCanvases(uid: string, persistence: 'firestore' | 'lo
     current.current = next
     setCanvasState(next)
   }, [])
+  const setUserCanvases: Dispatch<SetStateAction<LeanCanvas[]>> = useCallback((update) => {
+    const next = typeof update === 'function' ? update(current.current) : update
+    if (next === current.current) return
+    setScheduled(true)
+    setCanvases(next)
+  }, [setCanvases])
   const flushCanvases = useCallback((): Promise<void> => {
     const work = (saving.current ?? Promise.resolve()).catch(() => undefined).then(async () => {
       if (!ready.current) throw new Error('Canvases are still loading. Retry shortly.')
+      setScheduled(false)
       setPending(true)
       try {
         const target = current.current
@@ -67,5 +75,5 @@ export function usePersistedCanvases(uid: string, persistence: 'firestore' | 'lo
     const timer = window.setTimeout(() => { void flushCanvases().catch(() => undefined) }, isLocal ? 0 : 450)
     return () => window.clearTimeout(timer)
   }, [canvases, isLocal, loading, flushCanvases])
-  return { canvases, setCanvases, loading, error, pending, boards, flushCanvases }
+  return { canvases, setCanvases: setUserCanvases, loading, error, pending: pending || scheduled, boards, flushCanvases }
 }

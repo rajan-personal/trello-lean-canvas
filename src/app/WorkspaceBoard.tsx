@@ -1,3 +1,4 @@
+import type { TicketSelection } from '../components/board/RoutedTicketDialog'
 import { useRef } from 'react'
 import type { AppUser } from '../auth/auth-context'
 import { KanbanBoard } from '../components/board/KanbanBoard'
@@ -6,11 +7,12 @@ import type { useBoard } from './useBoard'
 import type { RegisterDraftGuard } from './useNavigationGuard'
 
 interface Props {
+  ticket?: TicketSelection
   deleted?: boolean; onDismissDeleted: () => void
   state: ReturnType<typeof useBoard>; user: AppUser; blocked: boolean
   register: RegisterDraftGuard; notify: (message: string) => void
 }
-export function WorkspaceBoard({ state, user, blocked, deleted, onDismissDeleted, register, notify }: Props) {
+export function WorkspaceBoard({ state, user, blocked, deleted, onDismissDeleted, register, notify, ticket }: Props) {
   const busy = useRef(false)
   const run = async (command: BoardCommand) => {
     if (deleted || busy.current || blocked || state.pending || state.loading) return false
@@ -28,7 +30,7 @@ export function WorkspaceBoard({ state, user, blocked, deleted, onDismissDeleted
       <button onClick={() => void state.reload()} disabled={state.pending}>Retry loading board</button></div>}
     {state.loading && <p className="kanban-status" role="status">Loading board…</p>}
     {state.pending && <p className="kanban-status" role="status">Saving board…</p>}
-    {state.board && <KanbanBoard board={state.board} user={user}
+    {state.board && <KanbanBoard ticket={ticket} loading={state.loading} board={state.board} user={user}
       deleted={deleted} pending={blocked || state.pending || (!deleted && state.loading)} error={deleted ? null : state.error} run={run} register={register} />}
   </div>
 }

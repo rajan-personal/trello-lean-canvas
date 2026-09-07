@@ -1,0 +1,80 @@
+import { expect, test } from '@playwright/test'
+import { routingTransport } from '../support/routing-transport'
+
+const ticket = '/project/a/ticket/card-a'
+
+test('login preserves deep destination and waits for both asynchronous resource loads', async ({ context, page }) => {
+  await routingTransport(context, ['logged-out', 'hold-canvases', 'hold-board'])
+  await page.goto(ticket)
+  await page.getByRole('button', { name: 'Continue with Google' }).click()
+  await expect(page).toHaveURL(ticket)
+  await expect(page.getByRole('status')).toContainText('Opening your workspace')
+  await expect(page.getByText(/unavailable/)).toHaveCount(0)
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('test:subscribed'))).toBe('true')
+  await page.evaluate(() => window.dispatchEvent(new Event('test:canvases')))
+  await expect(page.getByRole('heading', { name: 'Test canvas', exact: true })).toBeVisible()
+  await expect(page.getByRole('status').filter({ hasText: 'Loading board' })).toBeVisible()
+  await expect(page.getByText(/unavailable/)).toHaveCount(0)
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('test:subscribed'))).toBe('true')
+  await page.evaluate(() => { localStorage.removeItem('test:hold-board'); window.dispatchEvent(new Event('test:board')) })
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(page.getByRole('textbox', { name: 'Title', exact: true })).toHaveValue('First')
+  await page.getByRole('button', { name: 'Close dialog' }).click()
+  await expect(page).toHaveURL('/project/a/ticket')
+  await page.getByRole('button', { name: 'Sign out route@example.test' }).click()
+  await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeVisible()
+  await expect(page).toHaveURL('/project/a/ticket')
+  await page.getByRole('button', { name: 'Continue with Google' }).click()
+  await page.evaluate(() => window.dispatchEvent(new Event('test:canvases')))
+  await expect(page.getByRole('tab', { name: 'Board', exact: true })).toHaveAttribute('aria-selected', 'true')
+})
+
+for (const denied of [false, true]) test(`missing project is resolved only after async ${denied ? 'access error' : 'load'}`, async ({ context, page }) => {
+  await routingTransport(context, ['hold-canvases'])
+  await page.goto('/project/inaccessible/ticket/card-a')
+  await expect(page.getByRole('status')).toContainText('Opening your workspace')
+  await expect(page.getByText(/unavailable/)).toHaveCount(0)
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('test:subscribed'))).toBe('true')
+  await page.evaluate((denied) => window.dispatchEvent(new Event(denied ? 'test:access-error' : 'test:canvases')), denied)
+  await expect(page.getByText(denied ? 'Test access denied' : /This project is unavailable/)).toBeVisible()
+  await expect(page).toHaveURL('/project/inaccessible/ticket/card-a')
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+})
+
+test('deleted project route retains read-only drafts, then safely dismisses to default project', async ({ context, page }) => {
+  await routingTransport(context)
+  await page.goto(ticket)
+  await page.getByLabel('Description').fill('Retain after remote deletion')
+  await page.evaluate(() => {
+    const workspace = JSON.parse(localStorage.getItem('test:workspace')!)
+    workspace.canvases = workspace.canvases.filter((canvas: { id: string }) => canvas.id !== 'a')
+    delete workspace.revisions.a
+    workspace.orderRevision++
+    localStorage.setItem('test:workspace', JSON.stringify(workspace))
+    window.dispatchEvent(new Event('test:canvases'))
+  })
+  await expect(page.getByRole('dialog').getByRole('alert')).toContainText('canvas was deleted elsewhere')
+  await expect(page.getByLabel('Description')).toHaveValue('Retain after remote deletion')
+  await expect(page.getByLabel('Description')).toHaveAttribute('readonly', '')
+  page.once('dialog', (dialog) => dialog.dismiss())
+  await page.getByRole('button', { name: 'Close dialog' }).click()
+  await expect(page).toHaveURL(ticket)
+  page.once('dialog', (dialog) => dialog.accept())
+  await page.getByRole('button', { name: 'Close dialog' }).click()
+  await page.getByRole('button', { name: 'Close deleted canvas' }).click()
+  await expect(page).toHaveURL('/project/b')
+  await page.goto(ticket)
+  await expect(page.getByRole('alert')).toContainText('This project is unavailable')
+})
+
+test('missing ticket is reported only after its Board finishes loading', async ({ context, page }) => {
+  await routingTransport(context, ['hold-board'])
+  await page.goto('/project/a/ticket/missing')
+  await expect(page.getByRole('status').filter({ hasText: 'Loading board' })).toBeVisible()
+  await expect(page.getByText(/unavailable/)).toHaveCount(0)
+  await page.evaluate(() => { localStorage.removeItem('test:hold-board'); window.dispatchEvent(new Event('test:board')) })
+  await expect(page.getByRole('alert')).toContainText('This ticket is unavailable')
+  await expect(page).toHaveURL('/project/a/ticket/missing')
+  await page.getByRole('button', { name: 'Close ticket' }).click()
+  await expect(page).toHaveURL('/project/a/ticket')
+})

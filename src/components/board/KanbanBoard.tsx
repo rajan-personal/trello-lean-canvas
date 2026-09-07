@@ -3,6 +3,7 @@ import type { AppUser } from '../../auth/auth-context'
 import type { RegisterDraftGuard } from '../../app/useNavigationGuard'
 import type { BoardCard, BoardColumn, BoardData } from '../../data/board'
 import { orderedCards } from '../../data/board-mutations'
+import { RoutedTicketDialog, type TicketSelection } from './RoutedTicketDialog'
 import { BoardCardDialog } from './BoardCardDialog'
 import { BoardTitleDialog } from './BoardTitleDialog'
 import { BoardInlineComposer } from './BoardInlineComposer'
@@ -15,9 +16,10 @@ import './kanban.css'
 type Editor = { type: 'card'; card: BoardCard } | { type: 'rename-column'; column: BoardColumn }
 interface Props {
   board: BoardData; user: AppUser; pending: boolean; deleted?: boolean; error: string | null
+  ticket?: TicketSelection; loading?: boolean
   run: RunBoardCommand; register: RegisterDraftGuard
 }
-export function KanbanBoard({ board, user, pending, deleted, error, run, register }: Props) {
+export function KanbanBoard({ board, user, pending, deleted, error, run, register, ticket, loading = false }: Props) {
   const [editor, setEditor] = useState<Editor | null>(null)
   const [addingColumn, setAddingColumn] = useState(false)
   const composer = useComposerFocus(addingColumn)
@@ -35,7 +37,7 @@ export function KanbanBoard({ board, user, pending, deleted, error, run, registe
         pending={pending} deleted={deleted || index >= board.columns.length}
         error={index >= board.columns.length ? 'This column was deleted elsewhere. Copy your draft before dismissing it.' : error}
         register={register} run={run} drag={drag}
-        onOpen={(card) => setEditor({ type: 'card', card })}
+        onOpen={(card) => ticket ? ticket.open(card.id) : setEditor({ type: 'card', card })}
         onRename={() => setEditor({ type: 'rename-column', column })} />)}
       <div ref={composer} className="kanban-add-column">
         {addingColumn ? <BoardInlineComposer kind="column" pending={pending} deleted={deleted} error={error}
@@ -45,6 +47,8 @@ export function KanbanBoard({ board, user, pending, deleted, error, run, registe
             onClick={() => setAddingColumn(true)}>+ Add another column</button>}
       </div>
     </div>
+    {ticket?.id && <RoutedTicketDialog key={ticket.id} ticketId={ticket.id} loading={loading}
+      board={board} user={user} pending={pending} deleted={deleted} error={error} run={run} register={register} onClose={ticket.close} />}
     {editor?.type === 'card' && <BoardCardDialog key={editor.card.id}
       card={board.cards.find((card) => card.id === editor.card.id) ?? editor.card}
       board={board} user={user} pending={pending} deleted={deleted} error={error} run={run} register={register} onClose={close} />}

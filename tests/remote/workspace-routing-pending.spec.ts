@@ -1,0 +1,48 @@
+import { expect, test } from '@playwright/test'
+import { routingTransport } from '../support/routing-transport'
+
+test('debounced and in-flight canvas saves block project/view changes, sign-out, and Back', async ({ context, page }) => {
+  await routingTransport(context, ['hold-save'])
+  await page.goto('/project/a')
+  await page.getByRole('button', { name: 'Other', exact: true }).click()
+  await expect(page).toHaveURL('/project/b')
+  await page.getByRole('button', { name: 'Favorite canvas' }).click()
+  await page.getByRole('tab', { name: 'Board', exact: true }).click()
+  await expect(page).toHaveURL('/project/b')
+  await expect(page.getByRole('status')).toContainText('Wait for the current save')
+  await page.getByRole('button', { name: 'Test canvas', exact: true }).click()
+  await expect(page).toHaveURL('/project/b')
+  await page.getByRole('button', { name: 'Sign out route@example.test' }).click()
+  await expect(page.getByRole('button', { name: 'Continue with Google' })).toHaveCount(0)
+  await page.evaluate(() => history.back())
+  await expect(page).toHaveURL('/project/b')
+  // The transport starts after the normal 450 ms debounce; wait for a deterministic signal.
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('test:save-started'))).toBe('true')
+  await page.evaluate(() => { localStorage.removeItem('test:hold-save'); window.dispatchEvent(new Event('test:finish-save')) })
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('test:workspace')!).canvases[1].favorite)).toBe(true)
+  await page.evaluate(() => history.back())
+  await expect(page).toHaveURL('/project/a')
+  await page.goForward()
+  await expect(page).toHaveURL('/project/b')
+})
+
+test('in-flight ticket save blocks Back and close, then saved dialog closes to parent', async ({ context, page }) => {
+  await routingTransport(context, ['hold-board-save'])
+  await page.goto('/project/a/ticket')
+  await page.getByRole('button', { name: 'First', exact: true }).click()
+  await page.getByLabel('Description').fill('Saved description')
+  await page.getByRole('dialog').getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(page.getByRole('dialog').getByRole('status')).toContainText('Saving changes')
+  await page.evaluate(() => history.back())
+  await expect(page).toHaveURL('/project/a/ticket/card-a')
+  await page.getByRole('button', { name: 'Close dialog' }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.evaluate(() => {
+    localStorage.removeItem('test:hold-board-save')
+    window.dispatchEvent(new Event('test:finish-board-save'))
+  })
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await expect(page).toHaveURL('/project/a/ticket')
+  await page.getByRole('button', { name: 'First', exact: true }).click()
+  await expect(page.getByLabel('Description')).toHaveValue('Saved description')
+})

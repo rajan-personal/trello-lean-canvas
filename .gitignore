@@ -15,3 +15,7 @@ chromatic.log
 chromatic-build-*.xml
 chromatic-diagnostics.json
 .DS_Store
+
+.wrangler/
+.dev.vars
+.dev.vars.*
