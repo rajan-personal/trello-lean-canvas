@@ -21,7 +21,7 @@ test('creates, renames, reorders and deletes only empty columns, isolated per ca
   await page.getByRole('dialog').getByRole('button', { name: 'Save' }).click()
   await expect(column(page, 'Ready')).toBeVisible()
   await page.reload()
-  await page.getByRole('tab', { name: 'Board', exact: true }).click()
+  await page.getByRole('tab', { name: 'Tickets', exact: true }).click()
   await expect(page.locator('.kanban-column h2')).toHaveText(['Backlog', 'Todo', 'In Progress', 'Review', 'Done', 'Ready', 'Closed'])
   await page.getByRole('button', { name: 'Add canvas' }).click()
   await page.getByRole('button', { name: 'New', exact: true }).click()

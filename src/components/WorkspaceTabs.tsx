@@ -23,7 +23,7 @@ export function WorkspaceTabs({ view, onChange, idPrefix }: Props) {
         select(event.key === 'Home' ? 'canvas' : event.key === 'End' ? 'board' : tab === 'canvas' ? 'board' : 'canvas')
       }}>
         {tab === 'canvas' ? <LayoutDashboard size={14} aria-hidden="true" /> : <Columns3 size={14} aria-hidden="true" />}
-        {tab === 'canvas' ? 'Canvas' : 'Board'}
+        {tab === 'canvas' ? 'Canvas' : 'Tickets'}
       </button>)}
   </div>
 }

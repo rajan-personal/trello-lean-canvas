@@ -16,7 +16,7 @@ export const DesktopCanvas: Story = {
     const tabs = canvas.getByRole('tablist')
     const favorite = canvas.getByRole('button', { name: 'Favorite canvas' })
     const selected = canvas.getAllByRole('tab').find((tab) => tab.getAttribute('aria-selected') === 'true')!
-    await expect(selected).toHaveAccessibleName(args.initialView === 'board' ? 'Board' : 'Canvas')
+    await expect(selected).toHaveAccessibleName(args.initialView === 'board' ? 'Tickets' : 'Canvas')
     const bounds = tabs.getBoundingClientRect()
     const star = favorite.getBoundingClientRect()
     await expect(tabs.nextElementSibling).toBe(favorite)
@@ -34,7 +34,7 @@ export const DesktopCanvas: Story = {
     await expect(selected).toHaveFocus()
     for (const key of ['{End}', '{ArrowRight}', '{ArrowLeft}', '{Home}']) {
       await userEvent.keyboard(key)
-      const label = key === '{End}' || key === '{ArrowLeft}' ? 'Board' : 'Canvas'
+      const label = key === '{End}' || key === '{ArrowLeft}' ? 'Tickets' : 'Canvas'
       await expect(canvas.getByRole('tab', { name: label })).toHaveFocus()
       await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName(label)
     }

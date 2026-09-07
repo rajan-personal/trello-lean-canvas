@@ -21,9 +21,9 @@ export const IsolatedBoardsAndKeyboard: Story = {
     const storyUrl = window.location.href
     await userEvent.click(await canvas.findByRole('tab', { name: 'Canvas' }))
     await userEvent.keyboard('{ArrowRight}')
-    const boardTab = canvas.getByRole('tab', { name: 'Board' })
+    const boardTab = canvas.getByRole('tab', { name: 'Tickets' })
     await expect(boardTab).toHaveFocus()
-    await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Board')
+    await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Tickets')
     await expect(await canvas.findByRole('button', { name: 'Outline the launch plan' })).toBeVisible()
     await userEvent.click(canvas.getByRole('button', { name: 'Second canvas' }))
     await expect(await canvas.findByRole('heading', { name: 'Second canvas' })).toBeVisible()
@@ -45,12 +45,12 @@ export const DirtyDraftNavigation: Story = {
     const storyUrl = window.location.href
     const confirm = spyOn(window, 'confirm').mockReturnValue(false)
     try {
-      await userEvent.click(await canvas.findByRole('tab', { name: 'Board' }))
+      await userEvent.click(await canvas.findByRole('tab', { name: 'Tickets' }))
       await userEvent.click((await canvas.findAllByRole('button', { name: '+ Add a card' }))[0])
       await userEvent.type(canvas.getByRole('textbox', { name: 'Card title' }), 'Keep this draft')
       await userEvent.click(canvas.getByRole('tab', { name: 'Canvas' }))
       await expect(confirm).toHaveBeenCalled()
-      await expect(canvas.getByRole('tab', { name: 'Board' })).toHaveFocus()
+      await expect(canvas.getByRole('tab', { name: 'Tickets' })).toHaveFocus()
       await expect(canvas.getByRole('textbox', { name: 'Card title' })).toHaveValue('Keep this draft')
       await userEvent.click(canvas.getByRole('button', { name: 'Sign out alex@example.test' }))
       await expect(args.onSignOut).not.toHaveBeenCalled()

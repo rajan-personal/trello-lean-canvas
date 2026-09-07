@@ -41,7 +41,7 @@ for (const kind of ['card', 'column'] as const) test(`inline ${kind} composer re
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:boards:v1')!))
   expect(saved).toEqual(attempted)
   await page.reload()
-  await page.getByRole('tab', { name: 'Board', exact: true }).click()
+  await page.getByRole('tab', { name: 'Tickets', exact: true }).click()
   if (kind === 'card') await expect(column(page, 'Backlog').locator('.kanban-card')).toHaveText('Draft card')
   else await expect(column(page, 'Draft column')).toBeVisible()
 })

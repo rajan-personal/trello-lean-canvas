@@ -26,7 +26,7 @@ test('login preserves deep destination and waits for both asynchronous resource 
   await expect(page).toHaveURL('/project/a/ticket')
   await page.getByRole('button', { name: 'Continue with Google' }).click()
   await page.evaluate(() => window.dispatchEvent(new Event('test:canvases')))
-  await expect(page.getByRole('tab', { name: 'Board', exact: true })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByRole('tab', { name: 'Tickets', exact: true })).toHaveAttribute('aria-selected', 'true')
 })
 
 for (const denied of [false, true]) test(`missing project is resolved only after async ${denied ? 'access error' : 'load'}`, async ({ context, page }) => {

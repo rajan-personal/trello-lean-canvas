@@ -18,7 +18,7 @@ test('moves cards by drag within and across columns, preserving stable IDs and r
   await backlog.getByRole('button', { name: 'Alpha', exact: true }).dragTo(column(page, 'Todo'))
   await expect(column(page, 'Todo').locator('.kanban-card')).toHaveText(['Alpha'])
   await page.reload()
-  await page.getByRole('tab', { name: 'Board', exact: true }).click()
+  await page.getByRole('tab', { name: 'Tickets', exact: true }).click()
   await expect(backlog.locator('.kanban-card')).toHaveText(['Gamma', 'Beta'])
   await expect(column(page, 'Todo').locator('.kanban-card')).toHaveText(['Alpha'])
   expect(await page.evaluate(() => Object.values(JSON.parse(localStorage.getItem('lean-canvas:boards:v1')!))
