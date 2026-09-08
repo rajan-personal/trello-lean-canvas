@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { BoardSummary } from '../src/data/board'
-import { sortTicketListRows, summaryGroups, summaryTickets } from '../src/data/board-summary-order'
+import { groupTicketListRows, summaryGroups, summaryTickets } from '../src/data/board-summary-order'
 
 const summary = (project: string): BoardSummary => ({
   columns: [{ id: `${project}-custom`, title: 'Custom status' }, { id: `${project}-done`, title: 'Done' }, { id: `${project}-empty`, title: 'Empty' }],
@@ -12,7 +12,7 @@ const summary = (project: string): BoardSummary => ({
 })
 const sortableProjects = [
   { canvas: { id: 'project-a', name: 'Alpha' }, summary: {
-    columns: [{ id: 'z-column', title: 'Alpha status' }, { id: 'a-column', title: 'Zeta status' }],
+    columns: [{ id: 'z-column', title: 'Zeta status' }, { id: 'a-column', title: 'Alpha status' }],
     cards: [
       { id: 'duplicate-late', columnId: 'z-column', title: 'Duplicate title', rank: 'b' },
       { id: 'duplicate-first', columnId: 'z-column', title: 'Duplicate title', rank: 'a' },
@@ -41,28 +41,30 @@ describe('board summary order', () => {
     expect(first.id).toBe(second.id)
     expect(first.columnId).not.toBe(second.columnId)
   })
-  it('sorts ticket status by displayed names and preserves stable ties', () => {
+  it('sorts tickets within each project by workflow column position', () => {
     const rows = summaryTickets(sortableProjects)
-    expect(sortTicketListRows(rows, { key: 'status', direction: 'ascending' }).map(({ status }) => status)).toEqual([
-      'Alpha status', 'Alpha status', 'Beta status', 'Zeta status', 'Zeta status',
+    const ascending = groupTicketListRows(rows, { key: 'status', direction: 'ascending' })
+    expect(ascending.map(({ rows }) => rows.map(({ status }) => status))).toEqual([
+      ['Zeta status', 'Zeta status', 'Alpha status'], ['Beta status', 'Zeta status'],
     ])
-    expect(sortTicketListRows(rows, { key: 'status', direction: 'descending' }).map(({ status }) => status)).toEqual([
-      'Zeta status', 'Zeta status', 'Beta status', 'Alpha status', 'Alpha status',
-    ])
-    expect(sortTicketListRows(rows, { key: 'status', direction: 'ascending' }).filter(({ status }) => status === 'Zeta status').map(({ card }) => card.id)).toEqual([
-      'alpha-ticket', 'other-zeta',
+    const descending = groupTicketListRows(rows, { key: 'status', direction: 'descending' })
+    expect(descending.map(({ rows }) => rows.map(({ status }) => status))).toEqual([
+      ['Alpha status', 'Zeta status', 'Zeta status'], ['Zeta status', 'Beta status'],
     ])
   })
-  it('sorts projects in both directions without reversing tie order', () => {
-    const rows = summaryTickets(sortableProjects)
-    expect(sortTicketListRows(rows, { key: 'project', direction: 'ascending' }).map(({ projectName }) => projectName)).toEqual([
-      'Alpha', 'Alpha', 'Alpha', 'Beta', 'Beta',
-    ])
-    expect(sortTicketListRows(rows, { key: 'project', direction: 'descending' }).map(({ projectName }) => projectName)).toEqual([
-      'Beta', 'Beta', 'Alpha', 'Alpha', 'Alpha',
-    ])
-    expect(sortTicketListRows(rows, { key: 'project', direction: 'ascending' }).filter(({ projectName }) => projectName === 'Alpha').map(({ card }) => card.id)).toEqual([
-      'duplicate-first', 'duplicate-late', 'alpha-ticket',
-    ])
+  it('preserves sidebar project order through status sorting and filtering', () => {
+    const rows = summaryTickets([...sortableProjects].reverse())
+    expect(groupTicketListRows(rows).map(({ projectName }) => projectName)).toEqual(['Beta', 'Alpha'])
+    for (const direction of ['ascending', 'descending'] as const) {
+      const filtered = rows.filter(({ status }) => status === 'Zeta status')
+      const groups = groupTicketListRows(filtered, { key: 'status', direction })
+      expect(groups.map(({ projectName }) => projectName)).toEqual(['Beta', 'Alpha'])
+      expect(groups[1].rows.map(({ card }) => card.id)).toEqual(['duplicate-first', 'duplicate-late'])
+    }
+    expect(groupTicketListRows(summaryTickets(sortableProjects)).map(({ projectName }) => projectName)).toEqual(['Alpha', 'Beta'])
+  })
+  it('keeps projects with duplicate names separate in sidebar order', () => {
+    const rows = summaryTickets(sortableProjects.map((project) => ({ ...project, canvas: { ...project.canvas, name: 'Same name' } })).reverse())
+    expect(groupTicketListRows(rows).map(({ projectId }) => projectId)).toEqual(['project-b', 'project-a'])
   })
 })

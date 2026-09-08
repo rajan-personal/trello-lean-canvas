@@ -17,11 +17,9 @@ import { useNotice } from './useNotice'
 import { useWorkspacePanels } from './useWorkspacePanels'
 import { useBoard } from './useBoard'
 import { useNavigationGuard } from './useNavigationGuard'
-import { WorkspaceUnavailable } from './WorkspaceUnavailable'
 import { WorkspaceHeader } from './WorkspaceHeader'
-import { WorkspaceViewPanel } from './WorkspaceViewPanel'
+import { WorkspaceRouteContent } from './WorkspaceRouteContent'
 import { useWorkspaceTicketList } from './useWorkspaceTicketList'
-import { TicketListView } from '../components/board/TicketListView'
 interface Props {
   user: AppUser
   onSignOut: () => void | Promise<void>
@@ -76,13 +74,12 @@ export function Workspace({ user, onSignOut, persistence, browserRouting = false
           collapsed={panels.sidebarCollapsed}
           onClose={panels.closeSidebar}
         />
-        {allTickets ? <TicketListView projects={ticketList.projects} blocked={state.pending}
-          onOpenTicket={openTicket} onOpenProjectBoard={openProjectBoard} onRetry={ticketList.retry} /> :
-          state.activeCanvas ? <WorkspaceViewPanel canvas={state.activeCanvas} view={view} board={board}
-            sectionProps={sectionProps} user={user} ticket={ticket} blocked={state.pending} deleted={state.deleted} onDismissDeleted={() => {
-              if (allow()) state.setActiveId(null)
-            }} register={guard.register} notify={notify} /> :
-            <WorkspaceUnavailable route={route} onReturn={() => { if (allow()) history.navigate('/') }} />}
+        <WorkspaceRouteContent allTickets={allTickets} activeCanvas={state.activeCanvas}
+          ticketList={{ projects: ticketList.projects, blocked: state.pending,
+            onOpenTicket: openTicket, onOpenProjectBoard: openProjectBoard, onRetry: ticketList.retry }}
+          workspaceView={{ view, board, sectionProps, user, ticket, blocked: state.pending, deleted: state.deleted,
+            onDismissDeleted: () => { if (allow()) state.setActiveId(null) }, register: guard.register, notify }}
+          unavailable={{ route, onReturn: () => { if (allow()) history.navigate('/') } }} />
         {state.activeCanvas && !state.deleted && (
           <NotepadPanel
             key={state.activeCanvas.id}

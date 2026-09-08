@@ -1,0 +1,75 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "ignore": {
+    "overrides": [
+      {
+        "files": [
+          "dist/assets/**",
+          "storybook-static/assets/**"
+        ],
+        "rules": [
+          "react-doctor/artifact-baas-authority-surface"
+        ]
+      },
+      {
+        "files": [
+          "src/app/App.story-support.tsx",
+          "src/components/CardComposer.story-support.tsx",
+          "src/components/Dialog.story-support.tsx",
+          "src/components/InlineCardEditor.story-support.tsx"
+        ],
+        "rules": [
+          "react-doctor/only-export-components"
+        ]
+      },
+      {
+        "files": [
+          "src/app/AppSession.story-support.tsx",
+          "src/app/WorkspaceBoard.story-support.tsx",
+          "src/components/BoardTitle.story-support.tsx",
+          "src/components/CanvasCard.story-support.tsx",
+          "src/components/CanvasToolbarActions.story-support.tsx",
+          "src/components/Sidebar.story-support.tsx",
+          "src/components/TopBar.story-support.tsx",
+          "src/components/board/BoardEditors.story-support.tsx",
+          "src/components/board/KanbanColumn.story-support.tsx"
+        ],
+        "rules": [
+          "react-doctor/no-derived-useState"
+        ]
+      },
+      {
+        "files": [
+          "src/app/AppSession.story-support.tsx"
+        ],
+        "rules": [
+          "react-doctor/jsx-no-constructed-context-values"
+        ]
+      },
+      {
+        "files": [
+          "src/components/CardComposer.story-support.tsx"
+        ],
+        "rules": [
+          "react-doctor/no-array-index-as-key"
+        ]
+      },
+      {
+        "files": [
+          "src/components/InlineCardEditor.tsx"
+        ],
+        "rules": [
+          "react-doctor/no-autofocus"
+        ]
+      },
+      {
+        "files": [
+          "src/data/firestore-migration.ts"
+        ],
+        "rules": [
+          "react-doctor/async-await-in-loop"
+        ]
+      }
+    ]
+  }
+}
