@@ -159,7 +159,7 @@
 .ticket-list-filter-footer button { color: #0c66e4; font-weight: 600; }
 .ticket-list-filter-footer button:disabled { color: #8590a2; }
 .ticket-list-points-heading-short { display: none; }
-.ticket-list-ticket-cell { padding-inline-start: 22px !important; font-weight: 600; }
+.ticket-list-ticket-cell { padding-inline-start: 22px !important; font-weight: 400; }
 .ticket-list-ticket-button {
   display: block;
   inline-size: 100%;
@@ -171,7 +171,6 @@
   background: transparent;
   color: #172b4d;
   font: inherit;
-  font-weight: 600;
   text-align: start;
 }
 .ticket-list-project-button {
