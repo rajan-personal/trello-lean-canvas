@@ -15,9 +15,14 @@ describe('persisted schemas', () => {
   })
   it('rejects malformed, extra, and misordered persisted fields', () => {
     expect(canvasDocumentSchema.safeParse({ ...document(), surprise: true }).success).toBe(false)
+    const extraSectionField = { ...document(), sections: document().sections.map((section, index) =>
+      index === 0 ? { ...section, surprise: true } : section) }
+    expect(canvasDocumentSchema.safeParse(extraSectionField).success).toBe(false)
     const wrongOrder = document()
     wrongOrder.sections = [...wrongOrder.sections].reverse()
     expect(canvasDocumentSchema.safeParse(wrongOrder).success).toBe(false)
+    expect(workspaceSchema.safeParse({ schemaVersion: 2, canvasOrder: ['canvas-a'],
+      orderRevision: 1, updatedAt: timestamp, surprise: true }).success).toBe(false)
     expect(workspaceSchema.safeParse({ schemaVersion: 2, canvasOrder: ['x', 'x'],
       orderRevision: 1, updatedAt: timestamp }).success).toBe(false)
   })
