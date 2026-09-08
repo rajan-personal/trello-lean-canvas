@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fn } from 'storybook/test'
+import { expect, fn, fireEvent } from 'storybook/test'
 import { BoardCardDialog } from './BoardCardDialog'
 import { CardDialogStory } from './Board.story-support'
 import type { RunBoardCommand } from './board-ui'
 import { boardStoryData, boardStoryUser } from './board-story-fixtures'
+import { canvasStoryAct } from '../canvas-story-act'
 import './kanban.css'
 
 const meta = {
@@ -37,7 +38,15 @@ export const LongDiscussion: Story = { args: { board: { ...boardStoryData,
   comments: Array.from({ length: 8 }, (_, index) => ({ ...boardStoryData.comments[0], id: `comment-${index}`,
     authorName: index % 2 ? 'Sam Rivera' : 'Alex Morgan',
     text: index % 2 ? 'Agreed. Let’s keep the first milestone small and review what we learn.' : 'The pilot is ready for a closer look.\nWhat should we test first?' })) } } }
-export const Saving: Story = { args: { pending: true } }
+export const Saving: Story = { args: { pending: true }, play: async ({ canvas, args }) => {
+  const modal = canvas.getByRole('dialog', { name: 'Card details' })
+  await expect(modal).toHaveAttribute('closedby', 'any')
+  await expect(canvas.getByRole('button', { name: 'Save' })).toBeDisabled()
+  // Native light-dismiss and Escape both request cancellation, never bypass the draft guard.
+  await canvasStoryAct(() => { fireEvent(modal, new Event('cancel', { cancelable: true })) })
+  await expect(modal).toBeVisible()
+  await expect(args.onClose).not.toHaveBeenCalled()
+} }
 export const SaveFailure: Story = { args: { error: 'Changes could not be saved. Your draft is still here.', run: fn<RunBoardCommand>(async () => false) } }
 export const LongPlainText: Story = { args: { card: { ...boardStoryData.cards[0],
   title: 'A long card title that wraps across lines without icons, badges, or hidden metadata',
