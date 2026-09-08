@@ -19,8 +19,6 @@ const meta = {
   args: {
     canvases: [storyCanvas, favoriteCanvas],
     activeId: storyCanvas.id,
-    allTicketsActive: false,
-    onAllTickets: fn(),
     onSelect: fn(),
     onMove: fn(),
     user: {
@@ -51,14 +49,6 @@ export const Desktop: Story = {
     await expect(canvas.getByText('Signed out')).toBeVisible()
   },
 }
-export const AllTickets: Story = {
-  args: { allTicketsActive: true },
-  play: async ({ args, canvas, userEvent }) => {
-    await expect(canvas.getByRole('button', { name: 'All tickets' })).toHaveAttribute('aria-current', 'page')
-    await userEvent.click(canvas.getByRole('button', { name: 'All tickets' }))
-    await expect(args.onAllTickets).toHaveBeenCalledOnce()
-  },
-}
 export const Collapsed: Story = {
   args: { collapsed: true },
   play: async ({ canvasElement }) => {
@@ -81,9 +71,7 @@ export const MobileOpen: Story = {
   },
 }
 
-export const Empty: Story = {
-  args: { canvases: [], activeId: null },
-}
+export const Empty: Story = { args: { canvases: [], activeId: null } }
 
 export const KeyboardOrder: Story = {
   play: async ({ canvas, userEvent }) => {

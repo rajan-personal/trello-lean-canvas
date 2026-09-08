@@ -66,11 +66,12 @@ export const ActiveTools: Story = {
   },
 }
 export const AllTickets: Story = {
-  args: { canvas: undefined, heading: 'All tickets' },
+  args: { canvas: undefined, heading: 'All tickets', allTicketsActive: true },
   play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByRole('heading', { name: 'All tickets' })).toBeVisible()
-    await userEvent.click(canvas.getByRole('button', { name: 'All tickets' }))
-    await expect(args.onOpenAllTickets).toHaveBeenCalledOnce()
+    const button = canvas.getByRole('button', { name: 'All tickets' })
+    await expect(button).toHaveAttribute('aria-current', 'page'); await expect(button).toHaveTextContent('')
+    await userEvent.click(button); await expect(args.onOpenAllTickets).toHaveBeenCalledOnce()
   },
 }
 export const NoCanvas: Story = {

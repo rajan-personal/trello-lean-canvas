@@ -1,6 +1,6 @@
 import type { ChangeEvent, ReactNode } from 'react'
 import './topbar.css'
-import { List, Menu } from 'lucide-react'
+import { Ticket, Menu } from 'lucide-react'
 import type { LeanCanvas } from '../data/types'
 import { BoardTitle } from './BoardTitle'
 import { CanvasAddMenu } from './CanvasAddMenu'
@@ -11,6 +11,7 @@ interface Props {
   tabs?: ReactNode
   canvas?: LeanCanvas
   heading?: string
+  allTicketsActive?: boolean
   onOpenAllTickets?: () => void
   sidebarOpen: boolean
   sidebarCollapsed: boolean
@@ -52,6 +53,10 @@ export function TopBar(props: Props) {
       >
         <Menu size={19} />
       </button>
+      {props.onOpenAllTickets && <button type="button" className={`${toolbarButtonClass} topbar-all-tickets`}
+        onClick={props.onOpenAllTickets} aria-label="All tickets" title="All tickets" aria-current={props.allTicketsActive ? 'page' : undefined}>
+        <Ticket size={19} aria-hidden="true" />
+      </button>}
       <div className="topbar-brand flex h-full w-11 flex-none items-center justify-center px-2">
         <CanvasAddMenu
           onNew={props.onNewCanvas}
@@ -64,20 +69,17 @@ export function TopBar(props: Props) {
           <h1 className="truncate text-base font-semibold" aria-label={props.heading}>{props.heading}</h1>
         )}
         <span className="toolbar-spacer flex-1" />
-        {(canvas || props.onOpenAllTickets) && (
+        {canvas && (
           <div className="topbar-actions flex shrink-0 items-center">
-            {props.onOpenAllTickets && <button type="button" className={`${toolbarButtonClass} topbar-all-tickets max-[340px]:hidden`} onClick={props.onOpenAllTickets} aria-label="All tickets" title="All tickets">
-              <List size={17} aria-hidden="true" />
-            </button>}
-            {canvas && props.tabs}
-            {canvas && <CanvasToolbarActions
+            {props.tabs}
+            <CanvasToolbarActions
               canvas={canvas}
               notepadOpen={props.notepadOpen}
               onFavorite={props.onFavorite}
               onToggleNotepad={props.onToggleNotepad}
               onDelete={props.onDelete}
               onDownload={props.onDownload}
-            />}
+            />
           </div>
         )}
       </div>

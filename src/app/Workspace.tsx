@@ -50,7 +50,7 @@ export function Workspace({ user, onSignOut, persistence, browserRouting = false
     open: (id: string) => { if (projectId && allow()) history.navigate(projectPath(projectId, 'board', id)) },
     close: () => { if (projectId) history.navigate(projectPath(projectId, 'board')) },
   }
-  const openAllTickets = () => { if (allow()) history.navigate(ticketsPath()) }
+  const openAllTickets = () => { if (allow()) { history.navigate(ticketsPath()); panels.closeSidebar() } }
   const openTicket = (id: string, ticketId: string) => { if (allow()) history.navigate(projectPath(id, 'board', ticketId)) }
   const openProjectBoard = (id: string) => { if (allow()) history.navigate(projectPath(id, 'board')) }
   const signOut = () => { if (allow()) return onSignOut() }
@@ -64,8 +64,6 @@ export function Workspace({ user, onSignOut, persistence, browserRouting = false
         <Sidebar
           canvases={state.canvases}
           activeId={state.activeCanvas?.id ?? null}
-          allTicketsActive={allTickets}
-          onAllTickets={openAllTickets}
           onSelect={(id) => { if (allow()) commands.selectCanvas(id) }}
           onMove={(id, index) => { if (allow()) commands.moveCanvas(id, index) }}
           user={user}

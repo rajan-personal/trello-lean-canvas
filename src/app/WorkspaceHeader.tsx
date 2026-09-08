@@ -14,7 +14,7 @@ interface Props {
 }
 export function WorkspaceHeader({ state, commands, panels, allow, allTickets, onOpenAllTickets, setDialog, view, setView }: Props) {
   return <TopBar canvas={state.activeCanvas} heading={allTickets ? 'All tickets' : undefined}
-    onOpenAllTickets={!allTickets && view === 'board' ? onOpenAllTickets : undefined}
+    allTicketsActive={allTickets} onOpenAllTickets={onOpenAllTickets}
     sidebarOpen={panels.sidebarOpen}
     sidebarCollapsed={panels.sidebarCollapsed} onToggleSidebar={panels.toggleSidebar}
     onOpenSidebar={panels.openSidebar}
