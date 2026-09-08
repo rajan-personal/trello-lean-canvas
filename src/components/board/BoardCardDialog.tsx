@@ -29,7 +29,7 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
   const descriptionRef = useGrowingDescription(draft.description)
   const close = useDraftGuard(editor.dirty, pending, onClose, register)
   const exists = !deleted && board.cards.some((item) => item.id === card.id)
-  return <BoardDialog title="Card details" onClose={close} className="kanban-card-dialog"
+  return <BoardDialog title="Card details" onClose={close} lightDismiss className="kanban-card-dialog"
     headerActions={<button className="kanban-danger kanban-dialog-delete" disabled={pending || !exists}
       type="button" aria-label="Delete card" title="Delete card" onClick={async () => {
         if (!window.confirm(`Delete “${card.title}” and all its comments?${editor.dirty ? ' Unsaved changes will also be discarded.' : ''}`)) return
