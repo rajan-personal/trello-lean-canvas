@@ -37,7 +37,7 @@ export const Populated: Story = {
     await expect(canvas.queryByText('Tickets from every project. Sort the Project or Status columns to change row order.')).not.toBeInTheDocument()
     await expect(canvas.queryByText('Open a project board:')).not.toBeInTheDocument()
     await expect(canvas.getByText(/Projects in sidebar order/)).toHaveClass('ticket-list-visually-hidden')
-    await expect(canvas.queryByRole('button', { name: /Filter Project|Sort Project/ })).not.toBeInTheDocument()
+    await expect(canvas.queryByRole('button', { name: /Filter|Sort Project/ })).not.toBeInTheDocument()
     await expect(canvas.getAllByRole('button', { name: /Open board for/ }).map((button) => button.textContent)).toEqual(['Product launch', 'Customer research'])
     await expect(canvas.getAllByRole('button', { name: /^Plan release/ })).toHaveLength(2)
     await userEvent.click(canvas.getAllByRole('button', { name: /^Plan release/ })[0])

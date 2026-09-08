@@ -6,13 +6,10 @@ import type { LeanCanvas } from '../data/types'
 import { AccountButton } from './AccountButton'
 import { brandActionButtonClass } from './workspace-classes'
 import { SidebarCanvasItem } from './SidebarCanvasItem'
-import { SidebarAllTicketsItem } from './SidebarAllTicketsItem'
 import { getCanvasDropEdge, type DropTarget } from './sidebar-drag'
 interface Props {
   canvases: LeanCanvas[]
   activeId: string | null
-  allTicketsActive: boolean
-  onAllTickets: () => void
   onSelect: (id: string) => void
   onMove: (id: string, index: number) => void
   user: AppUser
@@ -69,7 +66,6 @@ export function Sidebar(p: Props) {
           className="grid min-h-0 gap-[3px] overflow-y-auto"
           aria-label="Workspace navigation"
         >
-          <SidebarAllTicketsItem active={p.allTicketsActive} onClick={() => { p.onAllTickets(); p.onClose() }} />
           {p.canvases.map((canvas, index) => (
             <SidebarCanvasItem
               key={canvas.id}
@@ -89,7 +85,7 @@ export function Sidebar(p: Props) {
             />
           ))}
         </nav>
-        <div className="sidebar-footer mt-auto border-t border-white/14 pt-2">
+        <div className="sidebar-footer mt-auto shrink-0 border-t border-white/14 pt-2">
           <AccountButton user={p.user} onSignOut={p.onSignOut} />
         </div>
       </aside>

@@ -1,3 +1,5 @@
+.topbar-all-tickets[aria-current='page'] { background: rgb(255 255 255 / 16%); color: white; }
+
 /* Reserve the action row in standalone headers as well as the workspace. */
 @media (max-width: 760px) {
   .topbar:has(.workspace-tabs) {
@@ -5,7 +7,7 @@
     align-items: flex-start;
   }
 
-  .topbar:has(.workspace-tabs) .mobile-sidebar-button {
+  .topbar:has(.workspace-tabs) :is(.mobile-sidebar-button, .topbar-all-tickets) {
     margin-top: 8px;
   }
 

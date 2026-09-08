@@ -68,7 +68,7 @@
   letter-spacing: .01em;
 }
 .ticket-list-table tbody tr:last-child th, .ticket-list-table tbody tr:last-child td { border-block-end: 0; }
-.ticket-list-column-menu-wrap {
+.ticket-list-sort-heading {
   position: relative;
   display: flex;
   min-block-size: 36px;
@@ -77,8 +77,7 @@
   gap: 3px;
   white-space: nowrap;
 }
-.ticket-list-column-actions { display: inline-flex; flex: none; gap: 1px; }
-.ticket-list-sort-toggle, .ticket-list-filter-toggle {
+.ticket-list-sort-toggle {
   display: inline-grid;
   min-inline-size: 30px;
   min-block-size: 32px;
@@ -91,73 +90,8 @@
   font: inherit;
   line-height: 1;
 }
-.ticket-list-sort-toggle:hover, .ticket-list-filter-toggle:hover, .ticket-list-filter-toggle[aria-expanded="true"] { border-color: #b6c2d2; background: #e9f2ff; color: #0747a6; }
+.ticket-list-sort-toggle:hover { border-color: #b6c2d2; background: #e9f2ff; color: #0747a6; }
 .ticket-list-sort-toggle.is-active { color: #0747a6; }
-.ticket-list-filter-toggle.is-filtered { border-color: #b3d4ff; background: #e9f2ff; color: #0c66e4; }
-.ticket-list-filter-menu {
-  position: absolute;
-  z-index: 20;
-  inset-block-start: calc(100% + 6px);
-  inset-inline-start: 0;
-  box-sizing: border-box;
-  inline-size: min(280px, calc(100vw - 48px));
-  padding: 8px;
-  border: 1px solid #b6c2d2;
-  border-radius: 10px;
-  background: #fff;
-  color: #172b4d;
-  box-shadow: 0 8px 20px #091e4233, 0 1px 4px #091e4226;
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: normal;
-}
-.ticket-list-column-menu-status .ticket-list-filter-menu { inset-inline: auto 0; }
-.ticket-list-filter-footer button {
-  min-block-size: 36px;
-  padding: 7px 9px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: #172b4d;
-  font: inherit;
-  text-align: start;
-}
-.ticket-list-filter-footer button:not(:disabled):hover { background: #e9f2ff; color: #0747a6; }
-.ticket-list-filter-search { display: block; }
-.ticket-list-filter-search input {
-  box-sizing: border-box;
-  inline-size: 100%;
-  min-block-size: 38px;
-  padding: 7px 9px;
-  border: 1px solid #8590a2;
-  border-radius: 6px;
-  background: #fff;
-  color: #172b4d;
-  font: inherit;
-}
-.ticket-list-filter-options {
-  max-block-size: 220px;
-  margin-block-start: 6px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-.ticket-list-filter-option {
-  display: flex;
-  min-block-size: 36px;
-  align-items: center;
-  gap: 8px;
-  box-sizing: border-box;
-  padding: 6px 8px;
-  border-radius: 6px;
-  overflow-wrap: anywhere;
-}
-.ticket-list-filter-option:hover { background: #f1f2f4; }
-.ticket-list-filter-option input { inline-size: 16px; block-size: 16px; flex: none; margin: 0; accent-color: #0c66e4; }
-.ticket-list-filter-all { border-block-end: 1px solid #ebecf0; border-radius: 6px 6px 0 0; font-weight: 650; }
-.ticket-list-filter-no-results { margin: 10px 8px; color: #626f86; }
-.ticket-list-filter-footer { display: flex; justify-content: flex-end; padding-block-start: 6px; border-block-start: 1px solid #ebecf0; }
-.ticket-list-filter-footer button { color: #0c66e4; font-weight: 600; }
-.ticket-list-filter-footer button:disabled { color: #8590a2; }
 .ticket-list-points-heading-short { display: none; }
 .ticket-list-ticket-cell { padding-inline-start: 22px !important; font-weight: 400; }
 .ticket-list-ticket-button {
@@ -222,7 +156,6 @@
   background: #f1f2f4;
   box-shadow: 0 2px 4px #091e4226;
 }
-.ticket-list-no-matches td { padding-block: 28px; color: #44546f; text-align: center; }
 .ticket-list-error { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; color: #ae2e24; }
 .ticket-list-error button {
   min-block-size: 36px;
@@ -235,7 +168,7 @@
   font-weight: 600;
 }
 .ticket-list-ticket-button:focus-visible, .ticket-list-project-button:focus-visible, .ticket-list-sort-toggle:focus-visible,
-.ticket-list-filter-toggle:focus-visible, .ticket-list-filter-menu button:focus-visible, .ticket-list-filter-menu input:focus-visible, .ticket-list-error button:focus-visible {
+.ticket-list-error button:focus-visible {
   outline: 3px solid #0c66e4;
   outline-offset: 2px;
 }
@@ -252,22 +185,13 @@
   .ticket-list-content { padding: 12px 12px 28px; }
   .ticket-list-table th, .ticket-list-table td { padding: 7px; }
   .ticket-list-table thead th { font-size: 12px; }
-  .ticket-list-column-menu-wrap { gap: 0; }
-  .ticket-list-column-actions { gap: 0; }
-  .ticket-list-sort-toggle, .ticket-list-filter-toggle { min-inline-size: 24px; padding-inline: 2px; }
-  .ticket-list-filter-menu {
-    position: fixed;
-    inset: 102px 12px auto;
-    inline-size: auto;
-    max-block-size: calc(100dvh - 116px);
-    overflow-y: auto;
-  }
+  .ticket-list-sort-heading { gap: 0; }
+  .ticket-list-sort-toggle { min-inline-size: 24px; padding-inline: 2px; }
   .ticket-list-points-heading-full { display: none; }
   .ticket-list-points-heading-short { display: inline; }
   .ticket-list-ticket-button { padding-inline: 4px; }
   .ticket-list-project-button { padding-inline: 6px; }
 }
 @media (pointer: coarse) {
-  .ticket-list-project-button, .ticket-list-sort-toggle, .ticket-list-filter-toggle, .ticket-list-filter-option,
-  .ticket-list-filter-footer button, .ticket-list-error button { min-block-size: 44px; }
+  .ticket-list-project-button, .ticket-list-sort-toggle, .ticket-list-error button { min-block-size: 44px; }
 }
