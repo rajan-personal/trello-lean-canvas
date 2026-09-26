@@ -20,6 +20,6 @@ export function parseWorkspaceRoute(pathname: string): WorkspaceRoute {
 
 export function ticketsPath(): string { return '/tickets' }
 
-export function projectPath(projectId: string, view: 'canvas' | 'board' = 'board', ticketId?: string): string {
+export function projectPath(projectId: string, view: 'canvas' | 'board' = 'canvas', ticketId?: string): string {
   return `/project/${encodeURIComponent(projectId)}${view === 'board' ? `/ticket${ticketId ? `/${encodeURIComponent(ticketId)}` : ''}` : ''}`
 }

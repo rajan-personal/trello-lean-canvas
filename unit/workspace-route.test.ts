@@ -11,11 +11,6 @@ describe('workspace-route', () => {
     expect(parseWorkspaceRoute('/project/a/ticket/b')).toEqual({ kind: 'project', projectId: 'a', view: 'board', ticketId: 'b' })
     expect(parseWorkspaceRoute('/project/a/ticket/')).toEqual({ kind: 'project', projectId: 'a', view: 'board' })
   })
-  it('defaults generated project links to Tickets while preserving explicit Canvas links', () => {
-    expect(projectPath('a')).toBe('/project/a/ticket')
-    expect(projectPath('a', 'canvas')).toBe('/project/a')
-    expect(parseWorkspaceRoute(projectPath('a'))).toEqual({ kind: 'project', projectId: 'a', view: 'board' })
-  })
   it('round-trips encoded IDs without treating them as paths', () => {
     expect(parseWorkspaceRoute(projectPath('my project', 'board', 'task #1'))).toEqual({
       kind: 'project', projectId: 'my project', view: 'board', ticketId: 'task #1',

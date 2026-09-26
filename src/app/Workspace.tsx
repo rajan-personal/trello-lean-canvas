@@ -43,7 +43,7 @@ export function Workspace({ user, onSignOut, persistence, browserRouting = false
   const panels = useWorkspacePanels(); const [dialog, setDialog] = useState<CanvasDialogState | null>(null)
   const sectionProps = { ...cards, dragHandlers }; const defaultId = !state.loading && !state.error && route.kind === 'root' ? state.canvases[0]?.id : undefined
   useEffect(() => {
-    if (defaultId) history.navigate(projectPath(defaultId), true)
+    if (defaultId) history.navigate(projectPath(defaultId, 'board'), true)
   }, [defaultId, history])
   const ticket = {
     id: ticketId,

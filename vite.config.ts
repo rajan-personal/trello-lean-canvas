@@ -3,14 +3,13 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   base: '/',
-  build: { chunkSizeWarningLimit: 600, outDir: mode === 'demo' ? 'dist-demo' : 'dist' },
+  build: { chunkSizeWarningLimit: 600 },
   plugins: [
     react(),
     tailwindcss(),
     VitePWA({
-      disable: mode === 'demo',
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
@@ -49,4 +48,4 @@ export default defineConfig(({ mode }) => ({
       },
     }),
   ],
-}))
+})

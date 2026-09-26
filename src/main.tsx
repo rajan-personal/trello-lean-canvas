@@ -1,7 +1,6 @@
 import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
-import { AppStatus } from './components/AppStatus'
-import App from './EntryApp'
+import App from './app/App'
 import './styles.css'
 
 const Agentation = import.meta.env.DEV
@@ -13,9 +12,7 @@ if (!rootElement) throw new Error('Root element was not found.')
 
 createRoot(rootElement).render(
   <StrictMode>
-    <Suspense fallback={<AppStatus />}>
-      <App browserRouting />
-    </Suspense>
+    <App browserRouting />
     {Agentation && (
       <Suspense fallback={null}>
         <Agentation />
