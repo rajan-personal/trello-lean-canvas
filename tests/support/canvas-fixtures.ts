@@ -85,6 +85,7 @@ export async function loadSamples(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Add canvas' }).click()
   await page.getByRole('button', { name: 'Sample' }).click()
   await expect(page.getByRole('heading', { name: 'Airbnb — 2008' })).toBeVisible()
+  await page.getByRole('tab', { name: 'Canvas', exact: true }).click()
 }
 
 export async function openSampleCanvas(page: Page): Promise<void> {
@@ -95,4 +96,5 @@ export async function openSampleCanvas(page: Page): Promise<void> {
     'team-alignment.yaml',
   )
   await expect(page.getByRole('heading', { name: 'Pulse' })).toBeVisible()
+  await page.getByRole('tab', { name: 'Canvas', exact: true }).click()
 }

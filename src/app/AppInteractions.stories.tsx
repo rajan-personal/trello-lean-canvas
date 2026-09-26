@@ -71,6 +71,7 @@ export const AddCardDraftResume: AppStory = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     await canvas.findByRole('heading', { name: 'Blank canvas' })
+    await userEvent.click(canvas.getByRole('tab', { name: 'Canvas' }))
     const section = canvasElement.querySelector(
       '.canvas-column.problem .canvas-cell',
     )

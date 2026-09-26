@@ -36,7 +36,7 @@ Vite already uses the origin-root base `/`. Manifest icons are explicitly root-r
 
 ## Routing and guards
 
-The production entry point opts into browser routing. Component/Storybook previews use per-instance memory routing, never shared window history. URLs remain untouched while authentication and workspace data load; unavailable IDs are shown explicitly, never substituted with the first project. Root alone defaults to the first loaded project. Retained deleted Board snapshots are read-only draft recovery views, not save targets.
+The production entry point opts into browser routing. Component/Storybook previews use per-instance memory routing, never shared window history. URLs remain untouched while authentication and workspace data load; unavailable IDs are shown explicitly, never substituted with the first project. Root alone defaults to the first loaded project's Tickets view. Explicit Canvas URLs still open Canvas. Retained deleted Board snapshots are read-only draft recovery views, not save targets.
 
 Navigation entries carry an index. Cancelled same-document Back/Forward restores the original history cursor instead of pushing an extra entry, preserving forward history and mounted drafts. Cross-document exits use native `beforeunload` prompts (browser support/user-activation rules apply). Closing a ticket navigates explicitly to its parent route, including direct-entry tickets. Board drafts and pending canvas/board saves guard workspace navigation; Canvas inline editors retain intentional outside-pointerdown dismissal, but Back/Forward/unload protect their drafts.
 

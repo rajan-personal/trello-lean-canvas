@@ -18,6 +18,8 @@ test('imports, reloads, exports and deletes board records without changing Lean 
   await expect(page.getByRole('heading', { name: 'Board transfer' })).toBeVisible()
   await expect.poll(() => page.evaluate(() => Object.keys(JSON.parse(localStorage.getItem('lean-canvas:boards:v1') ?? '{}')).length)).toBe(1)
   await page.reload()
+  await expect(page.getByRole('tab', { name: 'Tickets', exact: true })).toHaveAttribute('aria-selected', 'true')
+  await page.getByRole('tab', { name: 'Canvas', exact: true }).click()
   await expect(page.getByText('Separate Lean Canvas note')).toBeVisible()
   const download = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Download canvas data as YAML' }).click()

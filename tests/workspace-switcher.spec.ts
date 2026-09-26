@@ -32,7 +32,7 @@ for (const width of [320, 375, 760, 761, 1424]) {
     await expect(canvas).toBeFocused()
     for (const key of ['End', 'ArrowRight', 'ArrowLeft', 'Home']) {
       await page.keyboard.press(key)
-      const selected = key === 'End' || key === 'ArrowLeft' ? board : canvas
+      const selected = key === 'End' || key === 'ArrowLeft' ? canvas : board
       await expect(selected).toBeFocused()
       await expect(selected).toHaveAttribute('aria-selected', 'true')
       await expect(page.getByRole('tabpanel')).toHaveAccessibleName(await selected.innerText())

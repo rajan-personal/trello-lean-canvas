@@ -31,7 +31,7 @@ export const IsolatedBoardsAndKeyboard: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Blank canvas' }))
     await expect(await canvas.findByRole('button', { name: 'Outline the launch plan' })).toBeVisible()
     await userEvent.click(boardTab)
-    await userEvent.keyboard('{Home}')
+    await userEvent.keyboard('{End}')
     await expect(canvas.getByRole('tab', { name: 'Canvas' })).toHaveFocus()
     await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Canvas')
     await userEvent.tab()
