@@ -1,9 +1,9 @@
 import { X } from 'lucide-react'
 import { useEffect, useEffectEvent, useId, useRef, type ReactNode } from 'react'
 
-interface Props { title: string; onClose: () => void; children: ReactNode; className?: string; headerActions?: ReactNode; lightDismiss?: boolean }
+interface Props { title: string; onClose: () => void; children: ReactNode; className?: string; headerActions?: ReactNode; headerContext?: ReactNode; lightDismiss?: boolean }
 /** Native modal focus containment; every dismissal goes through the caller’s draft guard. */
-export function BoardDialog({ title, onClose, children, className = '', headerActions, lightDismiss = false }: Props) {
+export function BoardDialog({ title, onClose, children, className = '', headerActions, headerContext, lightDismiss = false }: Props) {
   const ref = useRef<HTMLDialogElement>(null)
   const titleId = useId()
   const requestClose = useEffectEvent(onClose)
@@ -44,7 +44,7 @@ export function BoardDialog({ title, onClose, children, className = '', headerAc
   return <dialog ref={ref} className={`kanban-dialog ${className}`} aria-labelledby={titleId}
     closedby={lightDismiss ? 'any' : 'closerequest'}
     onCancel={(event) => { event.preventDefault(); onClose() }}>
-    <header><h2 id={titleId}>{title}</h2>
+    <header><div className="kanban-dialog-heading"><h2 id={titleId}>{title}</h2>{headerContext}</div>
       <div className="kanban-dialog-header-actions">{headerActions}
         <button className="kanban-dialog-close" type="button" onClick={onClose} aria-label="Close dialog"><X size={20} aria-hidden="true" /></button>
       </div></header>

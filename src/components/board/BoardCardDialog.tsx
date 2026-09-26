@@ -6,10 +6,14 @@ import { storyPointValues, storyPointLabel, storyPointGuidance, storyPointsSchem
 import { orderedComments } from '../../data/board-mutations'
 import { BoardDialog } from './BoardDialog'
 import { BoardComments } from './BoardComments'
+import { BoardCardStatus } from './BoardCardStatus'
 import { useGrowingDescription } from './useGrowingDescription'
 import type { RunBoardCommand } from './board-ui'
 import { useBoardCardDraft } from './useBoardCardDraft'
 import { useDraftGuard } from './useDraftGuard'
+import './card-details.css'
+
+const commentAuthorName = (user: AppUser) => user.displayName || user.email || 'Canvas owner'
 
 interface Props {
   deleted?: boolean
@@ -30,6 +34,7 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
   const close = useDraftGuard(editor.dirty, pending, onClose, register)
   const exists = !deleted && board.cards.some((item) => item.id === card.id)
   return <BoardDialog title="Card details" onClose={close} lightDismiss className="kanban-card-dialog"
+    headerContext={<BoardCardStatus card={card} board={board} />}
     headerActions={<button className="kanban-danger kanban-dialog-delete" disabled={pending || !exists}
       type="button" aria-label="Delete card" title="Delete card" onClick={async () => {
         if (!window.confirm(`Delete “${card.title}” and all its comments?${editor.dirty ? ' Unsaved changes will also be discarded.' : ''}`)) return
@@ -76,11 +81,12 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
         <div className="kanban-actions">
           <button type="submit" className="kanban-primary" disabled={!exists || !draft.title.trim()}>Save</button>
           <button type="button" onClick={close}>Cancel</button>
+          {editor.fieldsDirty && <span className="kanban-draft-indicator">Unsaved changes</span>}
         </div>
       </fieldset>
     </form>
     </div>
-    <BoardComments comments={orderedComments(board, card.id)} text={editor.comment}
+    <BoardComments comments={orderedComments(board, card.id)} text={editor.comment} authorName={commentAuthorName(user)}
       onText={editor.setComment} pending={pending} readOnly={!exists} onAdd={editor.addComment} />
     </div>
   </BoardDialog>

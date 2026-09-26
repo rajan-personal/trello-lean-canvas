@@ -2,6 +2,8 @@
 
 Task details share a chronological plain-text thread. Comments show the author, **User** or **Agent**, and a timestamp. Historical comments without `authorType` remain User comments. Existing YAML export/import preserves the new optional attribution. No editing, deletion of individual comments, rich text, mentions, reactions, or attachments are introduced.
 
+The task dialog uses a dedicated conversation panel with human initials, agent icons, inline author labels, compact timestamps (full timestamp on hover), and a comment count. The reply composer follows the chronological thread. **Ctrl+Enter / Command+Enter** posts; plain Enter inserts a newline and IME composition is preserved. Narrow screens stack the panels, with the dialog controls remaining visible while scrolling.
+
 User comments retain the existing draft/pending/error behavior. Appends use independent comment documents plus an atomic board-revision update, not a replacement thread. Stable IDs make retries after lost acknowledgements idempotent. Concurrent user/agent posts are retried without overwriting each other. Deleting a task continues to clean up its comments.
 
 ## Agent authentication and scope
