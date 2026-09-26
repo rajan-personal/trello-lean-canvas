@@ -8,6 +8,7 @@ A strict TypeScript Lean Canvas workspace with Trello-style editing. Start with 
 - Create, upload, rename, favorite, switch, and delete Lean Canvases
 - Add, edit, delete, clear, and drag cards between all 12 canvas sections
 - Sign in only with Google and sync each user's canvases privately with Cloud Firestore
+- Discuss tasks in a shared user/agent comment thread; see [agent setup and CLI](docs/task-comments.md)
 - Download the current canvas as a portable YAML file
 - Upload additional YAML canvases
 - Responsive sidebar and horizontally scrollable canvas on small screens

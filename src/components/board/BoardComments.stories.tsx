@@ -42,6 +42,17 @@ export const AddPlainText: Story = { play: async ({ canvas, args, userEvent }) =
   await expect(input).toHaveValue('')
   await expect(args.onAdd).toHaveBeenCalledOnce()
 } }
+export const UserAndAgent: Story = {
+  args: { comments: [
+    { id: 'human', cardId: 'plan', authorId: 'alex', authorName: 'Alex Morgan', text: 'Please review.', createdAt: '2026-09-26T08:00:00.000Z' },
+    { id: 'agent', cardId: 'plan', authorId: 'review-agent', authorName: 'Review agent', authorType: 'agent', text: 'Tests pass.\nReady for review.', createdAt: '2026-09-26T08:01:00.000Z' },
+  ] },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText('User', { exact: true })).toBeVisible()
+    await expect(canvas.getByText('Agent', { exact: true })).toBeVisible()
+    await expect(canvas.getAllByRole('listitem')).toHaveLength(2)
+  },
+}
 export const Pending: Story = { args: { pending: true, text: 'Waiting comment' }, play: async ({ canvas, args }) => {
   const input = canvas.getByRole('textbox') as HTMLTextAreaElement
   await expect(input).toBeDisabled()

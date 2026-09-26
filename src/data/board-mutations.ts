@@ -1,12 +1,10 @@
 import { boardDataSchema, type BoardData, type BoardCard, type BoardComment } from './board'
+import { appendComment } from './board-comments'
+export { orderedComments } from './board-comments'
 
 export function orderedCards(board: BoardData, columnId: string): BoardCard[] {
   return board.cards.filter((card) => card.columnId === columnId)
     .sort((a, b) => a.rank < b.rank ? -1 : a.rank > b.rank ? 1 : a.id.localeCompare(b.id))
-}
-export function orderedComments(board: BoardData, cardId: string): BoardComment[] {
-  return board.comments.filter((comment) => comment.cardId === cardId).sort((a, b) =>
-    Date.parse(a.createdAt) - Date.parse(b.createdAt) || a.id.localeCompare(b.id))
 }
 // Variable-length lexical ranks move one record, without rewriting an entire column.
 export function rankBetween(lower = '', upper = ''): string {
@@ -91,10 +89,11 @@ export function applyBoardCommand(source: BoardData, command: BoardCommand): Boa
       board.cards = board.cards.filter(({ id }) => id !== command.id)
       board.comments = board.comments.filter(({ cardId }) => cardId !== command.id)
       break
-    case 'add-comment':
+    case 'add-comment': {
       card(command.comment.cardId)
-      board.comments.push(command.comment)
+      board.comments = appendComment(board.comments, command.comment)
       break
+    }
   }
   return boardDataSchema.parse(board)
 }

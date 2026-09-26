@@ -19,6 +19,9 @@
   },
   "include": [
     "src",
+    "preview",
+    "scripts/comment-agent.ts",
+    "vite.comments-preview.config.ts",
     ".storybook",
     "tests",
     "unit",

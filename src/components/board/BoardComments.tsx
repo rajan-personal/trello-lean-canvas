@@ -18,6 +18,7 @@ export function BoardComments({ comments, text, onText, pending, readOnly, onAdd
     {comments.length === 0 && <p className="kanban-comments-empty">No comments yet.<br /><span>Start the conversation here.</span></p>}
     <ol>{comments.map((comment) => <li key={comment.id}>
       <div className="kanban-comment-meta"><strong>{comment.authorName}</strong>
+        <span className="kanban-comment-author-type">{comment.authorType === 'agent' ? 'Agent' : 'User'}</span>
         <time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleString()}</time></div>
       <p>{comment.text}</p>
     </li>)}</ol>

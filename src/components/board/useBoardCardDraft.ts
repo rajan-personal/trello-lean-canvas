@@ -9,6 +9,7 @@ export function useBoardCardDraft(card: BoardCard, user: AppUser, run: RunBoardC
   const [comment, setComment] = useState('')
   const [message, setMessage] = useState('')
   const attempt = useRef<BoardComment | null>(null)
+  const posting = useRef(false)
   const fieldsDirty = draft.title !== baseline.title || draft.description !== baseline.description ||
     draft.columnId !== baseline.columnId || (draft.storyPoints ?? null) !== (baseline.storyPoints ?? null)
   const changedElsewhere = card.title !== baseline.title || card.description !== baseline.description ||
@@ -24,16 +25,19 @@ export function useBoardCardDraft(card: BoardCard, user: AppUser, run: RunBoardC
     return true
   }
   const addComment = async () => {
-    if (!comment.trim()) return
+    if (!comment.trim() || posting.current) return
+    posting.current = true
+    if (attempt.current?.text !== comment.trim()) attempt.current = null
     attempt.current ??= { id: crypto.randomUUID(), cardId: card.id, authorId: user.uid,
-      authorName: user.displayName || user.email || 'Canvas owner', text: comment.trim(),
+      authorName: user.displayName || user.email || 'Canvas owner', authorType: 'user', text: comment.trim(),
       createdAt: new Date().toISOString() }
-    attempt.current.text = comment.trim()
-    if (await run({ type: 'add-comment', comment: attempt.current })) {
-      attempt.current = null
-      setComment('')
-      setMessage('Comment added.')
-    }
+    try {
+      if (await run({ type: 'add-comment', comment: attempt.current })) {
+        attempt.current = null
+        setComment('')
+        setMessage('Comment added.')
+      }
+    } finally { posting.current = false }
   }
   return { draft, setDraft, comment, setComment, message, fieldsDirty,
     dirty: fieldsDirty || comment.length > 0, save, addComment }

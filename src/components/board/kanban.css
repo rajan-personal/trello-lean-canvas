@@ -70,6 +70,7 @@ button.kanban-add-column:hover { background: #fff; }
 .kanban-comments li { margin-bottom: 20px; }
 .kanban-comment-meta { display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
 .kanban-comment-meta strong { font-size: 13px; font-weight: 650; }
+.kanban-comment-author-type { align-self: flex-start; padding: 2px 6px; border-radius: 4px; background: #e9f2ff; color: #0747a6; font-size: 11px; font-weight: 600; }
 .kanban-comments time { color: #626f86; font-size: 11px; }
 .kanban-comments p { white-space: pre-wrap; overflow-wrap: anywhere; margin: 8px 0 0; }
 .kanban-comments li p { padding: 10px 12px; border: 1px solid #dcdfe4; border-radius: 8px; background: white; line-height: 1.55; box-shadow: 0 1px 2px #091e420a; }

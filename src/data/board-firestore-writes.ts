@@ -3,6 +3,7 @@ import { applyBoardCommand, type BoardCommand } from './board-mutations'
 import { boardPath, boardRecordSchema, childPayload } from './board-firestore-model'
 import { readBoard, type BoardSnapshot } from './board-firestore-read'
 import { startCardDeletion, finishCardDeletion } from './board-firestore-delete'
+import { appendBoardComment } from './board-firestore-comments'
 
 export async function mutateBoard(
   db: Firestore, uid: string, canvasId: string, command: BoardCommand, baseline?: BoardSnapshot,
@@ -11,6 +12,10 @@ export async function mutateBoard(
     await startCardDeletion(db, uid, canvasId, command.id)
     await finishCardDeletion(db, uid, canvasId, command.id)
     return
+  }
+  if (command.type === 'add-comment') {
+    await appendBoardComment(db, uid, canvasId, command.comment)
+    return // Invalidate the cached snapshot: other writers may have appended too.
   }
   const source = baseline ?? await readBoard(db, uid, canvasId)
   const next = applyBoardCommand(source.data, command)
