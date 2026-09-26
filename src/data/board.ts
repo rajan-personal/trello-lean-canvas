@@ -37,6 +37,8 @@ export const boardSummarySchema = z.strictObject({
 })
 export const boardCommentSchema = z.strictObject({
   id, cardId: id, authorId: z.string().min(1), authorName: title,
+  // Missing on historical comments, which were all posted by users.
+  authorType: z.enum(['user', 'agent']).optional(),
   text: z.string().trim().min(1).max(10000), createdAt: z.iso.datetime(),
 })
 export const boardDataSchema = z.strictObject({

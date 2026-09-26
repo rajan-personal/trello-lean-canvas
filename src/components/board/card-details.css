@@ -1,0 +1,78 @@
+.kanban-dialog.kanban-card-dialog {
+  width: min(1040px, calc(100% - 40px));
+  padding: 0;
+  border: 1px solid #d0d5dd;
+  border-radius: 16px;
+  background: #fff;
+  color: #182230;
+  box-shadow: 0 32px 96px #10182838, 0 8px 24px #1018281a;
+  scroll-padding-block: 80px;
+  overscroll-behavior: contain;
+}
+.kanban-card-dialog::backdrop { background: #10182899; }
+.kanban-dialog.kanban-card-dialog > header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 12px 24px;
+  border-block-end: 1px solid #e4e7ec;
+  background: #fff;
+}
+.kanban-dialog-heading { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.kanban-card-dialog .kanban-dialog-heading h2 { font-size: .8125rem; font-weight: 500; color: #667085; white-space: nowrap; }
+.kanban-task-status { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 3px 8px; border: 1px solid #e4e7ec; border-radius: 6px; color: #344054; background: #f9fafb; font-size: .75rem; font-weight: 500; overflow-wrap: anywhere; }
+.kanban-task-status-dot { flex: 0 0 6px; height: 6px; border-radius: 50%; background: #667085; }
+.kanban-task-status-label { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.kanban-dialog.kanban-card-dialog .kanban-dialog-delete { color: #667085; }
+.kanban-dialog.kanban-card-dialog .kanban-dialog-delete:not(:disabled):hover { color: #b42318; background: #fef3f2; }
+.kanban-card-dialog > :is([role="status"], [role="alert"]) { margin: 12px 24px; font-size: .8125rem; }
+.kanban-card-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: stretch; gap: 1px; }
+.kanban-card-editor { min-width: 0; padding: 28px 32px 32px; }
+.kanban-title-field { display: grid; gap: 6px; margin-block-end: 28px; }
+.kanban-card-dialog .kanban-title-field label { margin: 0; font-size: .75rem; font-weight: 500; color: #667085; }
+/* Native content sizing progressively enhances the two-row fallback. */
+.kanban-card-dialog .kanban-title-field textarea {
+  field-sizing: content;
+  min-height: 48px;
+  max-height: 160px;
+  padding: 6px 8px;
+  margin-inline-start: -8px;
+  width: calc(100% + 8px);
+  border-color: transparent;
+  border-radius: 6px;
+  background: #fff;
+  color: #182230;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -.025em;
+  line-height: 1.35;
+}
+.kanban-card-dialog .kanban-title-field textarea:hover { border-color: #98a2b3; }
+.kanban-card-dialog :is(textarea, select):focus { outline: 2px solid #2563eb; outline-offset: 2px; }
+.kanban-description-field { margin-block-end: 24px; }
+.kanban-description-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-block-end: 8px; }
+.kanban-card-dialog .kanban-description-heading label { display: flex; align-items: center; gap: 8px; margin: 0; font-weight: 500; white-space: nowrap; }
+.kanban-description-heading > label svg { color: #667085; }
+.kanban-card-dialog .kanban-description-field textarea { field-sizing: content; height: auto; min-height: 320px; max-height: none; padding: 14px; border-color: #98a2b3; border-radius: 8px; background: #fcfcfd; line-height: 1.7; overflow-y: hidden; resize: none; }
+.kanban-card-dialog .kanban-story-points-field select { border-color: #98a2b3; border-radius: 6px; }
+.kanban-card-dialog .kanban-actions { align-items: center; gap: 8px; }
+.kanban-card-dialog .kanban-actions button { padding-inline: 16px; }
+.kanban-card-dialog .kanban-actions button:not(.kanban-primary) { background: transparent; color: #475467; }
+.kanban-card-dialog .kanban-actions button:not(.kanban-primary):hover { background: #f2f4f7; }
+.kanban-dialog.kanban-card-dialog .kanban-primary { background: #245fce; border-radius: 7px; box-shadow: 0 1px 2px #1018280d; }
+.kanban-dialog.kanban-card-dialog .kanban-primary:not(:disabled):hover { background: #1d4fb0; }
+.kanban-draft-indicator { margin-inline-start: auto; color: #667085; font-size: .75rem; }
+.kanban-card-layout > .kanban-comments { padding: 24px 20px; border-inline-start: 1px solid #e4e7ec; background: #f8fafc; }
+@media (max-width: 760px) {
+  .kanban-dialog.kanban-card-dialog { width: calc(100% - 24px); max-height: calc(100dvh - 24px); border-radius: 12px; }
+  .kanban-dialog.kanban-card-dialog > header { padding: 8px 16px; gap: 8px; }
+  .kanban-dialog-heading { gap: 8px; flex-wrap: wrap; }
+  .kanban-card-dialog .kanban-dialog-heading h2 { font-size: .75rem; }
+  .kanban-task-status { padding: 2px 6px; font-size: .6875rem; }
+  .kanban-card-layout { grid-template-columns: minmax(0, 1fr); row-gap: 1px; }
+  .kanban-card-editor { padding: 24px 16px; }
+  .kanban-card-dialog .kanban-title-field textarea { font-size: 1.375rem; }
+  .kanban-card-layout > .kanban-comments { padding: 20px 16px; border-inline-start: 0; border-block-start: 1px solid #e4e7ec; }
+  .kanban-draft-indicator { flex-basis: 100%; margin: 4px 0 0; }
+}

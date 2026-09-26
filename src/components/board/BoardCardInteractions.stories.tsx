@@ -22,7 +22,7 @@ export const IndependentCommentRetry: Story = {
     await expect(input).toHaveValue('')
     await expect(args.run.mock.calls[0]).toEqual(args.run.mock.calls[1])
     await expect(args.run).toHaveBeenLastCalledWith({ type: 'add-comment', comment: {
-      id: expect.any(String), cardId: 'plan', authorId: boardStoryUser.uid, authorName: 'Alex Morgan',
+      id: expect.any(String), cardId: 'plan', authorId: boardStoryUser.uid, authorName: 'Alex Morgan', authorType: 'user',
       text: 'A real comment\nWith another line', createdAt: expect.stringMatching(/^\d{4}-/) } })
     await expect(canvas.getAllByRole('listitem')).toHaveLength(2)
     await expect(canvas.getByRole('textbox', { name: 'Title' })).toHaveValue('Local title draft')

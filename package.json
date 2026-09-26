@@ -10,10 +10,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:comments-preview": "vite build --config vite.comments-preview.config.ts",
+    "preview:comments": "vite preview --config vite.comments-preview.config.ts",
     "deploy": "npm run build && wrangler deploy",
     "deploy:firebase": "npx -y firebase-tools@15.28.2 deploy --only auth,firestore",
     "test": "vitest run",
     "test:firestore": "node scripts/run-firestore-tests.mjs",
+    "comment:agent": "node --experimental-strip-types scripts/comment-agent.ts",
     "test:e2e": "playwright test",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

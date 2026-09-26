@@ -66,6 +66,15 @@ service cloud.firestore {
           && !existsAfter(boardRef());
         match /boards/{boardId} {
           function ownsBoard() { return owner(userId) && workspaceId == 'default' && boardId == 'default'; }
+          // Issued only by a trusted Firebase Admin provisioner, never by clients.
+          function commentAgent() {
+            return request.auth != null && workspaceId == 'default' && boardId == 'default'
+              && request.auth.token.keys().hasAll(['leanRole', 'leanOwnerId', 'leanCanvasId', 'leanAgentName'])
+              && request.auth.token.leanRole == 'commenter'
+              && request.auth.token.leanOwnerId == userId
+              && request.auth.token.leanCanvasId == canvasId;
+          }
+          function readsBoard() { return ownsBoard() || commentAgent(); }
           function canvasRef() {
             return /databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId);
           }
@@ -102,7 +111,7 @@ service cloud.firestore {
             return board.status == 'deleting' ||
               (board.status == 'deleting-card' && board.deletingCardId == cardId);
           }
-          allow read: if ownsBoard();
+          allow read: if readsBoard();
           allow create: if ownsBoard() && existsAfter(canvasRef())
             && validBoard(request.resource.data) && request.resource.data.revision == 1
             && request.resource.data.status in ['active', 'importing', 'deleting'];
@@ -110,26 +119,34 @@ service cloud.firestore {
             && request.resource.data.revision == resource.data.revision + 1
             && request.resource.data.importId == resource.data.importId
             && resource.data.status != 'deleting';
+          allow update: if commentAgent() && existsAfter(canvasRef()) && validBoard(request.resource.data)
+            && resource.data.status == 'active' && request.resource.data.status == 'active'
+            && request.resource.data.revision == resource.data.revision + 1
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['revision', 'updatedAt']);
           allow delete: if ownsBoard() && resource.data.status == 'deleting' && !existsAfter(canvasRef());
           match /cards/{cardId} {
-            allow read: if ownsBoard();
+            allow read: if readsBoard();
             allow create, update: if ownsBoard() && writable() && validCard(request.resource.data);
             allow delete: if ownsBoard() && canDeleteCard(cardId);
           }
           match /comments/{commentId} {
             function validComment(data) {
-              return data.keys().hasOnly(['schemaVersion', 'canvasId', 'cardId', 'authorId', 'authorName', 'text', 'createdAt', 'updatedAt'])
+              return data.keys().hasOnly(['schemaVersion', 'canvasId', 'cardId', 'authorId', 'authorName', 'authorType', 'text', 'createdAt', 'updatedAt'])
                 && data.schemaVersion == 1 && data.canvasId == canvasId
                 && data.cardId is string
                 && existsAfter(/databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId)/boards/default/cards/$(data.cardId))
                 && data.authorId is string && data.authorId.size() > 0
                 && (get(boardRef()).data.status == 'importing' || data.authorId == request.auth.uid)
                 && data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 500
+                && (!data.keys().hasAny(['authorType']) || data.authorType in ['user', 'agent'])
+                && (ownsBoard() || (data.authorType == 'agent' && data.authorName == request.auth.token.leanAgentName))
                 && data.text is string && data.text.size() > 0 && data.text.size() <= 10000
+                && data.text.matches('(?s).*\\S.*')
                 && data.createdAt is string && data.createdAt.size() <= 40 && data.updatedAt == request.time;
             }
-            allow read: if ownsBoard();
-            allow create: if ownsBoard() && writable() && validComment(request.resource.data);
+            allow read: if readsBoard();
+            allow create: if (ownsBoard() || (commentAgent() && get(boardRef()).data.status == 'active'))
+              && writable() && validComment(request.resource.data);
             allow update: if ownsBoard() && get(boardRef()).data.status == 'importing'
               && writable() && validComment(request.resource.data);
             allow delete: if ownsBoard() && canDeleteCard(resource.data.cardId);
