@@ -3,7 +3,7 @@ import { Columns3, LayoutDashboard } from 'lucide-react'
 
 export type WorkspaceView = 'canvas' | 'board'
 interface Props { view: WorkspaceView; onChange: (view: WorkspaceView) => boolean; idPrefix?: string }
-const tabs = ['canvas', 'board'] as const
+const tabs = ['board', 'canvas'] as const
 
 export function WorkspaceTabs({ view, onChange, idPrefix }: Props) {
   const generatedId = useId()
@@ -20,7 +20,7 @@ export function WorkspaceTabs({ view, onChange, idPrefix }: Props) {
       onClick={() => select(tab)} onKeyDown={(event) => {
         if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
         event.preventDefault()
-        select(event.key === 'Home' ? 'canvas' : event.key === 'End' ? 'board' : tab === 'canvas' ? 'board' : 'canvas')
+        select(event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs[tabs.length - 1] : tab === 'canvas' ? 'board' : 'canvas')
       }}>
         {tab === 'canvas' ? <LayoutDashboard size={14} aria-hidden="true" /> : <Columns3 size={14} aria-hidden="true" />}
         {tab === 'canvas' ? 'Canvas' : 'Tickets'}

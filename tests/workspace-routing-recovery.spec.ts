@@ -11,7 +11,7 @@ test('unknown and inaccessible projects do not fall back to another canvas', asy
   await expect(page.getByRole('heading')).toHaveCount(0)
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await page.getByRole('button', { name: 'Go to workspace' }).click()
-  await expect(page).toHaveURL(first)
+  await expect(page).toHaveURL(`${first}/ticket`)
   await page.goto('/not-a-route')
   await expect(page.getByRole('alert')).toContainText('Page not found')
 })

@@ -26,8 +26,8 @@ type Story = StoryObj<typeof meta>
 
 export const KeyboardRouting: Story = {
   play: async ({ canvas, userEvent, args }) => {
-    const first = canvas.getByRole('tab', { name: 'Canvas' })
-    const second = canvas.getByRole('tab', { name: 'Tickets' })
+    const first = canvas.getByRole('tab', { name: 'Tickets' })
+    const second = canvas.getByRole('tab', { name: 'Canvas' })
     await userEvent.click(first)
     for (const key of ['{ArrowRight}', '{ArrowLeft}', '{End}', '{Home}']) {
       await userEvent.keyboard(key)
@@ -39,7 +39,7 @@ export const KeyboardRouting: Story = {
       await expect(panel).toHaveAttribute('id', active.getAttribute('aria-controls'))
       await expect(panel).toHaveAccessibleName(active.textContent!)
     }
-    await expect(args.onChange).toHaveBeenLastCalledWith('canvas')
+    await expect(args.onChange).toHaveBeenLastCalledWith('board')
     await userEvent.tab()
     await expect(canvas.getByRole('tabpanel')).toHaveFocus()
   },
@@ -51,7 +51,7 @@ export const RejectedNavigation: Story = {
     await expect(args.onChange).toHaveBeenCalledWith('board')
     await expect(canvas.getByRole('tab', { name: 'Canvas' })).toHaveFocus()
     await expect(canvas.getByRole('tabpanel')).toHaveTextContent('Canvas content')
-    await userEvent.keyboard('{End}')
+    await userEvent.keyboard('{Home}')
     await expect(canvas.getByRole('tab', { name: 'Canvas' })).toHaveFocus()
     await expect(canvas.getByRole('tab', { name: 'Tickets' })).toHaveAttribute('tabindex', '-1')
   },

@@ -13,6 +13,7 @@ type Story = StoryObj<typeof meta>
 export const DraftOwnership: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     await canvas.findByRole('heading', { name: 'Team alignment' })
+    await userEvent.click(canvas.getByRole('tab', { name: 'Canvas' }))
     const section = within(canvasElement.querySelector('.canvas-cell')! as HTMLElement)
     await userEvent.click(section.getByRole('button', { name: '＋ Add a card' }))
     const editor = canvas.getByRole('textbox', { name: 'New card' })

@@ -77,7 +77,6 @@ canvas:
       title: Revenue streams
       cards: []
 `
-
   await page.locator('input[type="file"]').setInputFiles({
     name: 'imported.yaml',
     mimeType: 'application/yaml',
@@ -85,6 +84,7 @@ canvas:
   })
 
   await expect(page.getByRole('heading', { name: 'Imported' })).toBeVisible()
+  await page.getByRole('tab', { name: 'Canvas', exact: true }).click()
   await expect(page.getByText('A freshly imported problem')).toBeVisible()
 })
 

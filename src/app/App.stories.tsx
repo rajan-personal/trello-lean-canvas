@@ -18,6 +18,8 @@ export const Default: AppStory = {
     await expect(
       await canvas.findByRole('heading', { name: 'Airbnb — 2008' }),
     ).toBeInTheDocument()
+    await expect(canvas.getByRole('tab', { name: 'Tickets' })).toHaveAttribute('aria-selected', 'true')
+    await userEvent.click(canvas.getByRole('tab', { name: 'Canvas' }))
     await expect(
       canvas.getByText('Booking fees from travellers'),
     ).toBeInTheDocument()
@@ -28,11 +30,12 @@ export const Default: AppStory = {
 }
 export const BlankCanvas: AppStory = {
   render: () => <SeededApp canvases={[blankCanvas]} />,
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     await expect(
       await canvas.findByRole('heading', { name: 'Blank canvas' }),
     ).toBeInTheDocument()
+    await userEvent.click(canvas.getByRole('tab', { name: 'Canvas' }))
     await expect(canvasElement.querySelectorAll('.cell-hint')).toHaveLength(12)
     const grid = canvasElement.querySelector('.lean-grid')
     const board = canvasElement.querySelector('.board-scroll')

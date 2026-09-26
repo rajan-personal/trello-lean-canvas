@@ -37,6 +37,8 @@ export const HeaderEditingAndCreation: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Create canvas' }))
     await expect(canvas.getByRole('heading', { name: 'New research' })).toBeVisible()
     await expect(canvas.queryByRole('dialog')).not.toBeInTheDocument()
+    await expect(canvas.getByRole('tab', { name: 'Tickets' })).toHaveAttribute('aria-selected', 'true')
+    await userEvent.click(canvas.getByRole('tab', { name: 'Canvas' }))
     await expect(canvas.getAllByRole('button', { name: '＋ Add a card' })).toHaveLength(12)
   },
 }
