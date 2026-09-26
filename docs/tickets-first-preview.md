@@ -37,4 +37,16 @@ npm run deploy:demo                       # only the dedicated demo Worker
 DEMO_BASE_URL=https://lean-tickets-first-demo.bittu15388.workers.dev npm run test:demo
 ```
 
-Deployment receipt: Worker `lean-tickets-first-demo`, version `6f5b6c28-e114-45c7-8041-406c2be1056d`. No production deployment was made.
+Deployment receipt: Worker `lean-tickets-first-demo`, version `9d48dd36-dc3c-4da2-a1c2-052d1fe94168`, built after rebasing onto `8696a08`. No production deployment was made.
+
+## Validation
+
+- Lint, TypeScript, production build: passed. Inspected production JavaScript: no demo credentials, demo login, or test-bypass user.
+- Unit tests: 91 passed.
+- Playwright: 118/120 passed in the full run; the two desktop layout tests hit the 30-second test budget and both passed on isolated rerun.
+- Storybook interactions/accessibility: 192/193 passed in the full run; Sign Out timed out waiting for the lazy workspace, then all three session stories passed on isolated rerun.
+- Local demo end-to-end test: passed (invalid credentials, deep-link login, editing, persistence, Canvas links, root default, sign-out; no Firebase auth/Firestore requests).
+- Deployed Ego browser smoke: login, deep link, local edit/reload, Canvas/reload, sign-out/reload, and re-login passed. Live headless Playwright navigation timed out in this environment; that is not claimed as a pass.
+- React Doctor changed-file scan: 100/100, no issues.
+
+![Deployed Tickets-first demo](pr-proofs/tickets-first-demo.png)
