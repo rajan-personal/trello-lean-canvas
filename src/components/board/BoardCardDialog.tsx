@@ -13,8 +13,6 @@ import { useBoardCardDraft } from './useBoardCardDraft'
 import { useDraftGuard } from './useDraftGuard'
 import './card-details.css'
 
-const commentAuthorName = (user: AppUser) => user.displayName || user.email || 'Canvas owner'
-
 interface Props {
   deleted?: boolean
   card: BoardCard; board: BoardData; user: AppUser; pending: boolean; error: string | null
@@ -86,7 +84,7 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
       </fieldset>
     </form>
     </div>
-    <BoardComments comments={orderedComments(board, card.id)} text={editor.comment} authorName={commentAuthorName(user)}
+    <BoardComments comments={orderedComments(board, card.id)} text={editor.comment}
       onText={editor.setComment} pending={pending} readOnly={!exists} onAdd={editor.addComment} />
     </div>
   </BoardDialog>

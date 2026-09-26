@@ -6,9 +6,9 @@ import './board-comments.css'
 
 interface Props {
   comments: BoardComment[]; text: string; onText: (text: string) => void
-  readOnly?: boolean; pending: boolean; onAdd: () => Promise<void>; authorName?: string
+  readOnly?: boolean; pending: boolean; onAdd: () => Promise<void>
 }
-export function BoardComments({ comments, text, onText, pending, readOnly, onAdd, authorName = 'You' }: Props) {
+export function BoardComments({ comments, text, onText, pending, readOnly, onAdd }: Props) {
   const inputId = useId()
   const hintId = useId()
   return <section className="kanban-comments" aria-label="Comments">
@@ -16,10 +16,7 @@ export function BoardComments({ comments, text, onText, pending, readOnly, onAdd
       <h3><MessageSquare size={17} strokeWidth={1.8} aria-hidden="true" /> Comments</h3>
       <span className="kanban-comments-count" aria-hidden="true">{comments.length}</span>
     </div>
-    {comments.length === 0 ? <div className="kanban-comments-empty">
-      <span className="kanban-comments-empty-icon" aria-hidden="true"><MessageSquare size={22} strokeWidth={1.5} /></span>
-      <p>No comments yet.</p><span>Share an update or start a conversation.</span>
-    </div> : <ol className="kanban-comment-thread" role="list" aria-label="Comment thread">
+    {comments.length === 0 ? <p className="kanban-comments-empty">No comments yet.</p> : <ol className="kanban-comment-thread" role="list" aria-label="Comment thread">
       {comments.map((comment) => <li key={comment.id}>
         <CommentAvatar name={comment.authorName} agent={comment.authorType === 'agent'} />
         <div className="kanban-comment-content">
@@ -27,10 +24,10 @@ export function BoardComments({ comments, text, onText, pending, readOnly, onAdd
             <span className="kanban-comment-author-type" data-author-type={comment.authorType ?? 'user'}>
               {comment.authorType === 'agent' ? 'Agent' : 'User'}
             </span>
+            <time dateTime={comment.createdAt} title={new Date(comment.createdAt).toLocaleString()} aria-label={new Date(comment.createdAt).toLocaleString()}>
+              {new Date(comment.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+            </time>
           </div>
-          <time dateTime={comment.createdAt} title={new Date(comment.createdAt).toLocaleString()}>
-            {new Date(comment.createdAt).toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })}
-          </time>
           <p>{comment.text}</p>
         </div>
       </li>)}
@@ -40,25 +37,19 @@ export function BoardComments({ comments, text, onText, pending, readOnly, onAdd
       if (!pending && !readOnly && text.trim()) void onAdd()
     }}>
       <fieldset disabled={pending}>
-        <div className="kanban-comment-composer-heading">
-          <CommentAvatar name={authorName} />
-          <div><label htmlFor={inputId}>New comment</label><span>Posting as {authorName}</span></div>
-        </div>
-        <div className="kanban-comment-composer">
-          <textarea id={inputId} name="comment" aria-describedby={hintId} placeholder="Share an update, ask a question…"
-            maxLength={10000} readOnly={readOnly} value={text} rows={3}
+        <label htmlFor={inputId}>New comment</label>
+        <div className="kanban-comment-composer" data-has-text={text.length > 0}>
+          <textarea id={inputId} name="comment" aria-describedby={hintId} placeholder="Write a comment…"
+            maxLength={10000} readOnly={readOnly} value={text} rows={1}
             onChange={(event) => onText(event.target.value)} onKeyDown={(event) => {
               if (event.key === 'Enter' && (event.metaKey || event.ctrlKey) && !event.nativeEvent.isComposing && event.keyCode !== 229) {
                 event.preventDefault(); event.currentTarget.form?.requestSubmit()
               }
             }} />
-          <div className="kanban-comment-composer-footer">
-            <span id={hintId} className="kanban-comment-shortcut"><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>Enter</kbd> to post</span>
-            <button type="submit" disabled={readOnly || !text.trim()} className="kanban-primary">
-              <ArrowUp size={15} aria-hidden="true" /> Add comment
-            </button>
-          </div>
+          <button type="submit" disabled={readOnly || !text.trim()} className="kanban-primary kanban-comment-send"
+            aria-label="Add comment" title="Add comment (Ctrl/⌘ + Enter)"><ArrowUp size={17} aria-hidden="true" /></button>
         </div>
+        <span id={hintId} className="kanban-comment-shortcut"><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>Enter</kbd> to post</span>
       </fieldset>
     </form>
   </section>
