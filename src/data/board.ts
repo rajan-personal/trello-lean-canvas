@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { safeCanvasId } from './firestore-model'
+import { boardActivitySchema } from './board-activity'
 
 const id = z.string().refine(safeCanvasId, 'Unsafe record id')
 const title = z.string().trim().min(1).max(500)
@@ -25,6 +26,7 @@ export const boardSummaryCardSchema = z.strictObject({
   rank: z.string().regex(/^[0-9a-z]*[1-9a-z]$/).max(2048),
 })
 export const boardSummarySchema = z.strictObject({
+  activity: boardActivitySchema.optional(),
   columns: z.array(boardColumnSchema).max(100), cards: z.array(boardSummaryCardSchema),
 }).superRefine((data, ctx) => {
   const unique = (values: string[]) => new Set(values).size === values.length
@@ -42,6 +44,7 @@ export const boardCommentSchema = z.strictObject({
   text: z.string().trim().min(1).max(10000), createdAt: z.iso.datetime(),
 })
 export const boardDataSchema = z.strictObject({
+  activity: boardActivitySchema.optional(),
   columns: z.array(boardColumnSchema).max(100),
   cards: z.array(boardCardSchema), comments: z.array(boardCommentSchema),
 }).superRefine((data, ctx) => {
@@ -63,7 +66,7 @@ export type BoardSummary = z.infer<typeof boardSummarySchema>
 export type BoardComment = z.infer<typeof boardCommentSchema>
 export type BoardData = z.infer<typeof boardDataSchema>
 export const boardSummary = (data: BoardData): BoardSummary => boardSummarySchema.parse({
-  columns: data.columns,
+  ...(data.activity ? { activity: data.activity } : {}), columns: data.columns,
   cards: data.cards.map(({ id, columnId, title, storyPoints, rank }) => ({
     id, columnId, title, ...(storyPoints === undefined ? {} : { storyPoints }), rank,
   })),

@@ -1,0 +1,56 @@
+.ticket-activity {
+  position: relative;
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  z-index: 1;
+  color: #626f86;
+  font-size: .6875rem;
+}
+.ticket-activity[open] { z-index: 2; }
+.ticket-activity summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 32px;
+  cursor: pointer;
+  list-style: none;
+  border-radius: 4px;
+}
+.ticket-activity summary::-webkit-details-marker { display: none; }
+.ticket-activity summary:focus-visible { outline: 2px solid #0c66e4; outline-offset: 2px; }
+.ticket-activity-squares { display: flex; gap: 3px; }
+.ticket-activity-day {
+  inline-size: 12px;
+  block-size: 12px;
+  border: 1px solid #8590a2;
+  border-radius: 2px;
+  background: #ebedf0;
+}
+.ticket-activity-day[data-level="1"] { background: #9be9a8; border-color: #549260; }
+.ticket-activity-day[data-level="2"] { background: #40c463; border-color: #308547; }
+.ticket-activity-day[data-level="3"] { background: #30a14e; border-color: #247539; }
+.ticket-activity-day[data-level="4"] { background: #216e39; border-color: #216e39; }
+.ticket-activity-day[data-level="unknown"] { border-style: dashed; background: transparent; }
+.ticket-activity-breakdown {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-start: 100%;
+  inline-size: min(240px, 70vw);
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #dcdfe4;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 16px #091e4226;
+  color: #44546f;
+  font-size: .75rem;
+}
+.ticket-activity-breakdown p { margin: 0 0 8px; font-weight: 650; }
+.ticket-activity-breakdown ul { margin: 0 0 8px; padding: 0; list-style: none; }
+.ticket-activity-breakdown li { display: flex; justify-content: space-between; padding-block: 2px; font-variant-numeric: tabular-nums; }
+.ticket-activity-breakdown small { display: block; line-height: 1.5; }
+@container ticket-list (max-width: 620px) {
+  .ticket-activity { grid-column: 1 / -1; grid-row: auto; }
+}
+@media (pointer: coarse) { .ticket-activity summary { min-block-size: 44px; } }

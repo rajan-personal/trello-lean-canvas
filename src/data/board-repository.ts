@@ -7,6 +7,7 @@ import * as remote from './board-firestore'
 import { createRemoteBoardAccess } from './board-remote-access'
 import type { LeanCanvas } from './types'
 import { createLocalBoardSummaryAccess } from './board-summary-local'
+import { recordTicketActivity } from './board-activity'
 export interface BoardRepository {
   load(canvasId: string): Promise<BoardData>
   loadSummary(canvasId: string): Promise<BoardSummary>; initialize(canvasId: string): Promise<void>
@@ -23,8 +24,7 @@ export function createBoardRepository(uid: string, persistence: 'local' | 'fires
   const isLocal = persistence === 'local'
   const db = () => getFirestore(firebaseApp)
   const pendingKey = `lean-canvas:board-imports:${isLocal ? 'local' : uid}`
-  const initialized = new Set<string>()
-  const initializing = new Map<string, Promise<void>>()
+  const initialized = new Set<string>(); const initializing = new Map<string, Promise<void>>()
   const access = createRemoteBoardAccess(db, uid, (id) => repository.initialize(id))
   const localSummary = createLocalBoardSummaryAccess(storage); const pendingImports = () => readPendingImports(storage, pendingKey)
   const writeLocal = (boards: Record<string, BoardData>) => writeLocalBoards(storage, boards)
@@ -55,7 +55,7 @@ export function createBoardRepository(uid: string, persistence: 'local' | 'fires
       if (!isLocal) return access.dispatch(canvasId, command)
       const boards = readLocalBoards(storage)
       if (!boards[canvasId]) throw new Error('Board has not been initialized.')
-      writeLocal({ ...boards, [canvasId]: applyBoardCommand(boards[canvasId], command) })
+      writeLocal({ ...boards, [canvasId]: recordTicketActivity(boards[canvasId], applyBoardCommand(boards[canvasId], command)) })
     },
     subscribe(canvasId, changed, error) {
       if (!isLocal) return access.subscribe(canvasId, changed, error)

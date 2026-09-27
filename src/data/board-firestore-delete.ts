@@ -1,5 +1,6 @@
 import { collection, doc, getDocsFromServer, limit, query, runTransaction, serverTimestamp, where, writeBatch, type Firestore } from 'firebase/firestore'
 import { createBoard } from './board'
+import { incrementActivity } from './board-activity'
 import { boardPath, boardRecordSchema, boardRecord } from './board-firestore-model'
 
 // Chunked deletes are safe only behind a durable tombstone; every child write rule checks it.
@@ -37,7 +38,8 @@ export async function finishCardDeletion(db: Firestore, uid: string, canvasId: s
     if (current.status !== 'deleting-card' || current.deletingCardId !== cardId)
       throw new Error('Board deletion state changed; retry.')
     tx.delete(doc(db, `${path}/cards`, cardId))
-    tx.update(ref, { status: 'active', deletingCardId: '', revision: current.revision + 1, updatedAt: serverTimestamp() })
+    tx.update(ref, { status: 'active', deletingCardId: '', revision: current.revision + 1, updatedAt: serverTimestamp(),
+      activity: incrementActivity(current.activity) })
   })
 }
 export async function prepareBoardDeletion(db: Firestore, uid: string, canvasId: string): Promise<void> {

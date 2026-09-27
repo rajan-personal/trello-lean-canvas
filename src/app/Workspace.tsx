@@ -51,7 +51,6 @@ export function Workspace({ user, onSignOut, persistence, browserRouting = false
     close: () => { if (projectId) history.navigate(projectPath(projectId, 'board')) },
   }
   const openAllTickets = () => { if (allow()) { history.navigate(ticketsPath()); panels.closeSidebar() } }
-  const openTicket = (id: string, ticketId: string) => { if (allow()) history.navigate(projectPath(id, 'board', ticketId)) }
   const openProjectBoard = (id: string) => { if (allow()) history.navigate(projectPath(id, 'board')) }
   const signOut = () => { if (allow()) return onSignOut() }
   if (state.loading) return <AppStatus />
@@ -74,7 +73,7 @@ export function Workspace({ user, onSignOut, persistence, browserRouting = false
         />
         <WorkspaceRouteContent allTickets={allTickets} activeCanvas={state.activeCanvas}
           ticketList={{ projects: ticketList.projects, blocked: state.pending,
-            onOpenTicket: openTicket, onOpenProjectBoard: openProjectBoard, onRetry: ticketList.retry }}
+            onOpenProjectBoard: openProjectBoard, onRetry: ticketList.retry }}
           workspaceView={{ view, board, sectionProps, user, ticket, blocked: state.pending, deleted: state.deleted,
             onDismissDeleted: () => { if (allow()) state.setActiveId(null) }, register: guard.register, notify }}
           unavailable={{ route, onReturn: () => { if (allow()) history.navigate('/') } }} />

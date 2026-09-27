@@ -78,15 +78,29 @@ service cloud.firestore {
           function canvasRef() {
             return /databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId);
           }
+          function validActivityCount(value) {
+            return value is int && value >= 0 && value <= 1000000;
+          }
+          function validActivity(activity) {
+            return activity is map && activity.keys().hasOnly(['throughDay', 'counts', 'timeZone'])
+              && (!activity.keys().hasAny(['timeZone']) || activity.timeZone == 'Asia/Kolkata')
+              && activity.throughDay is int && activity.throughDay >= 0
+              && activity.counts is list && activity.counts.size() == 7
+              && validActivityCount(activity.counts[0]) && validActivityCount(activity.counts[1])
+              && validActivityCount(activity.counts[2]) && validActivityCount(activity.counts[3])
+              && validActivityCount(activity.counts[4]) && validActivityCount(activity.counts[5])
+              && validActivityCount(activity.counts[6]);
+          }
           function validBoard(data) {
             return data.keys().hasOnly(['schemaVersion', 'canvasId', 'revision', 'columns',
-                'status', 'importId', 'deletingCardId', 'updatedAt'])
+                'status', 'importId', 'deletingCardId', 'updatedAt', 'activity'])
               && data.schemaVersion == 1 && data.canvasId == canvasId
               && data.revision is int && data.revision > 0
               && data.columns is list && data.columns.size() <= 100
               && data.status in ['active', 'importing', 'deleting', 'deleting-card']
               && data.importId is string && data.deletingCardId is string
-              && data.updatedAt == request.time;
+              && data.updatedAt == request.time
+              && (!data.keys().hasAny(['activity']) || validActivity(data.activity));
           }
           function writable() {
             let before = get(boardRef()).data;

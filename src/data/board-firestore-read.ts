@@ -38,7 +38,7 @@ export async function readBoard(db: Firestore, uid: string, canvasId: string): P
       return { ...data, id }
     }
     return { revision: after.revision, data: boardDataSchema.parse({
-      columns: after.columns,
+      columns: after.columns, ...(after.activity ? { activity: after.activity } : {}),
       cards: cards.docs.map((item) => boardCardSchema.parse(decode(item.data(), item.id))),
       comments: comments.docs.map((item) => boardCommentSchema.parse(decode(item.data(), item.id))),
     }) }
@@ -67,7 +67,7 @@ export async function readBoardSummary(db: Firestore, uid: string, canvasId: str
       const card = boardCardSchema.parse({ ...data, id: item.id })
       return { id: card.id, columnId: card.columnId, title: card.title, ...(card.storyPoints === undefined ? {} : { storyPoints: card.storyPoints }), rank: card.rank }
     })
-    return { revision: after.revision, data: boardSummarySchema.parse({ columns: after.columns, cards: summaryCards }) }
+    return { revision: after.revision, data: boardSummarySchema.parse({ columns: after.columns, cards: summaryCards, ...(after.activity ? { activity: after.activity } : {}) }) }
   }
   throw new Error('Board changed while loading. Please retry.')
 }
