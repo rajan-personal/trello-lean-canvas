@@ -47,6 +47,12 @@ export const Loading: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('status')).toHaveTextContent('Loading tickets')
     await expect(canvas.getByRole('list', { name: 'Task counts for Loading project' })).toHaveTextContent('Backlog: —Todo: —In Review: —')
+    const activity = canvas.getByLabelText('Activity for Loading project: unavailable')
+    await expect(activity.querySelector('svg')).toHaveAttribute('data-state', 'unknown')
+    await expect(activity.querySelector('polyline')).toHaveAttribute('points', '2,26 102,26')
+    const counts = canvas.getByRole('list', { name: 'Task counts for Loading project' })
+    await expect(counts.querySelectorAll('[data-unavailable]')).toHaveLength(3)
+    await expect(counts.querySelectorAll('.ticket-status-bar')).toHaveLength(0)
   },
 }
 export const PartialProjectStates: Story = {
@@ -54,6 +60,12 @@ export const PartialProjectStates: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByRole('status')).toHaveTextContent('Loading tickets')
     await expect(canvas.getByRole('alert')).toHaveTextContent('Tickets could not be loaded')
+    const activity = canvas.getByLabelText('Activity for Needs retry: unavailable')
+    await expect(activity.querySelector('svg')).toHaveAttribute('data-state', 'unknown')
+    await expect(activity.querySelector('polyline')).toHaveAttribute('points', '2,26 102,26')
+    const counts = canvas.getByRole('list', { name: 'Task counts for Needs retry' })
+    await expect(counts.querySelectorAll('[data-unavailable]')).toHaveLength(3)
+    await expect(counts.querySelectorAll('.ticket-status-bar')).toHaveLength(0)
     await userEvent.click(canvas.getByRole('button', { name: 'Retry loading tickets for Needs retry' }))
     await expect(args.onRetry).toHaveBeenCalledWith('error')
     await expect(args.onOpenProjectBoard).not.toHaveBeenCalled()

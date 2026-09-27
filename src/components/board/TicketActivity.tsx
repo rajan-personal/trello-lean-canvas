@@ -1,21 +1,22 @@
 import { activityDays, type BoardActivity } from '../../data/board-activity'
 import './ticket-activity.css'
 
-interface Props { activity?: BoardActivity; today: number; projectName: string; unavailable: boolean }
-const level = (count: number) => count === 0 ? 0 : count < 3 ? 1 : count < 6 ? 2 : count < 10 ? 3 : 4
-export function TicketActivity({ activity, today, projectName, unavailable }: Props) {
+interface Props { activity?: BoardActivity; today: number; peak: number; projectName: string; unavailable: boolean }
+export function TicketActivity({ activity, today, peak, projectName, unavailable }: Props) {
   const days = activityDays(activity, today)
   const total = days.reduce((sum, { count }) => sum + count, 0)
+  const points = days.map(({ count }, index) => `${(2 + index * 100 / 6).toFixed(2)},${(26 - count / peak * 24).toFixed(2)}`).join(' ')
   const changes = total === 1 ? 'change' : 'changes'
   const label = unavailable ? `Activity for ${projectName}: unavailable`
     : `Activity for ${projectName}: ${total} recorded ${changes} in the last 7 days`
   return <details className="ticket-activity" onKeyDown={(event) => {
     if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus() }
   }}>
-    <summary aria-label={label}>
-      <span className="ticket-activity-squares" aria-hidden="true">
-        {days.map(({ date, count }) => <span key={date} className="ticket-activity-day" data-level={unavailable ? 'unknown' : level(count)} />)}
-      </span>
+    <summary aria-label={label} aria-description="Daily activity, oldest to newest. Graphs share one scale across loaded projects.">
+      <svg className="ticket-activity-sparkline" viewBox="0 0 104 28" aria-hidden="true" focusable="false"
+        data-state={unavailable ? 'unknown' : total === 0 ? 'empty' : 'recorded'}>
+        <polyline points={unavailable ? '2,26 102,26' : points} />
+      </svg>
     </summary>
     <div className="ticket-activity-breakdown">
       <p>{unavailable ? 'Activity unavailable.' : `${total} recorded ticket ${changes}`}</p>
