@@ -1,4 +1,4 @@
-.kanban-area { min-width: 0; flex: 1; height: 100%; display: flex; flex-direction: column; color: #172b4d; font-size: 14px; }
+.kanban-area { position: relative; min-width: 0; flex: 1; height: 100%; display: flex; flex-direction: column; color: #172b4d; font-size: 14px; }
 .kanban-lists { display: flex; flex: 1; min-height: 0; align-items: flex-start; gap: 12px; padding: 18px 16px 28px; overflow: auto; scrollbar-color: #ffffff80 transparent; }
 .kanban-column { width: 272px; flex: 0 0 272px; max-height: 100%; padding: 8px; overflow-y: auto; border-radius: 12px; background: #f1f2f4; box-shadow: 0 2px 4px #091e4226, 0 0 0 1px #091e4214; scrollbar-width: thin; }
 .kanban-column[data-drop-target] { outline: 3px solid #85b8ff; outline-offset: 2px; }
@@ -54,6 +54,9 @@ button.kanban-add-column:hover { background: #fff; }
 .kanban-error { background: #fff0ed; color: #ae2e24; padding: 10px 12px; border-radius: 6px; overflow-wrap: anywhere; }
 .kanban-status { padding: 8px 16px; background: #ffffffed; }
 .kanban-status button { margin-left: 12px; text-decoration: underline; }
+.kanban-sync-status { position: absolute; inset-inline-end: 16px; bottom: 12px; z-index: 1; margin: 0; padding: 6px 10px; border-radius: 6px; background: #172b4de6; color: white; font-size: 12px; pointer-events: none; }
+/* Keep the board visually steady while writes temporarily lock interaction. */
+.kanban-area[data-syncing] .kanban-card:disabled { opacity: 1; }
 .kanban-composer label { display: grid; gap: 6px; color: #44546f; font-size: 12px; font-weight: 600; }
 .kanban-composer textarea { box-sizing: border-box; width: 100%; min-width: 0; padding: 10px; border: 1px solid #8590a2; border-radius: 8px; background: white; font: inherit; font-size: 14px; font-weight: 400; color: #172b4d; resize: vertical; box-shadow: 0 1px 2px #091e4214; }
 .kanban-composer textarea:focus { outline: 2px solid #0c66e4; outline-offset: 1px; }

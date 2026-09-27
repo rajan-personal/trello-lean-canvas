@@ -33,6 +33,8 @@ export function useBoardDrag(board: BoardData, pending: boolean, run: RunBoardCo
       if (event.clientY > rect.top + rect.height / 2) index++
     }
     end()
+    const source = board.cards.find((card) => card.id === id)
+    if (source?.columnId === columnId && orderedCards(board, columnId).findIndex((card) => card.id === id) === index) return
     void run({ type: 'move-card', id, columnId, index })
   }
   return { start, end, over, drop, target }
