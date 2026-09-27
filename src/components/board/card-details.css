@@ -21,31 +21,17 @@
 }
 .kanban-dialog-heading { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .kanban-card-dialog .kanban-dialog-heading h2 { font-size: .8125rem; font-weight: 500; color: #667085; white-space: nowrap; }
-.kanban-card-dialog .kanban-status-field { position: relative; display: inline-flex; align-items: center; min-width: 0; max-width: min(14rem, 100%); margin: 0; color: #667085; }
-.kanban-card-dialog .kanban-status-field select {
-  /* Keep the OS picker; content sizing is an enhancement over intrinsic select sizing. */
-  appearance: none;
-  field-sizing: content;
-  width: auto;
-  max-width: 100%;
-  min-block-size: 36px;
-  padding-block: 6px;
-  padding-inline: 24px 28px;
-  border-color: #e4e7ec;
-  border-radius: 6px;
-  background: #f9fafb;
-  color: #344054;
-  font-size: .8125rem;
-  font-weight: 500;
-  text-overflow: ellipsis;
-  cursor: pointer;
+.kanban-status-trigger { min-width: 0; max-width: min(14rem, 100%); }
+.kanban-status-trigger [data-slot="select-value"] { min-width: 0; overflow: hidden; }
+.kanban-status-menu { width: max(12rem, var(--radix-select-trigger-width)); max-width: calc(100vw - 24px); }
+.kanban-status-menu [data-radix-select-viewport] { min-width: 0; }
+.kanban-status-menu [data-slot="select-item"] { min-height: 32px; overflow-wrap: anywhere; }
+@media (pointer: coarse) {
+  .kanban-status-trigger, .kanban-status-menu [data-slot="select-item"] { min-height: 44px; }
 }
-.kanban-card-dialog .kanban-status-field select:not(:disabled):hover { background: #f2f4f7; border-color: #98a2b3; }
-.kanban-card-dialog .kanban-status-field select:disabled { opacity: .55; cursor: not-allowed; }
-.kanban-status-dot, .kanban-status-chevron { position: absolute; pointer-events: none; }
-.kanban-status-dot { inset-inline-start: 10px; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.kanban-status-chevron { inset-inline-end: 8px; }
-@media (pointer: coarse) { .kanban-card-dialog .kanban-status-field select { min-block-size: 44px; font-size: 1rem; } }
+@media (forced-colors: active) {
+  .kanban-status-trigger:focus-visible, .kanban-status-menu [data-highlighted] { outline: 2px solid Highlight; }
+}
 .kanban-dialog.kanban-card-dialog .kanban-dialog-delete { color: #667085; }
 .kanban-dialog.kanban-card-dialog .kanban-dialog-delete:not(:disabled):hover { color: #b42318; background: #fef3f2; }
 .kanban-card-dialog > :is([role="status"], [role="alert"]) { margin: 12px 24px; font-size: .8125rem; }
@@ -91,7 +77,7 @@
   .kanban-dialog.kanban-card-dialog > header { padding: 8px 16px; gap: 8px; }
   .kanban-dialog-heading { gap: 8px; flex-wrap: wrap; }
   .kanban-card-dialog .kanban-dialog-heading h2 { font-size: .75rem; }
-  .kanban-card-dialog .kanban-status-field select { min-block-size: 44px; font-size: 1rem; }
+  .kanban-status-menu [data-slot="select-item"] { min-height: 44px; }
   .kanban-card-layout { grid-template-columns: minmax(0, 1fr); row-gap: 1px; }
   .kanban-card-editor { padding: 24px 16px; }
   .kanban-card-dialog .kanban-title-field textarea { font-size: 1.375rem; }

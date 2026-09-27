@@ -21,7 +21,7 @@ const meta = {
     await expect(modal.querySelectorAll('form form')).toHaveLength(0)
     await expect(canvas.getByRole('combobox', { name: 'Story points' })).toHaveValue(String(args.card.storyPoints ?? ''))
     const status = canvas.getByRole('combobox', { name: 'Status' })
-    await expect(status).toHaveValue(args.card.columnId)
+    await expect(status).toHaveTextContent(args.board.columns.find(({ id }) => id === args.card.columnId)?.title ?? 'Unavailable column')
     if (args.pending || args.deleted) await expect(status).toBeDisabled()
     await expect(modal.querySelectorAll('li')).toHaveLength(args.board.comments.filter(({ cardId }) => cardId === args.card.id).length)
     if (args.pending || args.deleted) for (const name of ['Save', 'Delete card', 'Add comment'])

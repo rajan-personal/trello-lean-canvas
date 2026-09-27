@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addBoardCard, column, openBoard, openBoardCard } from './support/board-fixtures'
+import { addBoardCard, column, openBoard, openBoardCard, setStatus } from './support/board-fixtures'
 
 test('moves cards by drag within and across columns, preserving stable IDs and reload order', async ({ page }) => {
   await openBoard(page)
@@ -32,8 +32,8 @@ test('mobile card details change status without dragging and persist after reloa
   await openBoardCard(page, 'First')
   const modal = page.getByRole('dialog')
   await expect(modal.getByRole('combobox', { name: 'Story points' })).toHaveValue('')
-  await expect(modal.getByRole('combobox', { name: 'Status', exact: true })).toHaveValue('backlog')
-  await modal.getByRole('combobox', { name: 'Status', exact: true }).selectOption({ label: 'In Progress' })
+  await expect(modal.getByRole('combobox', { name: 'Status', exact: true })).toHaveText('Backlog')
+  await setStatus(page, 'In Progress')
   await expect(modal.getByText('Unsaved changes', { exact: true })).toBeVisible()
   await modal.getByLabel('Description').fill('Moved using the status selector.')
   await modal.getByRole('button', { name: 'Save', exact: true }).click()
@@ -41,7 +41,7 @@ test('mobile card details change status without dragging and persist after reloa
   await expect(column(page, 'In Progress').locator('.kanban-card')).toHaveText(['First'])
   await page.reload()
   await openBoardCard(page, 'First')
-  await expect(modal.getByRole('combobox', { name: 'Status', exact: true })).toHaveValue('in-progress')
+  await expect(modal.getByRole('combobox', { name: 'Status', exact: true })).toHaveText('In Progress')
   await expect(modal.getByLabel('Description')).toHaveValue('Moved using the status selector.')
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(375)
 })
@@ -56,13 +56,13 @@ test('status options include custom columns and cancelled changes do not move ti
   await openBoardCard(page, 'Keep in backlog')
   const modal = page.getByRole('dialog')
   const status = modal.getByRole('combobox', { name: 'Status', exact: true })
-  await status.selectOption({ label: 'Waiting for customer' })
+  await setStatus(page, 'Waiting for customer')
   page.once('dialog', (dialog) => dialog.accept())
   await modal.getByRole('button', { name: 'Cancel', exact: true }).click()
   await expect(column(page, 'Backlog').locator('.kanban-card')).toHaveText(['Keep in backlog'])
   await openBoardCard(page, 'Keep in backlog')
-  await expect(status).toHaveValue('backlog')
-  await status.selectOption({ label: 'Waiting for customer' })
+  await expect(status).toHaveText('Backlog')
+  await setStatus(page, 'Waiting for customer')
   await modal.getByRole('button', { name: 'Save', exact: true }).click()
   await expect(column(page, 'Waiting for customer').locator('.kanban-card')).toHaveText(['Keep in backlog'])
 })

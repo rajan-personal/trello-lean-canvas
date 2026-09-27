@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addBoardCard, openBoard, openBoardCard } from './support/board-fixtures'
-
+import { addBoardCard, openBoard, openBoardCard, setStatus } from './support/board-fixtures'
 for (const fallback of [false, true]) test.describe(fallback ? 'light-dismiss fallback' : 'native light-dismiss', () => {
   test.beforeEach(async ({ page }) => {
     if (fallback) await page.addInitScript(() => {
@@ -50,8 +49,9 @@ for (const fallback of [false, true]) test.describe(fallback ? 'light-dismiss fa
       const ticket = page.url()
       const isSelect = field === 'Story points' || field === 'Status'
       const input = page.getByRole(isSelect ? 'combobox' : 'textbox', { name: field, exact: true })
-      const value = field === 'Status' ? 'todo' : field === 'Story points' ? '5' : 'Keep this draft'
-      if (isSelect) await input.selectOption(value)
+      const value = field === 'Status' ? 'Todo' : field === 'Story points' ? '5' : 'Keep this draft'
+      if (field === 'Status') await setStatus(page, value)
+      else if (isSelect) await input.selectOption(value)
       else await input.fill(value)
       page.once('dialog', async (dialog) => {
         expect(dialog.message()).toBe('Discard unsaved changes?')
@@ -60,12 +60,14 @@ for (const fallback of [false, true]) test.describe(fallback ? 'light-dismiss fa
       await page.mouse.click(4, 4)
       await expect(page.getByRole('dialog')).toBeVisible()
       await expect(page).toHaveURL(ticket)
-      await expect(input).toHaveValue(value)
+      if (field === 'Status') await expect(input).toHaveText(value)
+      else await expect(input).toHaveValue(value)
       page.once('dialog', async (dialog) => { await dialog.accept() })
       await page.mouse.click(4, 4)
       await expect(page.getByRole('dialog')).toHaveCount(0)
       await openBoardCard(page, 'Outside-click ticket')
-      await expect(input).toHaveValue(field === 'Status' ? 'backlog' : field === 'Title' ? 'Outside-click ticket' : '')
+      if (field === 'Status') await expect(input).toHaveText('Backlog')
+      else await expect(input).toHaveValue(field === 'Title' ? 'Outside-click ticket' : '')
     })
   }
 
@@ -85,7 +87,6 @@ for (const fallback of [false, true]) test.describe(fallback ? 'light-dismiss fa
     await expect(page.getByRole('dialog')).toHaveCount(0)
   })
 })
-
 test('mobile backdrop tap closes card details', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true })
   const page = await context.newPage()
