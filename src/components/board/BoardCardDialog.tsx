@@ -21,6 +21,7 @@ interface Props {
 export function BoardCardDialog({ card, board, user, pending, deleted, error, run, onClose, register }: Props) {
   const titleId = useId()
   const descriptionId = useId()
+  const formId = useId()
   const pointsId = useId()
   const pointsHelpId = useId()
   const editor = useBoardCardDraft(card, user, run)
@@ -32,7 +33,8 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
   const close = useDraftGuard(editor.dirty, pending, onClose, register)
   const exists = !deleted && board.cards.some((item) => item.id === card.id)
   return <BoardDialog title="Card details" onClose={close} lightDismiss className="kanban-card-dialog"
-    headerContext={<BoardCardStatus card={card} board={board} />}
+    headerContext={<BoardCardStatus columnId={draft.columnId} board={board} formId={formId}
+      disabled={pending || !exists} onChange={(columnId) => setDraft({ ...draft, columnId })} />}
     headerActions={<button className="kanban-danger kanban-dialog-delete" disabled={pending || !exists}
       type="button" aria-label="Delete card" title="Delete card" onClick={async () => {
         if (!window.confirm(`Delete “${card.title}” and all its comments?${editor.dirty ? ' Unsaved changes will also be discarded.' : ''}`)) return
@@ -45,7 +47,7 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
     {editor.message && <p role="status">{editor.message}</p>}
     <div className="kanban-card-layout">
     <div className="kanban-card-editor">
-    <form onSubmit={async (event) => {
+    <form id={formId} onSubmit={async (event) => {
       event.preventDefault()
       if (!pending && exists && draft.title.trim() && await editor.save() && !editor.comment) onClose()
     }}>

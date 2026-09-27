@@ -17,7 +17,7 @@ for (const fallback of [false, true]) test(`menu stays bounded when its header s
   await expect(backlog.locator('.kanban-card')).toHaveCount(20)
   await backlog.getByRole('button', { name: 'Column actions for Backlog' }).click()
   const panel = page.getByRole('group', { name: 'Column actions for Backlog' })
-  await backlog.evaluate((element) => { element.scrollTop = 250 })
+  await page.locator('.kanban-lists').evaluate((element) => { element.scrollTop = 250 })
   await expect.poll(async () => (await panel.boundingBox())!.y).toBeGreaterThanOrEqual(8)
   await expect.poll(async () => { const box = (await panel.boundingBox())!; return box.y + box.height }).toBeLessThanOrEqual(492)
   await expect(panel.getByRole('button', { name: 'Rename column' })).toBeInViewport()

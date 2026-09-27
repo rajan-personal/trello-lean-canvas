@@ -21,9 +21,8 @@
 }
 .kanban-dialog-heading { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .kanban-card-dialog .kanban-dialog-heading h2 { font-size: .8125rem; font-weight: 500; color: #667085; white-space: nowrap; }
-.kanban-task-status { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 3px 8px; border: 1px solid #e4e7ec; border-radius: 6px; color: #344054; background: #f9fafb; font-size: .75rem; font-weight: 500; overflow-wrap: anywhere; }
-.kanban-task-status-dot { flex: 0 0 6px; height: 6px; border-radius: 50%; background: #667085; }
-.kanban-task-status-label { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.kanban-card-dialog .kanban-status-field { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; color: #475467; font-size: .75rem; font-weight: 500; }
+.kanban-card-dialog .kanban-status-field select { width: 200px; max-width: 100%; min-block-size: 48px; font-size: 1rem; }
 .kanban-dialog.kanban-card-dialog .kanban-dialog-delete { color: #667085; }
 .kanban-dialog.kanban-card-dialog .kanban-dialog-delete:not(:disabled):hover { color: #b42318; background: #fef3f2; }
 .kanban-card-dialog > :is([role="status"], [role="alert"]) { margin: 12px 24px; font-size: .8125rem; }
@@ -69,10 +68,12 @@
   .kanban-dialog.kanban-card-dialog > header { padding: 8px 16px; gap: 8px; }
   .kanban-dialog-heading { gap: 8px; flex-wrap: wrap; }
   .kanban-card-dialog .kanban-dialog-heading h2 { font-size: .75rem; }
-  .kanban-task-status { padding: 2px 6px; font-size: .6875rem; }
+  .kanban-card-dialog .kanban-status-field { flex-wrap: wrap; gap: 2px; }
+  .kanban-card-dialog .kanban-status-field select { width: 100%; }
   .kanban-card-layout { grid-template-columns: minmax(0, 1fr); row-gap: 1px; }
   .kanban-card-editor { padding: 24px 16px; }
   .kanban-card-dialog .kanban-title-field textarea { font-size: 1.375rem; }
+  .kanban-description-heading { flex-wrap: wrap; }
   .kanban-card-layout > .kanban-comments { padding: 20px 16px; border-inline-start: 0; border-block-start: 1px solid #e4e7ec; }
   .kanban-draft-indicator { flex-basis: 100%; margin: 4px 0 0; }
 }

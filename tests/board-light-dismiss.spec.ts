@@ -45,12 +45,13 @@ for (const fallback of [false, true]) test.describe(fallback ? 'light-dismiss fa
     await expect(modal).toHaveCount(0)
   })
 
-  for (const field of ['Title', 'Description', 'New comment', 'Story points']) {
+  for (const field of ['Title', 'Description', 'New comment', 'Story points', 'Status']) {
     test('protects unsaved ' + field + ' until discard is confirmed', async ({ page }) => {
       const ticket = page.url()
-      const input = page.getByRole(field === 'Story points' ? 'combobox' : 'textbox', { name: field, exact: true })
-      const value = field === 'Story points' ? '5' : 'Keep this draft'
-      if (field === 'Story points') await input.selectOption(value)
+      const isSelect = field === 'Story points' || field === 'Status'
+      const input = page.getByRole(isSelect ? 'combobox' : 'textbox', { name: field, exact: true })
+      const value = field === 'Status' ? 'todo' : field === 'Story points' ? '5' : 'Keep this draft'
+      if (isSelect) await input.selectOption(value)
       else await input.fill(value)
       page.once('dialog', async (dialog) => {
         expect(dialog.message()).toBe('Discard unsaved changes?')
@@ -64,7 +65,7 @@ for (const fallback of [false, true]) test.describe(fallback ? 'light-dismiss fa
       await page.mouse.click(4, 4)
       await expect(page.getByRole('dialog')).toHaveCount(0)
       await openBoardCard(page, 'Outside-click ticket')
-      await expect(input).toHaveValue(field === 'Title' ? 'Outside-click ticket' : '')
+      await expect(input).toHaveValue(field === 'Status' ? 'backlog' : field === 'Title' ? 'Outside-click ticket' : '')
     })
   }
 

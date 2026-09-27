@@ -20,6 +20,9 @@ const meta = {
     await expect(modal.querySelectorAll('form')).toHaveLength(2)
     await expect(modal.querySelectorAll('form form')).toHaveLength(0)
     await expect(canvas.getByRole('combobox', { name: 'Story points' })).toHaveValue(String(args.card.storyPoints ?? ''))
+    const status = canvas.getByRole('combobox', { name: 'Status' })
+    await expect(status).toHaveValue(args.card.columnId)
+    if (args.pending || args.deleted) await expect(status).toBeDisabled()
     await expect(modal.querySelectorAll('li')).toHaveLength(args.board.comments.filter(({ cardId }) => cardId === args.card.id).length)
     if (args.pending || args.deleted) for (const name of ['Save', 'Delete card', 'Add comment'])
       await expect(canvas.getByRole('button', { name })).toBeDisabled()
@@ -42,6 +45,7 @@ export const Saving: Story = { args: { pending: true }, play: async ({ canvas, a
   const modal = canvas.getByRole('dialog', { name: 'Card details' })
   await expect(modal).toHaveAttribute('closedby', 'any')
   await expect(canvas.getByRole('button', { name: 'Save' })).toBeDisabled()
+  await expect(canvas.getByRole('combobox', { name: 'Status' })).toBeDisabled()
   // Native light-dismiss and Escape both request cancellation, never bypass the draft guard.
   await canvasStoryAct(() => { fireEvent(modal, new Event('cancel', { cancelable: true })) })
   await expect(modal).toBeVisible()

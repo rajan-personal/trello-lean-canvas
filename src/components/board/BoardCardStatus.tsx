@@ -1,9 +1,16 @@
-import type { BoardCard, BoardData } from '../../data/board'
+import type { BoardData } from '../../data/board'
 
-export function BoardCardStatus({ card, board }: { card: BoardCard; board: BoardData }) {
-  const title = board.columns.find(({ id }) => id === card.columnId)?.title ?? 'Unavailable'
-  return <span className="kanban-task-status" title={title}>
-    <span className="kanban-task-status-dot" aria-hidden="true" />
-    <span className="kanban-task-status-label">{title}</span>
-  </span>
+interface Props {
+  columnId: string; board: BoardData; formId: string; disabled: boolean
+  onChange: (columnId: string) => void
+}
+
+export function BoardCardStatus({ columnId, board, formId, disabled, onChange }: Props) {
+  return <label className="kanban-status-field">Status
+    <select name="columnId" form={formId} disabled={disabled} value={columnId}
+      onChange={(event) => onChange(event.target.value)}>
+      {!board.columns.some(({ id }) => id === columnId) && <option value={columnId} disabled>Unavailable column</option>}
+      {board.columns.map((column) => <option key={column.id} value={column.id}>{column.title}</option>)}
+    </select>
+  </label>
 }

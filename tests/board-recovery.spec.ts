@@ -7,6 +7,7 @@ test('keeps drafts on failed saves and subscription read errors, then retries wi
   await openBoardCard(page, 'Recovery card')
   const modal = page.getByRole('dialog')
   await modal.getByLabel('Description').fill('Keep my description')
+  await modal.getByRole('combobox', { name: 'Status', exact: true }).selectOption('todo')
   await modal.getByLabel('New comment').fill('Retry my comment')
   await page.evaluate(() => {
     const original = Storage.prototype.setItem
@@ -21,6 +22,7 @@ test('keeps drafts on failed saves and subscription read errors, then retries wi
   await expect(modal.getByLabel('New comment')).toHaveValue('Retry my comment')
   await modal.getByRole('button', { name: 'Save', exact: true }).click()
   await expect(modal.getByLabel('Description')).toHaveValue('Keep my description')
+  await expect(modal.getByRole('combobox', { name: 'Status', exact: true })).toHaveValue('todo')
   await page.evaluate(() => {
     (window as unknown as { restoreBoardStorage: () => void }).restoreBoardStorage()
     const saved = localStorage.getItem('lean-canvas:boards:v1')!
@@ -41,6 +43,7 @@ test('keeps drafts on failed saves and subscription read errors, then retries wi
   await expect(modal).toHaveCount(0)
   await openBoardCard(page, 'Recovery card')
   await expect(modal.getByLabel('Description')).toHaveValue('Keep my description')
+  await expect(modal.getByRole('combobox', { name: 'Status', exact: true })).toHaveValue('todo')
   await expect(modal.getByText('Retry my comment', { exact: true })).toHaveCount(1)
 })
 
@@ -65,7 +68,7 @@ test('does not overwrite an open draft when the persisted card changes in anothe
   await expect(page.getByLabel('Description')).toHaveValue('Remote description')
 })
 
-for (const field of ['title', 'description']) test(`retains drafts if remote ${field} notification is delayed`, async ({ page }) => {
+for (const field of ['title', 'description', 'columnId']) test(`retains drafts if remote ${field} notification is delayed`, async ({ page }) => {
   await openBoard(page)
   await addBoardCard(page, 'Shared card')
   await openBoardCard(page, 'Shared card')
@@ -73,7 +76,7 @@ for (const field of ['title', 'description']) test(`retains drafts if remote ${f
   await page.evaluate((field) => {
     const boards = JSON.parse(localStorage.getItem('lean-canvas:boards:v1')!)
     const board = Object.values(boards)[0] as { cards: Record<string, string>[] }
-    board.cards[0][field] = 'Remote edit'
+    board.cards[0][field] = field === 'columnId' ? 'todo' : 'Remote edit'
     localStorage.setItem('lean-canvas:boards:v1', JSON.stringify(boards))
   }, field)
   const modal = page.getByRole('dialog')
@@ -81,9 +84,10 @@ for (const field of ['title', 'description']) test(`retains drafts if remote ${f
   await expect(modal.getByRole('alert')).toContainText('changed elsewhere')
   await expect(modal.getByLabel('Description')).toHaveValue('Local description')
   const persisted = await page.evaluate(() => Object.values(JSON.parse(localStorage.getItem('lean-canvas:boards:v1')!))[0])
-  expect(persisted).toMatchObject({ cards: [expect.objectContaining({ [field]: 'Remote edit' })] })
+  expect(persisted).toMatchObject({ cards: [expect.objectContaining({ [field]: field === 'columnId' ? 'todo' : 'Remote edit' })] })
   page.once('dialog', (dialog) => dialog.accept())
   await modal.getByRole('button', { name: 'Close dialog' }).click()
   await openBoardCard(page, field === 'title' ? 'Remote edit' : 'Shared card')
-  await expect(modal.getByRole('textbox', { name: field === 'title' ? 'Title' : 'Description', exact: true })).toHaveValue('Remote edit')
+  if (field === 'columnId') await expect(modal.getByRole('combobox', { name: 'Status', exact: true })).toHaveValue('todo')
+  else await expect(modal.getByRole('textbox', { name: field === 'title' ? 'Title' : 'Description', exact: true })).toHaveValue('Remote edit')
 })
