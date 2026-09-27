@@ -61,11 +61,7 @@ button.kanban-add-column:hover { background: #fff; }
 .kanban-composer button:not(:disabled):hover { background: #dcdfe4; }
 .kanban-composer .kanban-actions { margin-top: 8px; }
 @media (max-width: 760px) {
-  /* One vertical scroll surface keeps every status reachable without sideways swiping. */
-  .kanban-lists { flex-direction: column; align-items: stretch; padding: 12px 12px 24px; }
-  .kanban-column, .kanban-add-column { width: 100%; flex: 0 0 auto; max-height: none; overflow: visible; }
-  .kanban-card { min-block-size: 44px; cursor: pointer; }
-  .kanban-add-column > button { width: 100%; min-block-size: 44px; text-align: start; }
+  .kanban-lists { padding-inline: 12px; }
   .kanban-dialog { padding: 16px; max-height: calc(100dvh - 24px); }
   .kanban-dialog :is(input, textarea, select), .kanban-composer textarea { font-size: 16px; }
   .kanban-dialog button, .kanban-add-card, .kanban-column-menu-trigger, .kanban-column-popover button, .kanban-composer button { min-height: 44px; }

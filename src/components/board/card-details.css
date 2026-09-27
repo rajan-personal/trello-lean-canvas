@@ -73,7 +73,6 @@
   .kanban-card-layout { grid-template-columns: minmax(0, 1fr); row-gap: 1px; }
   .kanban-card-editor { padding: 24px 16px; }
   .kanban-card-dialog .kanban-title-field textarea { font-size: 1.375rem; }
-  .kanban-description-heading { flex-wrap: wrap; }
   .kanban-card-layout > .kanban-comments { padding: 20px 16px; border-inline-start: 0; border-block-start: 1px solid #e4e7ec; }
   .kanban-draft-indicator { flex-basis: 100%; margin: 4px 0 0; }
 }

@@ -33,7 +33,7 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
   const close = useDraftGuard(editor.dirty, pending, onClose, register)
   const exists = !deleted && board.cards.some((item) => item.id === card.id)
   return <BoardDialog title="Card details" onClose={close} lightDismiss className="kanban-card-dialog"
-    headerContext={<BoardCardStatus columnId={draft.columnId} board={board} formId={formId}
+    headerContext={<BoardCardStatus columnId={draft.columnId} columns={board.columns} formId={formId}
       disabled={pending || !exists} onChange={(columnId) => setDraft({ ...draft, columnId })} />}
     headerActions={<button className="kanban-danger kanban-dialog-delete" disabled={pending || !exists}
       type="button" aria-label="Delete card" title="Delete card" onClick={async () => {
