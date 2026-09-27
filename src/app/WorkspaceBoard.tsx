@@ -23,13 +23,15 @@ export function WorkspaceBoard({ state, user, blocked, deleted, onDismissDeleted
       return true
     } catch { return false } finally { busy.current = false }
   }
-  return <div className="kanban-area">
+  return <div className="kanban-area" data-syncing={state.pending || state.loading || undefined}>
     {deleted && <div className="kanban-status" role="alert">This canvas was deleted elsewhere. Copy your drafts before closing.
       <button onClick={onDismissDeleted}>Close deleted canvas</button></div>}
     {!deleted && state.error && <div className="kanban-status" role="alert">{state.error}
       <button onClick={() => void state.reload()} disabled={state.pending}>Retry loading board</button></div>}
-    {state.loading && <p className="kanban-status" role="status">Loading board…</p>}
-    {state.pending && <p className="kanban-status" role="status">Saving board…</p>}
+    <p className={state.board ? 'kanban-sync-status' : 'kanban-status'} role="status" aria-atomic="true"
+      hidden={!state.pending && !state.loading}>
+      {state.pending ? 'Saving board…' : state.board ? 'Refreshing board…' : 'Loading board…'}
+    </p>
     {state.board && <KanbanBoard ticket={ticket} loading={state.loading} board={state.board} user={user}
       deleted={deleted} pending={blocked || state.pending || (!deleted && state.loading)} error={deleted ? null : state.error} run={run} register={register} />}
   </div>

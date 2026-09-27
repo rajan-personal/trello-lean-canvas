@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { BoardData } from '../data/board'
-import type { BoardCommand } from '../data/board-mutations'
+import { applyBoardCommand, type BoardCommand } from '../data/board-mutations'
 import type { BoardRepository } from '../data/board-repository'
 
 interface BoardView {
@@ -11,6 +11,9 @@ interface BoardView {
 export function useBoard(repository: BoardRepository, canvasId: string | undefined) {
   const [view, setView] = useState<BoardView | null>(null)
   const [pending, setPending] = useState(0)
+  const [optimisticMove, setOptimisticMove] = useState<{
+    id: string; repository: BoardRepository; command: Extract<BoardCommand, { type: 'move-card' }>
+  } | null>(null)
   const generation = useRef(0)
   const request = useRef(0)
   const reload = useCallback(async () => {
@@ -46,6 +49,8 @@ export function useBoard(repository: BoardRepository, canvasId: string | undefin
   const dispatch = useCallback(async (command: BoardCommand): Promise<void> => {
     if (!canvasId) throw new Error('Select a canvas first.')
     const scope = generation.current
+    const move = command.type === 'move-card' ? { id: canvasId, repository, command } : null
+    if (move) setOptimisticMove(move)
     setPending((count) => count + 1)
     try {
       await repository.dispatch(canvasId, command)
@@ -56,9 +61,20 @@ export function useBoard(repository: BoardRepository, canvasId: string | undefin
         setView((previous) => ({ id: canvasId, repository, board: latest ?? previous?.board, loading: false,
           error: cause instanceof Error ? cause.message : 'Board change could not be saved.' }))
       throw cause
-    } finally { setPending((count) => count - 1) }
+    } finally {
+      if (move) setOptimisticMove((current) => current === move ? null : current)
+      setPending((count) => count - 1)
+    }
   }, [canvasId, repository, reload])
   const current = view?.id === canvasId && view?.repository === repository ? view : null
-  return { board: current?.board, loading: !!canvasId && (current?.loading ?? true),
+  // Project over the latest persisted snapshot so subscription refreshes cannot
+  // flash the card back to its source while the write is still in flight.
+  const board = useMemo(() => {
+    if (!current?.board || optimisticMove?.id !== canvasId || optimisticMove?.repository !== repository)
+      return current?.board
+    try { return applyBoardCommand(current.board, optimisticMove.command) }
+    catch { return current.board } // A remotely deleted card/column must not be resurrected.
+  }, [current?.board, optimisticMove, canvasId, repository])
+  return { board, loading: !!canvasId && (current?.loading ?? true),
     pending: pending > 0, error: current?.error ?? null, dispatch, reload }
 }

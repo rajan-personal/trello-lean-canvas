@@ -53,7 +53,9 @@ export async function routingTransport(context: BrowserContext, flags: string[] 
         if (localStorage.getItem('test:hold-board')) await new Promise(resolve => window.addEventListener('test:board', resolve, { once: true }));
         return repository.load(id);
       }, dispatch: async (id, command) => {
+        localStorage.setItem('test:board-save-started', 'true');
         if (localStorage.getItem('test:hold-board-save')) await new Promise(resolve => window.addEventListener('test:finish-board-save', resolve, { once: true }));
+        if (localStorage.getItem('test:fail-board-save')) throw new Error('Test board save failed');
         return repository.dispatch(id, command);
       } };
     }` }))
