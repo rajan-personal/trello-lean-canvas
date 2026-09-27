@@ -19,19 +19,19 @@
 }
 .ticket-activity summary::-webkit-details-marker { display: none; }
 .ticket-activity summary:focus-visible { outline: 2px solid #0c66e4; outline-offset: 2px; }
-.ticket-activity-squares { display: flex; gap: 3px; }
-.ticket-activity-day {
-  inline-size: 12px;
-  block-size: 12px;
-  border: 1px solid #8590a2;
-  border-radius: 2px;
-  background: #ebedf0;
+.ticket-activity-sparkline { display: block; inline-size: 104px; block-size: 28px; color: #308547; }
+.ticket-activity-sparkline polyline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
-.ticket-activity-day[data-level="1"] { background: #9be9a8; border-color: #549260; }
-.ticket-activity-day[data-level="2"] { background: #40c463; border-color: #308547; }
-.ticket-activity-day[data-level="3"] { background: #30a14e; border-color: #247539; }
-.ticket-activity-day[data-level="4"] { background: #216e39; border-color: #216e39; }
-.ticket-activity-day[data-level="unknown"] { border-style: dashed; background: transparent; }
+.ticket-activity-sparkline[data-state="empty"], .ticket-activity-sparkline[data-state="unknown"] { color: #8590a2; }
+.ticket-activity-sparkline[data-state="unknown"] polyline { stroke-dasharray: 3 4; }
+@media (forced-colors: active) {
+  .ticket-activity-sparkline { color: CanvasText; }
+}
 .ticket-activity-breakdown {
   position: absolute;
   inset-inline-end: 0;

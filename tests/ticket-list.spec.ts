@@ -12,7 +12,7 @@ test('shows one project list with stars, counts, and seven-day activity, without
   await expect(page.getByRole('list', { name: 'Task counts for Beta project' })).toHaveText('Backlog: 0Todo: 1In Review: 1')
   await expect(page.getByRole('list', { name: 'Task counts for Empty project' })).toHaveText('Backlog: 0Todo: 0In Review: 0')
   await expect(page.locator('.ticket-project-updated')).toHaveCount(0)
-  await expect(page.locator('.ticket-activity-day')).toHaveCount(21)
+  await expect(page.locator('.ticket-activity-sparkline')).toHaveCount(3)
   await expect(page.getByRole('table')).toHaveCount(0)
   const rows = await page.locator('.ticket-project-row').evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().toJSON()))
   expect(new Set(rows.map((row) => row.x)).size).toBe(1)
