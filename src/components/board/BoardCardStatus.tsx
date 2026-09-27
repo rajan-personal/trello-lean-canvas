@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react'
 import type { BoardColumn } from '../../data/board'
 
 interface Props {
@@ -6,11 +7,15 @@ interface Props {
 }
 
 export function BoardCardStatus({ columnId, columns, formId, disabled, onChange }: Props) {
-  return <label className="kanban-status-field">Status
-    <select name="columnId" form={formId} disabled={disabled} value={columnId}
+  const current = columns.find(({ id }) => id === columnId)
+  return <label className="kanban-status-field">
+    <span className="sr-only">Status</span>
+    <span className="kanban-status-dot" aria-hidden="true" />
+    <select name="columnId" form={formId} disabled={disabled} value={columnId} title={current?.title ?? 'Unavailable column'}
       onChange={(event) => onChange(event.target.value)}>
-      {!columns.some(({ id }) => id === columnId) && <option value={columnId} disabled>Unavailable column</option>}
+      {!current && <option value={columnId} disabled>Unavailable column</option>}
       {columns.map((column) => <option key={column.id} value={column.id}>{column.title}</option>)}
     </select>
+    <ChevronDown className="kanban-status-chevron" size={14} aria-hidden="true" />
   </label>
 }
