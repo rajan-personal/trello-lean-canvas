@@ -14,6 +14,13 @@ export async function addBoardCard(page: Page, title: string, list = 'Backlog') 
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(column(page, list).getByRole('button', { name: title, exact: true })).toBeVisible()
 }
+export async function setStatus(page: Page, title: string) {
+  await page.getByRole('combobox', { name: 'Status', exact: true }).click()
+  await page.getByRole('option', { name: title, exact: true }).click()
+  await expect(page.getByRole('listbox', { name: 'Status', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('combobox', { name: 'Status', exact: true })).toBeFocused()
+}
+
 export async function openBoardCard(page: Page, title: string) {
   await page.getByRole('button', { name: title, exact: true }).click()
   await expect(page.getByRole('dialog', { name: 'Card details' })).toBeVisible()

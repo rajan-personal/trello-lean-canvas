@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addBoardCard, column, openBoard, openBoardCard } from './support/board-fixtures'
+import { addBoardCard, column, openBoard, openBoardCard, setStatus } from './support/board-fixtures'
 
 test('moves cards by drag within and across columns, preserving stable IDs and reload order', async ({ page }) => {
   await openBoard(page)
@@ -25,17 +25,44 @@ test('moves cards by drag within and across columns, preserving stable IDs and r
     .flatMap((board) => (board as { cards: { id: string }[] }).cards.map((card) => card.id)).sort())).toEqual(ids)
 })
 
-test('mobile card details omit movement controls and preserve the column when saving', async ({ page }) => {
+test('mobile card details change status without dragging and persist after reload', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 667 })
   await openBoard(page)
   await addBoardCard(page, 'First')
   await openBoardCard(page, 'First')
   const modal = page.getByRole('dialog')
   await expect(modal.getByRole('combobox', { name: 'Story points' })).toHaveValue('')
-  await expect(modal.getByText('Move card', { exact: true })).toHaveCount(0)
-  await modal.getByLabel('Description').fill('Details only; drag the card to move it.')
+  await expect(modal.getByRole('combobox', { name: 'Status', exact: true })).toHaveText('Backlog')
+  await setStatus(page, 'In Progress')
+  await expect(modal.getByText('Unsaved changes', { exact: true })).toBeVisible()
+  await modal.getByLabel('Description').fill('Moved using the status selector.')
   await modal.getByRole('button', { name: 'Save', exact: true }).click()
-  await expect(column(page, 'Backlog').locator('.kanban-card')).toHaveText(['First'])
-  await expect(page.locator('.kanban-card > *')).toHaveCount(0)
+  await expect(column(page, 'Backlog').locator('.kanban-card')).toHaveCount(0)
+  await expect(column(page, 'In Progress').locator('.kanban-card')).toHaveText(['First'])
+  await page.reload()
+  await openBoardCard(page, 'First')
+  await expect(modal.getByRole('combobox', { name: 'Status', exact: true })).toHaveText('In Progress')
+  await expect(modal.getByLabel('Description')).toHaveValue('Moved using the status selector.')
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(375)
+})
+
+test('status options include custom columns and cancelled changes do not move tickets', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 667 })
+  await openBoard(page)
+  await addBoardCard(page, 'Keep in backlog')
+  await page.getByRole('button', { name: '+ Add another column' }).click()
+  await page.getByLabel('Column title', { exact: true }).fill('Waiting for customer')
+  await page.getByRole('button', { name: 'Add column', exact: true }).click()
+  await openBoardCard(page, 'Keep in backlog')
+  const modal = page.getByRole('dialog')
+  const status = modal.getByRole('combobox', { name: 'Status', exact: true })
+  await setStatus(page, 'Waiting for customer')
+  page.once('dialog', (dialog) => dialog.accept())
+  await modal.getByRole('button', { name: 'Cancel', exact: true }).click()
+  await expect(column(page, 'Backlog').locator('.kanban-card')).toHaveText(['Keep in backlog'])
+  await openBoardCard(page, 'Keep in backlog')
+  await expect(status).toHaveText('Backlog')
+  await setStatus(page, 'Waiting for customer')
+  await modal.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(column(page, 'Waiting for customer').locator('.kanban-card')).toHaveText(['Keep in backlog'])
 })

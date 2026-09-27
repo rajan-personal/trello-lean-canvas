@@ -30,7 +30,7 @@ export function BoardDialog({ title, onClose, children, className = '', headerAc
       const dismiss = startedOnBackdrop && event.detail > 0 && isBackdrop(element, event)
       reset()
       // Safari fallback: both ends must be outside, not padding or a drag from an editor.
-      if (dismiss) requestClose()
+      if (dismiss && !element.querySelector('[role="listbox"]')) requestClose()
     }
     element.addEventListener('pointerdown', pointerDown)
     element.addEventListener('pointercancel', reset)
@@ -43,7 +43,11 @@ export function BoardDialog({ title, onClose, children, className = '', headerAc
   }, [lightDismiss])
   return <dialog ref={ref} className={`kanban-dialog ${className}`} aria-labelledby={titleId}
     closedby={lightDismiss ? 'any' : 'closerequest'}
-    onCancel={(event) => { event.preventDefault(); onClose() }}>
+    onCancel={(event) => {
+      event.preventDefault()
+      // A portaled picker owns its outside tap/Escape before the parent modal does.
+      if (!event.currentTarget.querySelector('[role="listbox"]')) onClose()
+    }}>
     <header><div className="kanban-dialog-heading"><h2 id={titleId}>{title}</h2>{headerContext}</div>
       <div className="kanban-dialog-header-actions">{headerActions}
         <button className="kanban-dialog-close" type="button" onClick={onClose} aria-label="Close dialog"><X size={20} aria-hidden="true" /></button>
