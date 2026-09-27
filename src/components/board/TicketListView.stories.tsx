@@ -1,90 +1,81 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fn } from 'storybook/test'
-import type { BoardSummary } from '../../data/board'
-import type { LeanCanvas } from '../../data/types'
+import { expect, fn, within } from 'storybook/test'
+import type { TicketListProject } from '../../app/useWorkspaceTicketList'
+import { defaultBoardColumns } from '../../data/board'
+import { activityDay, ACTIVITY_TIME_ZONE } from '../../data/board-activity'
 import { TicketListView } from './TicketListView'
 
-const canvas = (id: string, name: string): LeanCanvas => ({ id, name, title: name, favorite: false, notes: '', sections: [] })
-const summary = (prefix: string): BoardSummary => ({
-  columns: [{ id: `${prefix}-custom`, title: 'Needs review' }, { id: `${prefix}-done`, title: 'Done' }],
-  cards: [
-    { id: 'shared-card', columnId: `${prefix}-custom`, title: 'Plan release', rank: 'a', storyPoints: 3 },
-    { id: 'done-card', columnId: `${prefix}-done`, title: 'Ship update', rank: 'a' },
-  ],
+const project = (id: string, name: string, favorite = false, notes = ''): TicketListProject => ({
+  canvas: { id, name, title: name, favorite, notes, sections: [] }, loading: false, error: null,
+  summary: { activity: { timeZone: ACTIVITY_TIME_ZONE, throughDay: activityDay(), counts: [0, 1, 3, 0, 7, 12, 2] }, columns: defaultBoardColumns, cards: [
+    { id: 'plan', columnId: 'backlog', title: 'Plan release', rank: 'a' },
+    { id: 'build', columnId: 'todo', title: 'Build release', rank: 'a' },
+    { id: 'review', columnId: 'review', title: 'Review release', rank: 'a' },
+    { id: 'review-again', columnId: 'review', title: 'Review documentation', rank: 'b' },
+  ] },
 })
-const project = (id: string, name: string): { canvas: LeanCanvas; loading: boolean; summary: BoardSummary; error: null } => ({ canvas: canvas(id, name), loading: false, summary: summary(id), error: null })
-const emptyProject = project('empty', 'Empty project')
-emptyProject.summary = { columns: [], cards: [] }
-const longProject = project('long', 'Customer research and product discovery with a very long project name')
-longProject.summary = {
-  columns: [{ id: 'long-status', title: 'Waiting for customer validation and stakeholder review' }],
-  cards: [{ id: 'long-card', columnId: 'long-status', title: 'A ticket title with enough detail to wrap across multiple lines and preserve every word', rank: 'a', storyPoints: 8 }],
-}
+const projects = [
+  project('launch', 'Product launch', true, 'Bring the next release to life with a focused plan and a smooth rollout.'),
+  project('research', 'Customer research', true, 'Listen to early customers and turn their feedback into a better product.'),
+  project('canvas', 'Lean Canvas', true, 'Map the problem, explore solutions, and validate the business model.'),
+  project('website', 'Website refresh', false, 'A clearer story and a simpler experience for everyone who visits.'),
+  project('ideas', 'Ideas & experiments', false, 'Small experiments worth exploring when there is room to try something new.'),
+  project('docs', 'Documentation', false, 'Keep the team’s knowledge organized and easy to find.'),
+]
 const meta = {
   title: 'Lean Canvas/TicketListView', component: TicketListView, tags: ['autodocs'], parameters: { layout: 'fullscreen' },
-  decorators: [(Story) => <div style={{ minHeight: '100dvh', background: 'linear-gradient(130deg, #0c66e4, #338bfa)' }}><Story /></div>],
-  args: { projects: [project('project-a', 'Product launch'), project('project-b', 'Customer research')], blocked: false, onOpenTicket: fn(), onOpenProjectBoard: fn(), onRetry: fn() },
+  decorators: [(Story) => <div style={{ height: '100dvh', display: 'flex', background: 'linear-gradient(130deg, #0c66e4, #338bfa)' }}><Story /></div>],
+  args: { projects, blocked: false, onOpenProjectBoard: fn(), onRetry: fn() },
 } satisfies Meta<typeof TicketListView>
 export default meta
 type Story = StoryObj<typeof meta>
 export const Populated: Story = {
   play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByRole('main', { name: 'All tickets' })).toBeVisible()
-    await expect(canvas.getByRole('table', { name: 'Tickets grouped by project' })).toBeVisible()
-    await expect(canvas.getByRole('columnheader', { name: /Ticket/ })).toBeVisible()
-    await expect(canvas.getByRole('columnheader', { name: /Project/ })).toBeVisible()
-    await expect(canvas.getByRole('columnheader', { name: /Status/ })).toBeVisible()
-    await expect(canvas.queryByText('Tickets from every project. Sort the Project or Status columns to change row order.')).not.toBeInTheDocument()
-    await expect(canvas.queryByText('Open a project board:')).not.toBeInTheDocument()
-    await expect(canvas.getByText(/Projects in sidebar order/)).toHaveClass('ticket-list-visually-hidden')
-    await expect(canvas.queryByRole('button', { name: /Filter|Sort Project/ })).not.toBeInTheDocument()
-    await expect(canvas.getAllByRole('button', { name: /Open board for/ }).map((button) => button.textContent)).toEqual(['Product launch', 'Customer research'])
-    await expect(canvas.getAllByRole('button', { name: /^Plan release/ })).toHaveLength(2)
-    await userEvent.click(canvas.getAllByRole('button', { name: /^Plan release/ })[0])
-    await expect(args.onOpenTicket).toHaveBeenCalledWith('project-a', 'shared-card')
-    await userEvent.click(canvas.getByRole('button', { name: 'Sort Status ascending' }))
-    await expect(canvas.getByRole('columnheader', { name: /Status/ })).toHaveAttribute('aria-sort', 'ascending')
-    await userEvent.click(canvas.getAllByRole('button', { name: /Open board for Product launch/ })[0])
-    await expect(args.onOpenProjectBoard).toHaveBeenCalledWith('project-a')
+    const list = within(canvas.getByRole('list', { name: 'Projects' }))
+    await expect(list.getAllByRole('button', { name: /Open board for/ })).toHaveLength(6)
+    await expect(canvas.queryByText(/High Priority|Low Priority/)).not.toBeInTheDocument()
+    await expect(list.getByRole('button', { name: 'Open board for Product launch' })).toHaveAccessibleDescription('Starred project')
+    const counts = within(canvas.getByRole('list', { name: 'Task counts for Product launch' }))
+    await expect(counts.getAllByRole('listitem').map((item) => item.textContent)).toEqual(['Backlog: 1', 'Todo: 1', 'In Review: 2'])
+    await userEvent.click(list.getByRole('button', { name: 'Open board for Product launch' }))
+    await expect(args.onOpenProjectBoard).toHaveBeenCalledWith('launch')
   },
 }
-export const Loading: Story = { args: { projects: [{ canvas: canvas('loading', 'Loading project'), loading: true, error: null }] }, play: async ({ canvas }) => { await expect(canvas.getByRole('status')).toHaveTextContent('Loading tickets') } }
+export const Loading: Story = {
+  args: { projects: [{ ...project('loading', 'Loading project'), loading: true, summary: undefined }] },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('status')).toHaveTextContent('Loading tickets')
+    await expect(canvas.getByRole('list', { name: 'Task counts for Loading project' })).toHaveTextContent('Backlog: —Todo: —In Review: —')
+  },
+}
 export const PartialProjectStates: Story = {
-  args: { projects: [project('loaded', 'Loaded project'), { canvas: canvas('loading', 'Loading project'), loading: true, error: null }, { canvas: canvas('error', 'Needs retry'), loading: false, error: 'Offline' }] },
+  args: { projects: [projects[0], { ...project('loading', 'Loading project'), loading: true }, { ...project('error', 'Needs retry'), error: 'Offline' }] },
   play: async ({ args, canvas, userEvent }) => {
-    await expect(canvas.getByRole('table')).toBeVisible()
     await expect(canvas.getByRole('status')).toHaveTextContent('Loading tickets')
     await expect(canvas.getByRole('alert')).toHaveTextContent('Tickets could not be loaded')
-    await userEvent.click(canvas.getByRole('button', { name: /^Retry loading tickets for Needs retry$/ }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Retry loading tickets for Needs retry' }))
     await expect(args.onRetry).toHaveBeenCalledWith('error')
-    await expect(canvas.getByText('Plan release')).toBeVisible()
+    await expect(args.onOpenProjectBoard).not.toHaveBeenCalled()
+    await expect(canvas.getByRole('button', { name: 'Open board for Product launch' })).toBeVisible()
   },
 }
-export const ErrorWithRetry: Story = { args: { projects: [{ canvas: canvas('error', 'Needs retry'), loading: false, error: 'Offline' }] }, play: async ({ args, canvas, userEvent }) => { await userEvent.click(canvas.getByRole('button', { name: /^Retry loading tickets for Needs retry$/ })); await expect(args.onRetry).toHaveBeenCalledWith('error') } }
 export const EmptyWorkspace: Story = { args: { projects: [] }, play: async ({ canvas }) => { await expect(canvas.getByRole('status')).toHaveTextContent('No projects yet') } }
 export const EmptyProject: Story = {
-  args: { projects: [emptyProject] },
+  args: { projects: [{ ...project('empty', 'Empty project'), summary: { columns: [], cards: [] } }] },
   play: async ({ canvas }) => {
-    await expect(canvas.queryByRole('navigation', { name: 'Project boards' })).not.toBeInTheDocument()
-    await expect(canvas.queryByRole('button', { name: 'Open board for Empty project' })).not.toBeInTheDocument()
-    await expect(canvas.queryByText('No tickets in this project yet.')).not.toBeInTheDocument()
+    await expect(canvas.getByRole('button', { name: 'Open board for Empty project' })).toBeVisible()
+    await expect(canvas.getByRole('list', { name: 'Task counts for Empty project' })).toHaveTextContent('Backlog: 0Todo: 0In Review: 0')
+    await expect(canvas.queryByText('No description yet.')).not.toBeInTheDocument()
+    await expect(canvas.queryByText('7 days', { exact: true })).not.toBeInTheDocument()
+    await expect(canvas.getByLabelText('Activity for Empty project: 0 recorded changes in the last 7 days')).toBeVisible()
   },
 }
-export const Blocked: Story = {
-  args: { blocked: true },
-  play: async ({ canvas }) => {
-    await expect(canvas.getAllByRole('button', { name: 'Open board for Product launch' })[0]).toBeDisabled()
-    await expect(canvas.getAllByRole('button', { name: /^Plan release/ })[0]).toBeDisabled()
-  },
-}
+export const Blocked: Story = { args: { blocked: true }, play: async ({ canvas }) => {
+  for (const button of canvas.getAllByRole('button', { name: /Open board for/ })) await expect(button).toBeDisabled()
+} }
 export const Mobile: Story = { globals: { viewport: { value: 'mobile1', isRotated: false } } }
 export const LongDataMobile: Story = {
-  args: { projects: [longProject] },
+  args: { projects: [project('long', 'Customer research and product discovery with a very long project name', false, 'A long description with enough detail to wrap across multiple lines. '.repeat(10))] },
   globals: { viewport: { value: 'mobile1', isRotated: false } },
-  play: async ({ canvas }) => {
-    await expect(canvas.getAllByText(longProject.canvas.name)[0]).toBeVisible()
-    await expect(canvas.getByText(/A ticket title with enough detail/)).toBeVisible()
-    await expect(canvas.getByText('Waiting for customer validation and stakeholder review')).toBeVisible()
-    await expect(canvas.getByText('8')).toBeVisible()
-  },
 }

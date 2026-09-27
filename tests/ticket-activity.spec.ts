@@ -1,0 +1,35 @@
+import { expect, test } from '@playwright/test'
+import { openList } from './support/ticket-list'
+
+for (const width of [320, 1440]) {
+  test(`seven-day heatmap supports keyboard/touch details and live changes at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 })
+    await openList(page)
+    const row = page.locator('.ticket-project-row[data-project-id="b"]')
+    const activity = row.locator('.ticket-activity')
+    await expect(activity.locator('.ticket-activity-day')).toHaveCount(7)
+    await expect(activity.locator('[data-level="0"]')).toHaveCount(7)
+    const summary = activity.locator('summary')
+    await expect(summary).toHaveText('')
+    await summary.focus(); await summary.press('Enter')
+    await expect(page).toHaveURL('/tickets')
+    await expect(activity.locator('li')).toHaveCount(7)
+    await expect(activity.getByText(/including today \(IST\)/)).toBeVisible()
+    await expect(activity.getByText('0 recorded ticket changes', { exact: true })).toBeVisible()
+    const bounds = await activity.locator('.ticket-activity-breakdown').boundingBox()
+    expect(bounds!.x).toBeGreaterThanOrEqual(0)
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width)
+    await summary.press('Escape')
+    await expect(activity).not.toHaveAttribute('open', '')
+    await page.getByRole('button', { name: 'Open board for Beta project' }).click()
+    await page.getByRole('region', { name: 'Todo', exact: true }).getByRole('button', { name: '+ Add a card' }).click()
+    await page.getByRole('textbox', { name: 'Card title', exact: true }).fill('Count this activity')
+    await page.getByRole('button', { name: 'Add card', exact: true }).click()
+    await page.getByRole('button', { name: 'All tickets', exact: true }).click()
+    await expect(summary).toHaveAttribute('aria-label', 'Activity for Beta project: 1 recorded change in the last 7 days')
+    await expect(activity.locator('[data-level="1"]')).toHaveCount(1)
+    await summary.click()
+    await expect(activity.getByText('1 recorded ticket change', { exact: true })).toBeVisible()
+    await expect(page).toHaveURL('/tickets')
+  })
+}
