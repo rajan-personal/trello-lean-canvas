@@ -25,6 +25,7 @@ for (const width of [320, 375, 760, 761, 1424]) {
     await expect(title).toBeFocused()
     const canvas = page.getByRole('tab', { name: 'Canvas', exact: true })
     const board = page.getByRole('tab', { name: 'Tickets', exact: true })
+    const about = page.getByRole('tab', { name: 'About', exact: true })
     await expect(board).toHaveText('Tickets')
     await expect(page.getByRole('tab', { name: 'Board', exact: true })).toHaveCount(0)
     const favorite = page.getByRole('button', { name: 'Favorite canvas' })
@@ -32,7 +33,7 @@ for (const width of [320, 375, 760, 761, 1424]) {
     await expect(canvas).toBeFocused()
     for (const key of ['End', 'ArrowRight', 'ArrowLeft', 'Home']) {
       await page.keyboard.press(key)
-      const selected = key === 'End' || key === 'ArrowLeft' ? canvas : board
+      const selected = key === 'End' || key === 'ArrowLeft' ? about : board
       await expect(selected).toBeFocused()
       await expect(selected).toHaveAttribute('aria-selected', 'true')
       await expect(page.getByRole('tabpanel')).toHaveAccessibleName(await selected.innerText())

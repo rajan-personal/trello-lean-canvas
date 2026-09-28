@@ -27,10 +27,11 @@ service cloud.firestore {
     }
     function validCanvas(data) {
       return data.keys().hasOnly(['schemaVersion', 'name', 'title', 'favorite', 'notes',
-          'sections', 'revision', 'updatedAt', 'legacyId'])
+          'about', 'sections', 'revision', 'updatedAt', 'legacyId'])
         && data.schemaVersion == 1 && data.name is string && data.name.size() <= 500
         && data.title is string && data.title.size() <= 500
         && data.favorite is bool && data.notes is string && data.notes.size() <= 100000
+        && (!data.keys().hasAny(['about']) || (data.about is string && data.about.size() <= 100000))
         && validSections(data.sections) && data.revision is int && data.revision > 0
         && data.updatedAt == request.time
         && (!data.keys().hasAny(['legacyId']) || data.legacyId is string);

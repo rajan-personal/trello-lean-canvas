@@ -15,9 +15,9 @@ const meta = {
         if (allowed) setView(next)
         return allowed
       }} />
-      {(['canvas', 'board'] as const).map((tab) => <div key={tab}
+      {(['board', 'canvas', 'about'] as const).map((tab) => <div key={tab}
         id={`${id}-${tab}-panel`} role="tabpanel" aria-labelledby={`${id}-${tab}-tab`}
-        tabIndex={0} hidden={tab !== view}>{tab === 'canvas' ? 'Canvas content' : 'Board content'}</div>)}
+        tabIndex={0} hidden={tab !== view}>{tab === 'about' ? 'About content' : tab === 'canvas' ? 'Canvas content' : 'Board content'}</div>)}
     </div>
   },
 } satisfies Meta<typeof WorkspaceTabs>
@@ -28,10 +28,11 @@ export const KeyboardRouting: Story = {
   play: async ({ canvas, userEvent, args }) => {
     const first = canvas.getByRole('tab', { name: 'Tickets' })
     const second = canvas.getByRole('tab', { name: 'Canvas' })
+    const third = canvas.getByRole('tab', { name: 'About' })
     await userEvent.click(first)
     for (const key of ['{ArrowRight}', '{ArrowLeft}', '{End}', '{Home}']) {
       await userEvent.keyboard(key)
-      const active = key === '{ArrowRight}' || key === '{End}' ? second : first
+      const active = key === '{End}' ? third : key === '{ArrowRight}' ? second : first
       await expect(active).toHaveFocus()
       await expect(active).toHaveAttribute('aria-selected', 'true')
       await expect(active).toHaveAttribute('tabindex', '0')
@@ -63,7 +64,7 @@ export const BoardSelected: Story = {
     await expect(canvas.getByRole('tab', { name: 'Tickets' })).toHaveAttribute('aria-selected', 'true')
     await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Tickets')
     const tabs = canvas.getByRole('tablist').getBoundingClientRect()
-    await expect(tabs.width).toBeLessThan(220)
+    await expect(tabs.width).toBeLessThan(300)
     await expect(tabs.bottom).toBeLessThanOrEqual(canvas.getByRole('tabpanel').getBoundingClientRect().top)
   },
 }

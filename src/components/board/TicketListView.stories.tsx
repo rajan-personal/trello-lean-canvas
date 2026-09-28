@@ -6,7 +6,7 @@ import { activityDay, ACTIVITY_TIME_ZONE } from '../../data/board-activity'
 import { TicketListView } from './TicketListView'
 
 const project = (id: string, name: string, favorite = false, notes = ''): TicketListProject => ({
-  canvas: { id, name, title: name, favorite, notes, sections: [] }, loading: false, error: null,
+  canvas: { id, name, title: name, favorite, notes, about: '', sections: [] }, loading: false, error: null,
   summary: { activity: { timeZone: ACTIVITY_TIME_ZONE, throughDay: activityDay(), counts: [0, 1, 3, 0, 7, 12, 2] }, columns: defaultBoardColumns, cards: [
     { id: 'plan', columnId: 'backlog', title: 'Plan release', rank: 'a' },
     { id: 'build', columnId: 'todo', title: 'Build release', rank: 'a' },

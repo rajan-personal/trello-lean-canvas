@@ -17,7 +17,7 @@ const sections = z.array(section).length(12).superRefine((value, context) => {
 })
 export const canvasSchema = z.strictObject({
   id: z.string().min(1), name: z.string(), title: z.string(),
-  favorite: z.boolean(), notes: z.string(), sections,
+  favorite: z.boolean(), notes: z.string(), about: z.string().max(100000).default(''), sections,
 })
 const legacyCanvas = canvasSchema.extend({ notes: z.string().default('') }).strict()
 const timestamp = z.custom<{ seconds: number; nanoseconds: number }>((value) => {

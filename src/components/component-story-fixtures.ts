@@ -23,6 +23,7 @@ export const storyCanvas: LeanCanvas = {
   title: 'Lean Canvas — Team alignment',
   favorite: false,
   notes: 'Interview five customers before Friday.',
+  about: '',
   sections: storySections,
 }
 

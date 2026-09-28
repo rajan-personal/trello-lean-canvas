@@ -8,6 +8,7 @@ export function canvas(id = 'canvas-a'): LeanCanvas {
     title: 'Test canvas',
     favorite: false,
     notes: '',
+    about: '',
     sections: sectionTemplate.map((section) => ({ ...section, cards: [] })),
   }
 }

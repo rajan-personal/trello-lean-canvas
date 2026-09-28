@@ -34,7 +34,7 @@ export const DesktopCanvas: Story = {
     await expect(selected).toHaveFocus()
     for (const key of ['{End}', '{ArrowRight}', '{ArrowLeft}', '{Home}']) {
       await userEvent.keyboard(key)
-      const label = key === '{End}' || key === '{ArrowLeft}' ? 'Canvas' : 'Tickets'
+      const label = key === '{End}' || key === '{ArrowLeft}' ? 'About' : 'Tickets'
       await expect(canvas.getByRole('tab', { name: label })).toHaveFocus()
       await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName(label)
     }

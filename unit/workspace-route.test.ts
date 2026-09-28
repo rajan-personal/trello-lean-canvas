@@ -10,13 +10,15 @@ describe('workspace-route', () => {
     expect(parseWorkspaceRoute('/project/a/ticket')).toEqual({ kind: 'project', projectId: 'a', view: 'board' })
     expect(parseWorkspaceRoute('/project/a/ticket/b')).toEqual({ kind: 'project', projectId: 'a', view: 'board', ticketId: 'b' })
     expect(parseWorkspaceRoute('/project/a/ticket/')).toEqual({ kind: 'project', projectId: 'a', view: 'board' })
+    expect(parseWorkspaceRoute('/project/a/about/')).toEqual({ kind: 'project', projectId: 'a', view: 'about' })
+    expect(parseWorkspaceRoute(projectPath('my project', 'about'))).toEqual({ kind: 'project', projectId: 'my project', view: 'about' })
   })
   it('round-trips encoded IDs without treating them as paths', () => {
     expect(parseWorkspaceRoute(projectPath('my project', 'board', 'task #1'))).toEqual({
       kind: 'project', projectId: 'my project', view: 'board', ticketId: 'task #1',
     })
   })
-  it.each(['/canvases/a', '/tickets//', '/project', '/project/', '/project/a/tickets', '/project/a/ticket/b/extra',
+  it.each(['/project/a/about/extra', '/canvases/a', '/tickets//', '/project', '/project/', '/project/a/tickets', '/project/a/ticket/b/extra',
     '/project/a//ticket', '/project/%', '/project/%2f', '/project/%5c', '/project/%00', '/project/..',
     '/project/a/ticket/%E0%A4%A', '//project/a', '/project/a/ticket/%2E'])('rejects malformed/unsupported route %s', (path) => {
     expect(parseWorkspaceRoute(path)).toEqual({ kind: 'missing' })

@@ -1,9 +1,11 @@
 import { useId, useRef } from 'react'
-import { Columns3, LayoutDashboard } from 'lucide-react'
+import { Columns3, FileText, LayoutDashboard } from 'lucide-react'
 
-export type WorkspaceView = 'canvas' | 'board'
+import { workspaceViews, type WorkspaceView } from '../data/workspace-view'
+export type { WorkspaceView } from '../data/workspace-view'
 interface Props { view: WorkspaceView; onChange: (view: WorkspaceView) => boolean; idPrefix?: string }
-const tabs = ['board', 'canvas'] as const
+const tabs = workspaceViews
+const labels = { board: 'Tickets', canvas: 'Canvas', about: 'About' }
 
 export function WorkspaceTabs({ view, onChange, idPrefix }: Props) {
   const generatedId = useId()
@@ -20,10 +22,11 @@ export function WorkspaceTabs({ view, onChange, idPrefix }: Props) {
       onClick={() => select(tab)} onKeyDown={(event) => {
         if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
         event.preventDefault()
-        select(event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs[tabs.length - 1] : tab === 'canvas' ? 'board' : 'canvas')
+        const offset = event.key === 'ArrowLeft' ? -1 : 1
+        select(event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs[tabs.length - 1] : tabs[(tabs.indexOf(tab) + offset + tabs.length) % tabs.length])
       }}>
-        {tab === 'canvas' ? <LayoutDashboard size={14} aria-hidden="true" /> : <Columns3 size={14} aria-hidden="true" />}
-        {tab === 'canvas' ? 'Canvas' : 'Tickets'}
+        {tab === 'canvas' ? <LayoutDashboard size={14} aria-hidden="true" /> : tab === 'about' ? <FileText size={14} aria-hidden="true" /> : <Columns3 size={14} aria-hidden="true" />}
+        {labels[tab]}
       </button>)}
   </div>
 }

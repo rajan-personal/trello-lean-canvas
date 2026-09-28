@@ -20,7 +20,7 @@ export const IsolatedBoardsAndKeyboard: Story = {
   play: async ({ canvas, userEvent }) => {
     const storyUrl = window.location.href
     await userEvent.click(await canvas.findByRole('tab', { name: 'Canvas' }))
-    await userEvent.keyboard('{ArrowRight}')
+    await userEvent.keyboard('{ArrowLeft}')
     const boardTab = canvas.getByRole('tab', { name: 'Tickets' })
     await expect(boardTab).toHaveFocus()
     await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Tickets')
@@ -31,7 +31,7 @@ export const IsolatedBoardsAndKeyboard: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Blank canvas' }))
     await expect(await canvas.findByRole('button', { name: 'Outline the launch plan' })).toBeVisible()
     await userEvent.click(boardTab)
-    await userEvent.keyboard('{End}')
+    await userEvent.keyboard('{ArrowRight}')
     await expect(canvas.getByRole('tab', { name: 'Canvas' })).toHaveFocus()
     await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Canvas')
     await userEvent.tab()

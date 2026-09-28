@@ -2,6 +2,7 @@ import { dump, load } from 'js-yaml'
 import type { LeanCanvas } from './types'
 import { sectionTemplate } from './sections'
 import { boardDataSchema, createBoard, type BoardData } from './board'
+import { canvasSchema } from './canvas-schema'
 type UnknownRecord = Record<string, unknown>
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === 'object' && value !== null
@@ -34,6 +35,7 @@ export function canvasToYaml(canvas: LeanCanvas, board?: BoardData): string {
         title: canvas.title,
         favorite: canvas.favorite,
         notes: canvas.notes,
+        about: canvas.about,
         sections: canvas.sections.map(({ id, number, title, hint, cards }) => ({
           id,
           ...(number ? { number } : {}),
@@ -62,11 +64,9 @@ export function yamlToCanvas(
     isRecord(parsed) && isRecord(parsed.canvas) ? parsed.canvas : parsed
   if (!isRecord(input))
     throw new Error('The YAML file does not contain a canvas object.')
-
   const suppliedSections = Array.isArray(input.sections) ? input.sections : []
   if (!suppliedSections.length)
     throw new Error('The YAML file does not contain any sections.')
-
   const sections = sectionTemplate.map((template, index) => {
     const incoming =
       suppliedSections.find(
@@ -94,6 +94,7 @@ export function yamlToCanvas(
     title: String(input.title ?? fallbackCanvas.title),
     favorite: Boolean(input.favorite ?? fallbackCanvas.favorite),
     notes: String(input.notes ?? fallbackCanvas.notes),
+    about: canvasSchema.shape.about.parse(input.about),
     sections,
   }
 }
