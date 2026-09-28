@@ -77,6 +77,6 @@ test('protects dirty title, description and comment drafts on Escape, Cancel and
   await page.keyboard.press('Escape')
   await expect(modal).toHaveCount(0)
   await page.getByRole('tab', { name: 'Tickets', exact: true }).focus()
-  await page.keyboard.press('ArrowLeft')
+  await page.keyboard.press('ArrowRight')
   await expect(page.getByRole('tab', { name: 'Canvas', exact: true })).toHaveAttribute('aria-selected', 'true')
 })

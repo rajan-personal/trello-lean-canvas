@@ -75,6 +75,8 @@ export function Workspace({ user, onSignOut, persistence, browserRouting = false
           ticketList={{ projects: ticketList.projects, blocked: state.pending,
             onOpenProjectBoard: openProjectBoard, onRetry: ticketList.retry }}
           workspaceView={{ view, board, sectionProps, user, ticket, blocked: state.pending, deleted: state.deleted,
+            about: { onSave: async (about) => {
+              state.updateActiveCanvas((canvas) => ({ ...canvas, about })); await state.flushCanvases() } },
             onDismissDeleted: () => { if (allow()) state.setActiveId(null) }, register: guard.register, notify }}
           unavailable={{ route, onReturn: () => { if (allow()) history.navigate('/') } }} />
         {state.activeCanvas && !state.deleted && (

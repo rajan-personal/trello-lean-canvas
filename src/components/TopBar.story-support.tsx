@@ -26,10 +26,10 @@ export function TopBarHarness(args: ComponentProps<typeof TopBar> & { initialVie
       args.onNewCanvas()
       setDialog({ heading: 'Create canvas', submitLabel: 'Create canvas', value: '' })
     }} />
-    {canvas && (['canvas', 'board'] as const).map((tab) => <div key={tab}
+    {canvas && (['board', 'canvas', 'about'] as const).map((tab) => <div key={tab}
       id={`${id}-${tab}-panel`} role="tabpanel" aria-labelledby={`${id}-${tab}-tab`}
       tabIndex={0} hidden={tab !== view} className="bg-white p-4 text-[#172b4d]">
-      {tab === 'canvas' ? 'Canvas content' : 'Board content'}
+      {tab === 'about' ? 'About content' : tab === 'canvas' ? 'Canvas content' : 'Board content'}
     </div>)}
     <CreateCanvasDialog dialog={dialog} setDialog={setDialog} onCreate={(name) => {
       setCanvas({ ...storyCanvas, id: 'created-canvas', name, title: name })

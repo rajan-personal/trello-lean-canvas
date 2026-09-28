@@ -6,6 +6,7 @@ A strict TypeScript Lean Canvas workspace with Trello-style editing. Start with 
 
 - Load four researched YAML examples on demand using the **Load sample data** button
 - Create, upload, rename, favorite, switch, and delete Lean Canvases
+- Save project overviews, goals, and links in the **About** tab with an explicit **Save** button
 - Add, edit, delete, clear, and drag cards between all 12 canvas sections
 - Sign in only with Google and sync each user's canvases privately with Cloud Firestore
 - Discuss tasks in a shared user/agent comment thread; see [agent setup and CLI](docs/task-comments.md)
@@ -56,8 +57,9 @@ During rollout, migrated metadata retains a compatibility `canvases` snapshot so
 - `/project/{projectId}` opens the Canvas view.
 - `/project/{projectId}/ticket` opens the **Tickets** view (the Kanban board).
 - `/project/{projectId}/ticket/{ticketId}` opens a ticket dialog.
+- `/project/{projectId}/about` opens the project’s **About** details.
 
-Root opens the first available project's Tickets view after loading. Tickets appears before Canvas (Home selects Tickets; End selects Canvas). Explicit Canvas links and the selected view when switching projects are preserved. Unavailable links never silently select another project. Signing in preserves the requested URL; Back/Forward restores project, view, and ticket selection. Clicking or tapping outside card details closes the dialog and returns to the Tickets view without deleting the card. Unsaved edits or comments require discard confirmation, and pending saves block dismissal. Clicking inside the dialog or dragging from an editor onto the backdrop does not close it. Closing a directly loaded ticket navigates to its parent Tickets route without leaving the app. Board drafts and pending saves guard navigation. Canvas inline editors retain their existing outside-click dismissal behavior; browser Back/Forward and unload protect their unsaved drafts.
+Root opens the first available project's Tickets view after loading. Tabs appear in Tickets, Canvas, About order (Home selects Tickets; End selects About). Explicit Canvas links and the selected view when switching projects are preserved. Unavailable links never silently select another project. Signing in preserves the requested URL; Back/Forward restores project, view, and ticket selection. Clicking or tapping outside card details closes the dialog and returns to the Tickets view without deleting the card. Unsaved edits or comments require discard confirmation, and pending saves block dismissal. Clicking inside the dialog or dragging from an editor onto the backdrop does not close it. Closing a directly loaded ticket navigates to its parent Tickets route without leaving the app. Board drafts and pending saves guard navigation. Canvas inline editors retain their existing outside-click dismissal behavior; browser Back/Forward and unload protect their unsaved drafts.
 
 ## Component workbench and UI review
 
@@ -109,3 +111,5 @@ canvas:
       cards:
         - Decisions disappear across chat, docs, and meetings
 ```
+
+About details are included in YAML exports. Existing projects and YAML files without `about` open with empty details. Deploy the updated Firestore rules before releasing this frontend so saves can include the new field.
