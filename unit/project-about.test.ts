@@ -13,7 +13,7 @@ describe('project about data', () => {
     expect(decodeCanvas(id, { ...payload, schemaVersion: 1, revision: 1, updatedAt: timestamp }).canvas).toEqual(canvas())
   })
   it('preserves multiline details through Firestore and YAML round trips', () => {
-    const original = { ...canvas(), about: 'Project overview\n\nGoals and links: https://example.com' }
+    const original = { ...canvas(), about: '# Project overview\n\n**Goals**\n- [ ] Validate demand\n\n[Plan](https://example.com)\n\n```js\nconst goal = 3\n```' }
     expect(decodeCanvas(original.id, { ...canvasPayload(original), schemaVersion: 1, revision: 2, updatedAt: timestamp }).canvas).toEqual(original)
     expect(yamlToCanvas(canvasToYaml(original), canvas())).toEqual(original)
   })
