@@ -59,3 +59,12 @@
 .rich-text-link { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; width: 100%; order: 1; font-size: 0.875rem; }
 .rich-text-link input { flex: 1; min-width: 120px; padding: 8px; border: 1px solid #8590a2; border-radius: 4px; }
 .rich-text-link p { width: 100%; color: #b42318; }
+
+/* Let the scratchpad devote its full panel to writing and formatting. */
+.notepad-panel .project-rich-text-editor { border: 0; border-radius: 0; }
+.notepad-panel .project-rich-text-editor:focus-within { outline-offset: -2px; }
+.notepad-panel .rich-text-toolbar { padding: 4px; }
+.notepad-panel .project-rich-text-content .tiptap { padding: 12px; }
+@media (pointer: fine) {
+  .notepad-panel .rich-text-buttons button { min-width: 32px; min-height: 32px; padding: 6px; }
+}

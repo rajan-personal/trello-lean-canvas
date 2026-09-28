@@ -1,0 +1,55 @@
+import { expect, test } from '@playwright/test'
+import { openSampleCanvas } from './support/canvas-fixtures'
+
+test('notes autosave formatting independently from About across tab changes and reloads', async ({ page }) => {
+  await openSampleCanvas(page)
+  const toggle = page.getByRole('button', { name: 'Notepad', exact: true })
+  await toggle.click()
+  const panel = page.getByRole('complementary', { name: 'Notepad' })
+  const notes = panel.getByRole('textbox', { name: 'Canvas notes' })
+  await expect(panel.getByRole('button', { name: 'Save', exact: true })).toHaveCount(0)
+  await notes.fill('Research notes')
+  await notes.press('ControlOrMeta+A')
+  await panel.getByRole('button', { name: 'Bold', exact: true }).click()
+  await expect(notes.locator('strong')).toHaveText('Research notes')
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:v2')!)[0].notes)).toBe('**Research notes**')
+  await toggle.click()
+  await toggle.click()
+  await expect(notes.locator('strong')).toHaveText('Research notes')
+  await page.getByRole('tab', { name: 'About', exact: true }).click()
+  const details = page.getByRole('textbox', { name: 'Project details' })
+  await expect(details).toHaveText('')
+  await details.fill('About still requires Save')
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:v2')!)[0].about)).toBe('')
+  await page.getByRole('tabpanel', { name: 'About' }).getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(page.getByRole('tabpanel', { name: 'About' }).getByRole('status')).toHaveText('All changes saved')
+  await page.reload()
+  await toggle.click()
+  await expect(notes.locator('strong')).toHaveText('Research notes')
+  await expect(details).toHaveText('About still requires Save')
+})
+
+test('notes remain editable after an autosave failure and retry on the next edit', async ({ page }) => {
+  await openSampleCanvas(page)
+  await page.getByRole('button', { name: 'Notepad', exact: true }).click()
+  await page.evaluate(() => {
+    const setItem = Storage.prototype.setItem
+    Storage.prototype.setItem = function (key, value) {
+      if (key === 'lean-canvas:v2' && sessionStorage.getItem('test:fail-notes')) throw new Error('Storage unavailable')
+      setItem.call(this, key, value)
+    }
+    sessionStorage.setItem('test:fail-notes', 'true')
+  })
+  const notes = page.getByRole('textbox', { name: 'Canvas notes' })
+  await notes.fill('Keep my notes')
+  await expect(page.getByRole('alert')).toHaveText('Storage unavailable')
+  await expect(notes).toHaveText('Keep my notes')
+  await page.evaluate(() => sessionStorage.removeItem('test:fail-notes'))
+  await notes.press('End')
+  await notes.press('!')
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:v2')!)[0].notes)).toBe('Keep my notes!')
+  await expect(page.getByRole('alert')).toHaveCount(0)
+  await page.reload()
+  await page.getByRole('button', { name: 'Notepad', exact: true }).click()
+  await expect(notes).toHaveText('Keep my notes!')
+})

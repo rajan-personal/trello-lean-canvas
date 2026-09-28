@@ -21,10 +21,11 @@ test('opens, expands, and persists the canvas notepad', async ({ page }) => {
       ),
     )
     .toBe(320)
-  await expect(panel.getByRole('heading')).toHaveCount(0)
-  await expect(panel.getByRole('button')).toHaveCount(0)
+  await expect(panel.getByRole('button', { name: 'Bold', exact: true })).toBeVisible()
+  await expect(panel.getByRole('button', { name: 'Save', exact: true })).toHaveCount(0)
   await expect(notes).toBeFocused()
   await notes.fill('Ask five customers about their current workflow.')
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:v2')!)[0].notes)).toBe('Ask five customers about their current workflow.')
 
   const compactWidth = await panel.evaluate((element) =>
     Math.round(element.getBoundingClientRect().width),
@@ -54,7 +55,7 @@ test('opens, expands, and persists the canvas notepad', async ({ page }) => {
     )
     .toBe(0)
   await toggle.click()
-  await expect(notes).toHaveValue(
+  await expect(notes).toHaveText(
     'Ask five customers about their current workflow.',
   )
 
@@ -62,7 +63,7 @@ test('opens, expands, and persists the canvas notepad', async ({ page }) => {
   await page.getByRole('button', { name: 'Notepad', exact: true }).click()
   await expect(
     page.getByRole('textbox', { name: 'Canvas notes' }),
-  ).toHaveValue('Ask five customers about their current workflow.')
+  ).toHaveText('Ask five customers about their current workflow.')
 })
 
 test('uses the full workspace for notes on mobile', async ({ page }) => {

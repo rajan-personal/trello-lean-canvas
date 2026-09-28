@@ -16,10 +16,11 @@ interface Props {
   value: string
   disabled: boolean
   invalid: boolean
+  focus?: boolean
   onChange: (value: string) => void
 }
 
-export default function ProjectRichTextEditor({ id, value, disabled, invalid, onChange }: Props) {
+export default function ProjectRichTextEditor({ id, value, disabled, invalid, focus = false, onChange }: Props) {
   const lastValue = useRef(value)
   const editor = useEditor({
     extensions,
@@ -33,13 +34,13 @@ export default function ProjectRichTextEditor({ id, value, disabled, invalid, on
   })
   // Apply cloud updates and discarded drafts without resetting the selection on each keystroke.
   useEffect(() => {
-    if (editor && value !== lastValue.current) {
+    if (editor && !editor.isDestroyed && value !== lastValue.current) {
       editor.commands.setContent(value, { contentType: 'markdown', emitUpdate: false })
       lastValue.current = value
     }
   }, [editor, value])
   useEffect(() => {
-    if (!editor) return
+    if (!editor || editor.isDestroyed) return
     editor.setEditable(!disabled, false)
     editor.setOptions({ editorProps: { attributes: {
       id, role: 'textbox', 'aria-multiline': 'true', 'aria-labelledby': `${id}-label`,
@@ -47,6 +48,9 @@ export default function ProjectRichTextEditor({ id, value, disabled, invalid, on
       'aria-readonly': String(disabled), spellcheck: 'true',
     } } })
   }, [editor, id, disabled, invalid])
+  useEffect(() => {
+    if (editor && !editor.isDestroyed && focus) editor.commands.focus()
+  }, [editor, focus])
   return <div className="project-rich-text-editor">
     {editor && <RichTextToolbar editor={editor} disabled={disabled} />}
     <EditorContent editor={editor} className="project-rich-text-content" />

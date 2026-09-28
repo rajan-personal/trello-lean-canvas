@@ -16,7 +16,7 @@ test('About saves per project, survives reloads, and follows browser history', a
   await page.reload()
   await expect(details).toHaveText(text, { useInnerText: true })
   await page.getByRole('button', { name: 'Notepad', exact: true }).click()
-  await expect(page.getByRole('textbox', { name: 'Canvas notes' })).toHaveValue('')
+  await expect(page.getByRole('textbox', { name: 'Canvas notes' })).toHaveText('')
   await page.getByRole('button', { name: 'Notepad', exact: true }).click()
   const projects = page.getByRole('navigation', { name: 'Workspace navigation' }).getByRole('button')
   await page.getByRole('button', { name: 'Expand sidebar' }).click()

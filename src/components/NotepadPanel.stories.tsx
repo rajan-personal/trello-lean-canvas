@@ -37,22 +37,16 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Open: Story = {
-  play: async ({ args, canvas }) => {
+  play: async ({ args, canvas, userEvent }) => {
     const panel = canvas.getByRole('complementary', { name: 'Notepad' })
-    const notes = canvas.getByRole('textbox', { name: 'Canvas notes' })
-    await expect(panel).toHaveStyle({ backgroundColor: 'rgb(12, 102, 228)' })
+    const notes = await canvas.findByRole('textbox', { name: 'Canvas notes' })
+    await expect(panel).toHaveStyle({ backgroundColor: 'rgb(241, 242, 244)' })
     await waitFor(() => expect(notes).toHaveFocus())
-    await expect(notes).toHaveStyle({
-      borderWidth: '2px',
-      outlineStyle: 'none',
-    })
-    fireEvent.change(notes, {
-      target: { value: 'A concise research note' },
-    })
-    await expect(notes).toHaveValue('A concise research note')
-    await expect(args.onChange).toHaveBeenLastCalledWith(
-      'A concise research note',
-    )
+    await expect(canvas.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
+    await userEvent.clear(notes)
+    await userEvent.type(notes, 'A concise research note')
+    await expect(notes).toHaveTextContent('A concise research note')
+    await expect(args.onChange).toHaveBeenLastCalledWith('A concise research note')
   },
 }
 
@@ -94,7 +88,7 @@ export const Mobile: Story = {
     const separator = canvas.getByLabelText('Resize notepad')
     await expect(separator).toBeInTheDocument()
     await expect(separator).not.toBeVisible()
-    await expect(canvas.getByRole('textbox', { name: 'Canvas notes' }))
+    await expect(await canvas.findByRole('textbox', { name: 'Canvas notes' }))
       .toBeVisible()
   },
 }
