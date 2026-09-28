@@ -18,6 +18,7 @@ test('invalid upload keeps the canvas, retry imports, and download contains rend
   await page.getByRole('button', { name: 'Favorite canvas' }).click()
   await page.getByRole('button', { name: 'Notepad', exact: true }).click()
   await page.getByRole('textbox', { name: 'Canvas notes' }).fill('Export notes')
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:v2')!).find((canvas: { name: string }) => canvas.name === 'Retry canvas').notes)).toBe('Export notes')
   const downloaded = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Download canvas data as YAML' }).click()
   const file = await downloaded

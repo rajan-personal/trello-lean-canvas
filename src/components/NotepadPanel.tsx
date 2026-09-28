@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState, type PointerEvent } from 'react'
+import { lazy, Suspense, useId, useRef, useState, type PointerEvent } from 'react'
 import type { LeanCanvas } from '../data/types'
+
+const ProjectRichTextEditor = lazy(() => import('./ProjectRichTextEditor'))
 
 interface Props {
   canvas: LeanCanvas
@@ -17,14 +19,10 @@ function clampWidth(width: number): number {
 }
 
 export function NotepadPanel({ canvas, open, onChange }: Props) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const id = useId()
   const resizeStart = useRef<{ x: number; width: number } | null>(null)
   const [width, setWidth] = useState(INITIAL_WIDTH)
   const [resizing, setResizing] = useState(false)
-
-  useEffect(() => {
-    if (open) textareaRef.current?.focus()
-  }, [open])
 
   const startResize = (event: PointerEvent<HTMLDivElement>) => {
     resizeStart.current = { x: event.clientX, width }
@@ -46,7 +44,7 @@ export function NotepadPanel({ canvas, open, onChange }: Props) {
   return (
     <aside
       id="canvas-notepad"
-      className={`notepad-panel relative z-30 h-full min-w-0 max-w-full flex-none overflow-hidden bg-[#0c66e4] shadow-[-2px_0_8px_rgba(9,30,66,0.18)] max-[900px]:fixed max-[900px]:inset-x-0 max-[900px]:top-12 max-[900px]:bottom-0 max-[900px]:h-auto max-[900px]:max-w-none max-[900px]:shadow-none ${open ? 'max-[900px]:!w-full' : ''}`}
+      className={`notepad-panel relative flex z-30 h-full min-w-0 max-w-full flex-none overflow-hidden bg-[#f1f2f4] shadow-[-2px_0_8px_rgba(9,30,66,0.18)] max-[900px]:fixed max-[900px]:inset-x-0 max-[900px]:top-12 max-[900px]:bottom-0 max-[900px]:h-auto max-[900px]:max-w-none max-[900px]:shadow-none ${open ? 'max-[900px]:!w-full' : ''}`}
       style={{ width: open ? width : 0 }}
       data-open={open}
       data-resizing={resizing}
@@ -76,15 +74,12 @@ export function NotepadPanel({ canvas, open, onChange }: Props) {
       >
         <span className="absolute inset-y-0 start-1/2 w-0.5 bg-[#0c66e4] group-hover:bg-[#85b8ff] group-focus-visible:bg-[#85b8ff]" />
       </div>
-      <textarea
-        ref={textareaRef}
-        className="absolute inset-2 h-auto w-auto resize-none rounded-lg border-2 border-[#0c66e4] bg-[#e4e7ec] p-3 text-sm leading-6 text-[#172b4d] shadow-[inset_0_1px_2px_rgba(9,30,66,0.08),0_0_1px_rgba(9,30,66,0.24)] outline-none placeholder:text-[#626f86] focus-visible:border-[#0055cc] max-[900px]:inset-0 max-[900px]:rounded-none max-[900px]:border-0"
-        value={canvas.notes}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder="Write notes…"
-        aria-label="Canvas notes"
-        spellCheck="true"
-      />
+      <span id={`${id}-label`} className="sr-only">Canvas notes</span>
+      <span id={`${id}-status`} className="sr-only">Notes save automatically.</span>
+      <Suspense fallback={<p className="p-3">Loading editor…</p>}>
+        <ProjectRichTextEditor id={id} value={canvas.notes} focus={open}
+          disabled={false} invalid={false} onChange={onChange} />
+      </Suspense>
     </aside>
   )
 }

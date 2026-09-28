@@ -3,7 +3,7 @@ import type { AppUser } from '../auth/auth-context'
 import { AppStatus } from '../components/AppStatus'
 import { CreateCanvasDialog } from '../components/CreateCanvasDialog'
 import type { CanvasDialogState } from '../components/Dialog'
-import { NotepadPanel } from '../components/NotepadPanel'
+import { WorkspaceNotepad } from './WorkspaceNotepad'
 import { Sidebar } from '../components/Sidebar'
 import { SyncError } from '../components/SyncError'
 import { Toast } from '../components/Toast'
@@ -79,14 +79,7 @@ export function Workspace({ user, onSignOut, persistence, browserRouting = false
               state.updateActiveCanvas((canvas) => ({ ...canvas, about })); await state.flushCanvases() } },
             onDismissDeleted: () => { if (allow()) state.setActiveId(null) }, register: guard.register, notify }}
           unavailable={{ route, onReturn: () => { if (allow()) history.navigate('/') } }} />
-        {state.activeCanvas && !state.deleted && (
-          <NotepadPanel
-            key={state.activeCanvas.id}
-            canvas={state.activeCanvas}
-            open={panels.notepadOpen}
-            onChange={(notes) => state.updateActiveCanvas((canvas) => ({ ...canvas, notes }))}
-          />
-        )}
+        <WorkspaceNotepad state={state} panels={panels} />
       </div>
       <CreateCanvasDialog dialog={dialog} setDialog={setDialog} onCreate={commands.createCanvas} />
       {state.error && <SyncError message={state.error} />}

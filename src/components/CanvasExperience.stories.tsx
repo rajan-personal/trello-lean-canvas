@@ -49,8 +49,9 @@ export const MobilePanels: Story = {
     await userEvent.keyboard('{Escape}')
     await expect(opener).toHaveFocus()
     await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
-    const notes = canvas.getByRole('textbox', { name: 'Canvas notes' })
-    fireEvent.change(notes, { target: { value: 'First canvas notes' } })
+    const notes = await canvas.findByRole('textbox', { name: 'Canvas notes' })
+    await userEvent.clear(notes)
+    await userEvent.type(notes, 'First canvas notes')
     const board = canvas.getByRole('tab', { name: 'Tickets' })
     await waitFor(() => {
       const rect = board.getBoundingClientRect()
@@ -60,9 +61,9 @@ export const MobilePanels: Story = {
     await expect(board).toHaveAttribute('aria-selected', 'true')
     await userEvent.click(opener)
     await userEvent.click(canvas.getByRole('button', { name: 'Favorite canvas with a deliberately long name' }))
-    await expect(canvas.getByRole('textbox', { name: 'Canvas notes' })).toHaveValue('Interview five customers before Friday.')
+    await expect(await canvas.findByRole('textbox', { name: 'Canvas notes' })).toHaveTextContent('Interview five customers before Friday.')
     await userEvent.click(opener)
     await userEvent.click(within(sidebar).getByRole('button', { name: 'Team alignment' }))
-    await expect(canvas.getByRole('textbox', { name: 'Canvas notes' })).toHaveValue('First canvas notes')
+    await expect(await canvas.findByRole('textbox', { name: 'Canvas notes' })).toHaveTextContent('First canvas notes')
   },
 }
