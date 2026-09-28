@@ -6,7 +6,7 @@ A strict TypeScript Lean Canvas workspace with Trello-style editing. Start with 
 
 - Load four researched YAML examples on demand using the **Load sample data** button
 - Create, upload, rename, favorite, switch, and delete Lean Canvases
-- Write project overviews, goals, and links in the **About** tab with a Markdown formatting toolbar, rendered preview, and explicit **Save** button
+- Write project overviews, goals, and links in the **About** tab in a single rich-text editor with a formatting toolbar and explicit **Save** button
 - Add, edit, delete, clear, and drag cards between all 12 canvas sections
 - Sign in only with Google and sync each user's canvases privately with Cloud Firestore
 - Discuss tasks in a shared user/agent comment thread; see [agent setup and CLI](docs/task-comments.md)
@@ -112,4 +112,4 @@ canvas:
         - Decisions disappear across chat, docs, and meetings
 ```
 
-About details are stored as Markdown text and included unchanged in YAML exports. Use **Write** to edit and format headings, emphasis, lists, links, quotes, and code; **Preview** shows the rendered document. Previewing does not save changes. Existing plain-text details remain editable, and projects and YAML files without `about` open with empty details. Raw HTML is omitted from the sanitized preview. Deploy the updated Firestore rules before releasing this frontend so saves can include the new field.
+About details are stored as Markdown text and included in YAML exports. Edit headings, emphasis, lists, checklists, links, quotes, and code directly in one rich-text surface, then click **Save**. Existing Markdown renders as formatted content; simply opening it does not rewrite the stored text. Projects and YAML files without `about` open with empty details. Deploy the updated Firestore rules before releasing this frontend so saves can include the new field.

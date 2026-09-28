@@ -4,7 +4,7 @@ import { useDraftGuard } from './board/useDraftGuard'
 import { usePendingAction } from './usePendingAction'
 import type { LeanCanvas } from '../data/types'
 
-const ProjectMarkdownEditor = lazy(() => import('./ProjectMarkdownEditor'))
+const ProjectRichTextEditor = lazy(() => import('./ProjectRichTextEditor'))
 
 function saveStatus(tooLong: boolean, failed: boolean, pending: boolean, dirty: boolean) {
   if (tooLong) return 'Project details must be 100,000 characters or fewer.'
@@ -34,12 +34,12 @@ export function ProjectAbout({ canvas, onSave, register }: Props) {
   return <div className="flex min-h-0 min-w-0 flex-1">
     <form onSubmit={(event) => { event.preventDefault(); if (dirty && !tooLong) void save.run() }} className="flex min-h-0 w-full flex-col bg-[#f1f2f4] p-6 text-[#172b4d] max-[760px]:p-4">
       <div className="mb-4 flex shrink-0 items-center justify-between gap-4">
-        <h2 className="text-base font-semibold"><label htmlFor={id}>Project details</label></h2>
+        <h2 id={`${id}-label`} className="text-base font-semibold">Project details</h2>
         <button type="submit" disabled={save.pending || !dirty || tooLong}
           className="min-h-10 shrink-0 rounded-md bg-[#0c66e4] px-4 text-sm font-semibold text-white hover:bg-[#0055cc] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4] disabled:opacity-60 max-[760px]:min-h-12">{save.pending ? 'Saving…' : 'Save'}</button>
       </div>
       <Suspense fallback={<p className="flex-1">Loading editor…</p>}>
-        <ProjectMarkdownEditor id={id} value={value} disabled={save.pending} invalid={tooLong}
+        <ProjectRichTextEditor id={id} value={value} disabled={save.pending} invalid={tooLong}
           onChange={(next) => { if (!save.pending) setDraft(next) }} />
       </Suspense>
       <p id={`${id}-status`} role="status" className="mt-3 shrink-0 text-xs text-[#626f86]">{saveStatus(tooLong, failed, save.pending, dirty)}</p>

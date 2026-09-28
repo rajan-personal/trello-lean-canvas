@@ -1,61 +1,70 @@
 import { expect, test } from '@playwright/test'
 import { loadSamples } from './support/canvas-fixtures'
 
-test('formats selected text, previews Markdown, and saves the exact source', async ({ page }) => {
+test('formats directly in one rich-text surface and saves as Markdown', async ({ page }) => {
   await loadSamples(page)
   await page.getByRole('tab', { name: 'About', exact: true }).click()
   const details = page.getByRole('textbox', { name: 'Project details', exact: true })
+  await expect(page.getByRole('button', { name: /^(Write|Preview)$/ })).toHaveCount(0)
+  await expect(details).toHaveAttribute('contenteditable', 'true')
   await details.fill('Project overview')
   await details.press('ControlOrMeta+A')
-  await page.getByRole('button', { name: 'Add bold text' }).click()
-  await expect(details).toHaveValue('**Project overview**')
-  const markdown = '# Project overview\n\n**Goals** and *scope*\n\n- Validate demand\n- Talk to hosts\n\n[Project plan](https://example.com/plan)\n\n```js\nconst hosts = 3\n```'
-  await details.fill(markdown)
-  await page.getByRole('button', { name: 'Preview', exact: true }).click()
-  const preview = page.getByRole('region', { name: 'Project details preview' })
-  await expect(preview.getByRole('heading', { name: 'Project overview' })).toBeVisible()
-  await expect(preview.locator('strong')).toHaveText('Goals')
-  await expect(preview.getByRole('listitem')).toHaveCount(2)
-  await expect(preview.getByRole('link', { name: 'Project plan' })).toHaveAttribute('href', 'https://example.com/plan')
-  await expect(preview.locator('pre')).toContainText('const hosts = 3')
+  await page.getByRole('button', { name: 'Bold', exact: true }).click()
+  await expect(details.locator('strong')).toHaveText('Project overview')
+  await expect(page.getByRole('button', { name: 'Bold', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await page.getByRole('button', { name: 'Undo', exact: true }).click()
+  await expect(details.locator('strong')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Redo', exact: true }).click()
+  await expect(details.locator('strong')).toHaveText('Project overview')
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:v2')!)[0].about)).toBe('')
   await page.getByRole('button', { name: 'Save', exact: true }).click()
   await expect(page.getByRole('tabpanel', { name: 'About' }).getByRole('status')).toHaveText('All changes saved')
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:v2')!)[0].about)).toBe('**Project overview**')
   await page.reload()
-  await expect(details).toHaveValue(markdown)
+  await expect(details.locator('strong')).toHaveText('Project overview')
+  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeDisabled()
   await details.press('Tab')
   await expect(details).not.toBeFocused()
 })
 
-test('preview strips unsafe HTML and link protocols without changing the source', async ({ page }) => {
+test('loads existing Markdown as editable formatting without rewriting it on open', async ({ page }) => {
   await loadSamples(page)
+  const markdown = '# Overview\n\n**Goals** and *scope*\n\n- Validate demand\n- Talk to hosts\n\n- [ ] Interview travelers\n\n[Plan](https://example.com/plan)\n\n```js\nconst hosts = 3\n```'
+  await page.evaluate((about) => {
+    const canvases = JSON.parse(localStorage.getItem('lean-canvas:v2')!)
+    canvases[0].about = about
+    localStorage.setItem('lean-canvas:v2', JSON.stringify(canvases))
+  }, markdown)
+  await page.reload()
   await page.getByRole('tab', { name: 'About', exact: true }).click()
   const details = page.getByRole('textbox', { name: 'Project details', exact: true })
-  const source = '# Safe heading\n\n<script>window.markdownExecuted = true</script>\n\n<img src=x onerror="window.markdownExecuted = true">\n\n[Unsafe](javascript:alert%281%29)'
-  await details.fill(source)
-  await page.getByRole('button', { name: 'Preview', exact: true }).click()
-  const preview = page.getByRole('region', { name: 'Project details preview' })
-  await expect(preview.getByRole('heading', { name: 'Safe heading' })).toBeVisible()
-  await expect(preview.locator('script, iframe, img, [onerror], [href^="javascript:"]')).toHaveCount(0)
-  expect(await page.evaluate(() => Reflect.get(window, 'markdownExecuted'))).toBeUndefined()
-  await page.getByRole('button', { name: 'Write', exact: true }).click()
-  await expect(details).toHaveValue(source)
+  await expect(details.getByRole('heading', { name: 'Overview' })).toBeVisible()
+  await expect(details.locator('strong')).toHaveText('Goals')
+  await expect(details.getByRole('listitem')).toHaveCount(3)
+  await expect(details.getByRole('link', { name: 'Plan' })).toHaveAttribute('href', 'https://example.com/plan')
+  await expect(details.locator('pre')).toContainText('const hosts = 3')
+  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeDisabled()
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:v2')!)[0].about)).toBe(markdown)
+  await details.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(page.getByRole('tabpanel', { name: 'About' }).getByRole('status')).toHaveText('All changes saved')
+  await page.reload()
+  await expect(details.getByRole('checkbox')).toBeChecked()
+  await expect(details.getByRole('heading', { name: 'Overview' })).toBeVisible()
 })
 
-test('editor controls and preview fit on a small phone', async ({ page }) => {
+test('editor and formatting controls fit on a small phone', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 740 })
   await loadSamples(page)
   await page.getByRole('tab', { name: 'About', exact: true }).click()
-  await page.getByRole('textbox', { name: 'Project details', exact: true }).fill('# Goals\n\n' + 'long-link'.repeat(80))
-  for (const button of await page.locator('.project-markdown-editor button').all()) {
-    if (!await button.isVisible()) continue
+  const details = page.getByRole('textbox', { name: 'Project details', exact: true })
+  await details.fill('long-text'.repeat(80))
+  for (const button of await page.locator('.project-rich-text-editor button').all()) {
     const bounds = await button.boundingBox()
     expect(bounds!.x).toBeGreaterThanOrEqual(0)
     expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(320)
   }
-  await page.getByRole('button', { name: 'Preview', exact: true }).click()
-  await expect(page.getByRole('region', { name: 'Project details preview' }).getByRole('heading')).toHaveText('Goals')
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320)
-  await page.getByRole('button', { name: 'Write', exact: true }).click()
-  await expect(page.getByRole('textbox', { name: 'Project details', exact: true })).toHaveValue(/^# Goals/)
+  await page.getByRole('button', { name: 'Heading', exact: true }).click()
+  await expect(details.getByRole('heading')).toHaveText('long-text'.repeat(80))
 })
