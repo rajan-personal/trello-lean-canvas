@@ -29,6 +29,11 @@
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.3.7",
+    "@tiptap/extension-list": "^3.31.3",
+    "@tiptap/markdown": "^3.31.3",
+    "@tiptap/pm": "^3.31.3",
+    "@tiptap/react": "^3.31.3",
+    "@tiptap/starter-kit": "^3.31.3",
     "clsx": "^2.1.1",
     "firebase": "^12.18.0",
     "js-yaml": "^4.1.0",
