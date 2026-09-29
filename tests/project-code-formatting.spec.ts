@@ -18,7 +18,7 @@ test('legacy ticket code uses the same multiline block as project code and saves
   await page.getByRole('tab', { name: 'About', exact: true }).click()
   const details = page.getByRole('textbox', { name: 'Project details', exact: true })
   const block = page.getByRole('button', { name: 'Code block', exact: true })
-  await expect(page.getByRole('button', { name: 'Inline code', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Inline code', exact: true })).toBeVisible()
   await expect(details.locator('pre')).toHaveCount(2)
   const tickets = details.locator('pre').nth(1)
   expect(await tickets.textContent()).toBe(' methods: get, edit\n schema:  title, status')
