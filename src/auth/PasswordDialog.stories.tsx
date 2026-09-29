@@ -21,7 +21,7 @@ export const ChangePassword: Story = { args: { hasPassword: true } }
 export const SavePassword: Story = {
   play: async ({ args }) => {
     const canvas = await fillPassword()
-    await userEvent.click(canvas.getByRole('button', { name: 'Verify with Google and save' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Verify with Google & save' }))
     await expect(args.onSave).toHaveBeenCalledWith('example-password')
     await expect(await canvas.findByRole('heading', { name: 'Password saved' })).toBeVisible()
     await expect(canvas.queryByLabelText('New password')).not.toBeInTheDocument()
@@ -31,7 +31,7 @@ export const MismatchedPasswords: Story = {
   play: async ({ args }) => {
     const canvas = await fillPassword()
     await userEvent.type(canvas.getByLabelText('Confirm password'), 'different')
-    await userEvent.click(canvas.getByRole('button', { name: 'Verify with Google and save' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Verify with Google & save' }))
     await expect(canvas.getByRole('alert')).toHaveTextContent('Passwords do not match.')
     await expect(args.onSave).not.toHaveBeenCalled()
   },
@@ -40,16 +40,16 @@ export const VerificationCancelled: Story = {
   args: { onSave: fn(async () => { throw { code: 'auth/popup-closed-by-user' } }) },
   play: async () => {
     const canvas = await fillPassword()
-    await userEvent.click(canvas.getByRole('button', { name: 'Verify with Google and save' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Verify with Google & save' }))
     await expect(await canvas.findByRole('alert')).toHaveTextContent('Google sign-in was cancelled.')
-    await expect(canvas.getByRole('button', { name: 'Verify with Google and save' })).toBeEnabled()
+    await expect(canvas.getByRole('button', { name: 'Verify with Google & save' })).toBeEnabled()
   },
 }
 export const PendingVerification: Story = {
   args: { onSave: fn(() => new Promise<void>(() => {})) },
   play: async ({ args }) => {
     const canvas = await fillPassword()
-    await userEvent.click(canvas.getByRole('button', { name: 'Verify with Google and save' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Verify with Google & save' }))
     await expect(canvas.getByRole('button', { name: 'Verifying and saving…' })).toBeDisabled()
     await userEvent.keyboard('{Escape}')
     await expect(args.onClose).not.toHaveBeenCalled()

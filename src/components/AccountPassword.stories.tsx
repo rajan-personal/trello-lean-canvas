@@ -21,16 +21,19 @@ export const SetThenChange: Story = {
     }} />
   },
   play: async ({ canvas, userEvent, args }) => {
-    await userEvent.click(canvas.getByRole('button', { name: 'Set password' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Account alex@example.test' }))
+    await userEvent.click(within(document.body).getByRole('menuitem', { name: 'Set password' }))
     const modal = within(await within(document.body).findByRole('dialog'))
     await userEvent.type(modal.getByLabelText('New password'), 'example-password')
     await userEvent.type(modal.getByLabelText('Confirm password'), 'example-password')
-    await userEvent.click(modal.getByRole('button', { name: 'Verify with Google and save' }))
+    await userEvent.click(modal.getByRole('button', { name: 'Verify with Google & save' }))
     await userEvent.click(await modal.findByRole('button', { name: 'Done' }))
     await expect(args.onSetPassword).toHaveBeenCalledWith('example-password')
-    await userEvent.click(canvas.getByRole('button', { name: 'Change password' }))
+    await expect(canvas.getByRole('button', { name: 'Account alex@example.test' })).toHaveFocus()
+    await userEvent.click(canvas.getByRole('button', { name: 'Account alex@example.test' }))
+    await userEvent.click(within(document.body).getByRole('menuitem', { name: 'Change password' }))
     await expect(within(document.body).getByRole('heading', { name: 'Change password' })).toBeVisible()
     await userEvent.keyboard('{Escape}')
-    await expect(canvas.getByRole('button', { name: 'Change password' })).toHaveFocus()
+    await expect(canvas.getByRole('button', { name: 'Account alex@example.test' })).toHaveFocus()
   },
 }

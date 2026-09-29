@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fn, mocked, waitFor } from 'storybook/test'
+import { within, expect, fn, mocked, waitFor } from 'storybook/test'
 import { AccountButton } from './AccountButton'
 
 const meta = {
@@ -16,16 +16,17 @@ export const RejectionAndRetry: Story = {
   play: async ({ args, canvas, userEvent }) => {
     let reject!: (error: Error) => void
     mocked(args.onSignOut).mockImplementationOnce(() => new Promise<void>((_, fail) => { reject = fail }))
-    await userEvent.click(canvas.getByRole('button', { name: 'Sign out Synthetic User' }))
-    const pending = canvas.getByRole('button', { name: 'Signing out Synthetic User' })
+    await userEvent.click(await canvas.findByRole('button', { name: 'Account Synthetic User' }))
+    await userEvent.click(within(document.body).getByRole('menuitem', { name: 'Sign out Synthetic User' }))
+    const pending = within(document.body).getByRole('menuitem', { name: 'Signing out Synthetic User' })
     await expect(pending).toBeDisabled()
     await expect(pending).toHaveAttribute('aria-busy', 'true')
     await userEvent.click(pending)
     await expect(args.onSignOut).toHaveBeenCalledOnce()
     reject(new Error('Synthetic rejection'))
     await expect(await canvas.findByRole('alert')).toHaveTextContent('Sign out failed. Please try again.')
-    await waitFor(() => expect(canvas.getByRole('button', { name: 'Sign out Synthetic User' })).toBeEnabled())
-    await userEvent.click(canvas.getByRole('button', { name: 'Sign out Synthetic User' }))
+    await waitFor(() => expect(within(document.body).getByRole('menuitem', { name: 'Sign out Synthetic User' })).toBeEnabled())
+    await userEvent.click(within(document.body).getByRole('menuitem', { name: 'Sign out Synthetic User' }))
     await expect(args.onSignOut).toHaveBeenCalledTimes(2)
     await expect(canvas.queryByRole('alert')).not.toBeInTheDocument()
   },
@@ -40,12 +41,13 @@ export const RejectionAfterUnmount: Story = {
   play: async ({ args, canvas, userEvent }) => {
     let reject!: (error: Error) => void
     mocked(args.onSignOut).mockImplementationOnce(() => new Promise<void>((_, fail) => { reject = fail }))
-    await userEvent.click(canvas.getByRole('button', { name: 'Sign out Synthetic User' }))
-    await expect(canvas.getByRole('button', { name: 'Signing out Synthetic User' })).toBeDisabled()
+    await userEvent.click(await canvas.findByRole('button', { name: 'Account Synthetic User' }))
+    await userEvent.click(within(document.body).getByRole('menuitem', { name: 'Sign out Synthetic User' }))
+    await expect(within(document.body).getByRole('menuitem', { name: 'Signing out Synthetic User' })).toBeDisabled()
     await userEvent.click(canvas.getByRole('button', { name: 'Toggle account' }))
     reject(new Error('Synthetic late rejection'))
     await userEvent.click(canvas.getByRole('button', { name: 'Toggle account' }))
-    await expect(canvas.getByRole('button', { name: 'Sign out Synthetic User' })).toBeEnabled()
+    await expect(canvas.getByRole('button', { name: 'Account Synthetic User' })).toBeEnabled()
     await expect(canvas.queryByRole('alert')).not.toBeInTheDocument()
     await expect(args.onSignOut).toHaveBeenCalledOnce()
   },

@@ -49,11 +49,19 @@ export const EmailSignIn: Story = {
   },
 }
 export const GoogleOnlySignUp: Story = {
-  play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: 'Sign up' }))
-    await expect(canvas.queryByLabelText('Email')).not.toBeInTheDocument()
-    await expect(canvas.queryByLabelText('Password')).not.toBeInTheDocument()
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText('New here? Create your account with Google.')).toBeVisible()
+    await expect(canvas.queryByRole('button', { name: /sign up/i })).not.toBeInTheDocument()
     await expect(canvas.getByRole('button', { name: 'Continue with Google' })).toBeEnabled()
-    await expect(canvas.getByText(/Create your account with Google/)).toBeVisible()
+  },
+}
+export const PasswordHelp: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const help = canvas.getByRole('button', { name: 'Forgot or haven’t set a password?' })
+    await expect(help).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(help)
+    await expect(canvas.getByText(/open your account menu/)).toBeVisible()
+    await userEvent.click(help)
+    await expect(canvas.queryByText(/open your account menu/)).not.toBeInTheDocument()
   },
 }

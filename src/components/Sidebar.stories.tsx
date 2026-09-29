@@ -1,6 +1,6 @@
 import { SidebarHarness } from './Sidebar.story-support'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fn, waitFor } from 'storybook/test'
+import { within, expect, fn, waitFor } from 'storybook/test'
 import { Sidebar } from './Sidebar'
 import { favoriteCanvas, storyCanvas } from './component-story-fixtures'
 const meta = {
@@ -42,8 +42,9 @@ export const Desktop: Story = {
     await expect(args.onSelect).toHaveBeenCalledWith(storyCanvas.id)
     await expect(canvas.getByRole('button', { name: 'Team alignment' })).toHaveAttribute('aria-current', 'page')
     await expect(args.onClose).toHaveBeenCalledOnce()
+    await userEvent.click(canvas.getByRole('button', { name: 'Account storybook@example.com' }))
     await userEvent.click(
-      canvas.getByRole('button', { name: 'Sign out storybook@example.com' }),
+      within(document.body).getByRole('menuitem', { name: 'Sign out storybook@example.com' }),
     )
     await expect(args.onSignOut).toHaveBeenCalledOnce()
     await expect(canvas.getByText('Signed out')).toBeVisible()
