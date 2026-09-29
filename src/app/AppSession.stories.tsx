@@ -7,7 +7,7 @@ const meta = {
   parameters: { layout: 'fullscreen', docs: { story: { inline: false } } },
   args: { state: {
     user: { uid: 'story-session', displayName: 'Synthetic User', email: null, photoURL: null },
-    busy: false, loading: false, error: null, signIn: fn(async () => {}), signOut: fn(async () => {}),
+    busy: false, loading: false, error: null, signIn: fn(async () => {}), signInWithEmail: fn(async () => {}), setPassword: fn(async () => {}), signOut: fn(async () => {}),
   } },
 } satisfies Meta<typeof SessionFixture>
 export default meta

@@ -14,6 +14,7 @@ interface Props {
   onMove: (id: string, index: number) => void
   user: AppUser
   onSignOut: () => void | Promise<void>
+  onSetPassword?: (password: string) => Promise<void>
   open: boolean
   collapsed: boolean
   onClose: () => void
@@ -86,7 +87,7 @@ export function Sidebar(p: Props) {
           ))}
         </nav>
         <div className="sidebar-footer mt-auto shrink-0 border-t border-white/14 pt-2">
-          <AccountButton user={p.user} onSignOut={p.onSignOut} />
+          <AccountButton user={p.user} onSignOut={p.onSignOut} onSetPassword={p.onSetPassword} />
         </div>
       </aside>
     </>

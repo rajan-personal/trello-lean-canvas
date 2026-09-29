@@ -1,3 +1,5 @@
+import { useRef, useState } from 'react'
+import { PasswordDialog } from '../auth/PasswordDialog'
 import type { AppUser } from '../auth/auth-context'
 import { usePendingAction } from './usePendingAction'
 import { SyncError } from './SyncError'
@@ -5,9 +7,12 @@ import { SyncError } from './SyncError'
 interface Props {
   user: AppUser
   onSignOut: () => void | Promise<void>
+  onSetPassword?: (password: string) => Promise<void>
 }
 
-export function AccountButton({ user, onSignOut }: Props) {
+export function AccountButton({ user, onSignOut, onSetPassword }: Props) {
+  const [passwordOpen, setPasswordOpen] = useState(false)
+  const passwordButton = useRef<HTMLButtonElement>(null)
   const { pending, failed, run } = usePendingAction(onSignOut)
   const name = user.displayName || user.email || 'Google account'
   const email = user.email && user.email !== name ? user.email : null
@@ -51,6 +56,11 @@ export function AccountButton({ user, onSignOut }: Props) {
         {pending ? 'Signing out…' : 'Sign out'}
       </button>
     </div>
+    {onSetPassword && user.email && <button ref={passwordButton} type="button" disabled={pending} onClick={() => setPasswordOpen(true)}
+      className="ml-2 rounded px-2 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-white">
+      {user.hasPassword ? 'Change password' : 'Set password'}
+    </button>}
+    {passwordOpen && onSetPassword && user.email && <PasswordDialog email={user.email} hasPassword={Boolean(user.hasPassword)} onSave={onSetPassword} onClose={() => { setPasswordOpen(false); passwordButton.current?.focus() }} />}
     {failed && <SyncError message="Sign out failed. Please try again." />}</>
   )
 }

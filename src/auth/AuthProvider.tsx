@@ -6,26 +6,17 @@ import {
   onAuthStateChanged,
   setPersistence,
   signInWithPopup,
+  signInWithEmailAndPassword,
   signOut as firebaseSignOut,
 } from 'firebase/auth'
 import { firebaseApp } from '../firebase'
 import { AuthContext, type AppUser } from './auth-context'
+import { authMessage } from './auth-errors'
+import { hasPassword, saveAccountPassword } from './password-account'
 
 const auth = getAuth(firebaseApp)
 const provider = new GoogleAuthProvider()
 provider.setCustomParameters({ prompt: 'select_account' })
-
-function authMessage(error: unknown): string {
-  const code =
-    typeof error === 'object' && error && 'code' in error
-      ? String(error.code)
-      : ''
-  if (code.includes('popup-closed')) return 'Google sign-in was cancelled.'
-  if (code.includes('popup-blocked')) return 'Allow pop-ups and try again.'
-  if (code.includes('unauthorized-domain'))
-    return 'This site is not authorized for Google sign-in.'
-  return 'Google sign-in failed. Please try again.'
-}
 
 function toAppUser(user: typeof auth.currentUser): AppUser | null {
   if (!user) return null
@@ -34,6 +25,7 @@ function toAppUser(user: typeof auth.currentUser): AppUser | null {
     displayName: user.displayName,
     email: user.email,
     photoURL: user.photoURL,
+    hasPassword: hasPassword(user),
   }
 }
 
@@ -45,7 +37,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     void setPersistence(auth, browserLocalPersistence)
     return onAuthStateChanged(auth, (nextUser) => {
-      setUser(toAppUser(nextUser))
+      if (nextUser && !nextUser.providerData.some(({ providerId }) => providerId === 'google.com')) {
+        setUser(null)
+        setError('Please create your account with Google first.')
+        void firebaseSignOut(auth).catch(() => setError('Please sign out and continue with Google.'))
+      } else setUser(toAppUser(nextUser))
       setLoading(false)
     })
   }, [])
@@ -65,6 +61,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
         } finally {
           setBusy(false)
         }
+      },
+      signInWithEmail: async (email: string, password: string) => {
+        setBusy(true)
+        setError(null)
+        try { await signInWithEmailAndPassword(auth, email.trim(), password) }
+        catch (cause) { setError(authMessage(cause)) }
+        finally { setBusy(false) }
+      },
+      setPassword: async (password: string) => {
+        const current = auth.currentUser
+        if (!current) throw new Error('Please sign in again.')
+        await saveAccountPassword(current, password)
+        setUser(toAppUser(current))
       },
       signOut: async () => {
         setBusy(true)
