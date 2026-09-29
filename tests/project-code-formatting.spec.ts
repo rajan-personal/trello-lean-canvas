@@ -6,33 +6,41 @@ test.beforeEach(async ({ page }) => {
   await page.route('https://fonts.googleapis.com/**', (route) => route.abort())
 })
 
-test('code controls distinguish snippets from blocks and preserve edits on reload', async ({ page }) => {
+test('legacy ticket code uses the same multiline block as project code and saves as a block', async ({ page }) => {
   await loadSamples(page)
+  const markdown = '**projects:**\n\n```\nmethods: create, get\nschema:  title, about\n```\n\n**tickets:**\n\n `methods: get, edit`\n\n `schema:  title, status`\n\nUse `project_id` in a sentence.'
+  await page.evaluate((about) => {
+    const canvases = JSON.parse(localStorage.getItem('lean-canvas:v2')!)
+    canvases[0].about = about
+    localStorage.setItem('lean-canvas:v2', JSON.stringify(canvases))
+  }, markdown)
+  await page.reload()
   await page.getByRole('tab', { name: 'About', exact: true }).click()
   const details = page.getByRole('textbox', { name: 'Project details', exact: true })
-  const inline = page.getByRole('button', { name: 'Inline code', exact: true })
   const block = page.getByRole('button', { name: 'Code block', exact: true })
-  await expect(inline).toHaveText('Inline code')
-  await expect(block).toHaveText('Code block')
-  await details.fill('methods: get, edit, add_comments')
-  await details.press('ControlOrMeta+A')
-  await inline.click()
-  await expect(details.locator('p > code')).toHaveText('methods: get, edit, add_comments')
-  await expect(inline).toHaveAttribute('aria-pressed', 'true')
-  await block.click()
-  await expect(details.locator('pre > code')).toHaveText('methods: get, edit, add_comments')
+  await expect(page.getByRole('button', { name: 'Inline code', exact: true })).toHaveCount(0)
+  await expect(details.locator('pre')).toHaveCount(2)
+  const tickets = details.locator('pre').nth(1)
+  expect(await tickets.textContent()).toBe(' methods: get, edit\n schema:  title, status')
+  await expect(details.locator('p > code')).toHaveText('project_id')
+  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeDisabled()
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('lean-canvas:v2')!)[0].about)).toBe(markdown)
+  const boxes = await details.locator('pre').evaluateAll((elements) => elements.map((el) => ({
+    width: el.getBoundingClientRect().width, padding: getComputedStyle(el).padding,
+    background: getComputedStyle(el).backgroundColor, border: getComputedStyle(el).border,
+  })))
+  expect(boxes[0]).toEqual(boxes[1])
+  await tickets.click()
   await expect(block).toHaveAttribute('aria-pressed', 'true')
-  await expect(inline).toBeDisabled()
+  await block.click()
+  await expect(details.locator('pre')).toHaveCount(1)
+  await page.getByRole('button', { name: 'Undo', exact: true }).click()
+  await expect(details.locator('pre')).toHaveCount(2)
   await page.getByRole('button', { name: 'Save', exact: true }).click()
   await expect(page.getByRole('status').filter({ hasText: 'All changes saved' })).toBeVisible()
   await page.reload()
-  await expect(details.locator('pre > code')).toHaveText('methods: get, edit, add_comments')
-  await details.locator('pre').click()
-  await block.click()
-  await expect(details.locator('pre')).toHaveCount(0)
-  await expect(inline).toBeEnabled()
-  await page.getByRole('button', { name: 'Undo', exact: true }).click()
-  await expect(details.locator('pre > code')).toHaveText('methods: get, edit, add_comments')
+  await expect(details.locator('pre')).toHaveCount(2)
+  expect(await details.locator('pre').nth(1).textContent()).toBe(' methods: get, edit\n schema:  title, status')
 })
 
 for (const surface of ['About', 'Notepad'] as const) {

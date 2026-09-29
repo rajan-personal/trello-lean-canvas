@@ -1,5 +1,5 @@
 import { useEditorState, type Editor } from '@tiptap/react'
-import { Bold, Italic, Strikethrough, Heading2, List, ListOrdered, ListChecks, Quote, Code, SquareCode, Undo2, Redo2 } from 'lucide-react'
+import { Bold, Italic, Strikethrough, Heading2, List, ListOrdered, ListChecks, Quote, SquareCode, Undo2, Redo2 } from 'lucide-react'
 import { RichTextLinkControl } from './RichTextLinkControl'
 
 const formatting = [
@@ -11,22 +11,19 @@ const formatting = [
   { label: 'Numbered list', icon: ListOrdered, active: 'orderedList', run: (e: Editor) => e.chain().focus().toggleOrderedList().run() },
   { label: 'Checklist', icon: ListChecks, active: 'taskList', run: (e: Editor) => e.chain().focus().toggleTaskList().run() },
   { label: 'Quote', icon: Quote, active: 'blockquote', run: (e: Editor) => e.chain().focus().toggleBlockquote().run() },
-  { label: 'Inline code', icon: Code, active: 'code', description: 'Inline code for a word or short snippet', run: (e: Editor) => e.chain().focus().toggleCode().run() },
   { label: 'Code block', icon: SquareCode, active: 'codeBlock', description: 'Code block for multiple lines; preserves spacing', run: (e: Editor) => e.chain().focus().toggleCodeBlock().run() },
 ]
 
 export function RichTextToolbar({ editor, disabled }: { editor: Editor; disabled: boolean }) {
   const state = useEditorState({ editor, selector: ({ editor }) => ({
     active: formatting.map(({ active }) => editor.isActive(active)),
-    canInlineCode: editor.can().toggleCode(),
     link: editor.isActive('link'), undo: editor.can().undo(), redo: editor.can().redo(),
   }) })
   return <fieldset disabled={disabled} className="rich-text-toolbar">
     <legend className="sr-only">Text formatting</legend>
     <div className="rich-text-buttons">
-      {formatting.map(({ label, icon: Icon, active, description, run }, index) =>
+      {formatting.map(({ label, icon: Icon, description, run }, index) =>
         <button key={label} type="button" aria-label={description ? undefined : label} title={description ?? label} aria-pressed={state.active[index]}
-          disabled={active === 'code' && !state.canInlineCode}
           className={description ? 'rich-text-code-button' : undefined}
           onClick={() => run(editor)}><Icon size={18} aria-hidden="true" />{description && <span>{label}</span>}</button>)}
       <RichTextLinkControl editor={editor} active={state.link} />
