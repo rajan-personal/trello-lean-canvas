@@ -24,6 +24,7 @@
 .rich-text-buttons button:hover { background: #f1f2f4; }
 .rich-text-buttons button[aria-pressed="true"] { background: #e9f2ff; color: #0055cc; }
 .rich-text-buttons button:disabled { opacity: 0.4; cursor: default; }
+.rich-text-code-button { gap: 6px; font-size: 0.75rem; font-weight: 500; white-space: nowrap; }
 .project-rich-text-editor:focus-within { outline: 2px solid #0c66e4; outline-offset: 2px; }
 .rich-text-buttons :focus-visible { outline: 2px solid #0c66e4; outline-offset: -2px; }
 .project-rich-text-content { display: flex; flex: 1; min-height: 0; overflow-y: auto; }
@@ -49,9 +50,40 @@
 .project-rich-text-content li > p { margin-bottom: 0; }
 .project-rich-text-content a { color: #0055cc; text-decoration: underline; }
 .project-rich-text-content blockquote { border-left: 3px solid #8590a2; padding-left: 1em; color: #626f86; }
-.project-rich-text-content code { background: #f1f2f4; border-radius: 3px; padding: 2px 4px; font-family: monospace; }
-.project-rich-text-content pre { overflow-x: auto; padding: 12px; background: #f1f2f4; border-radius: 4px; }
-.project-rich-text-content pre code { padding: 0; }
+.project-rich-text-content :is(code, pre) {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-style: normal;
+  color: #172b4d;
+  background: #f1f2f4;
+}
+.project-rich-text-content code {
+  border: 1px solid #d0d5dd;
+  border-radius: 4px;
+  padding: 0.1em 0.3em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.project-rich-text-content .tiptap pre {
+  max-width: 100%;
+  margin: 0.5em 0;
+  overflow-x: auto;
+  padding: 12px 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  line-height: 1.6;
+  tab-size: 4;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+.project-rich-text-content pre code {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font: inherit;
+}
 .project-rich-text-content hr { margin: 1em 0; border-top: 1px solid #8590a2; }
 .project-rich-text-content ul[data-type="taskList"] { list-style: none; padding-left: 0; }
 .project-rich-text-content li[data-type="taskItem"] { display: flex; align-items: baseline; gap: 8px; }

@@ -1,15 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import { Markdown } from '@tiptap/markdown'
-import { TaskItem, TaskList } from '@tiptap/extension-list'
+import { parseProjectText, projectTextExtensions } from './project-rich-text-document'
 import { RichTextToolbar } from './RichTextToolbar'
 import './project-rich-text-editor.css'
-
-const extensions = [
-  StarterKit.configure({ underline: false, link: { openOnClick: false }, trailingNode: false }),
-  TaskList, TaskItem.configure({ nested: true }), Markdown,
-]
 
 interface Props {
   id: string
@@ -22,10 +15,10 @@ interface Props {
 
 export default function ProjectRichTextEditor({ id, value, disabled, invalid, focus = false, onChange }: Props) {
   const lastValue = useRef(value)
+  const [initialContent] = useState(() => parseProjectText(value))
   const editor = useEditor({
-    extensions,
-    content: value,
-    contentType: 'markdown',
+    extensions: projectTextExtensions,
+    content: initialContent,
     editable: !disabled,
     onUpdate: ({ editor }) => {
       lastValue.current = editor.isEmpty ? '' : editor.getMarkdown()
@@ -35,7 +28,7 @@ export default function ProjectRichTextEditor({ id, value, disabled, invalid, fo
   // Apply cloud updates and discarded drafts without resetting the selection on each keystroke.
   useEffect(() => {
     if (editor && !editor.isDestroyed && value !== lastValue.current) {
-      editor.commands.setContent(value, { contentType: 'markdown', emitUpdate: false })
+      editor.commands.setContent(parseProjectText(value), { emitUpdate: false })
       lastValue.current = value
     }
   }, [editor, value])
