@@ -1,6 +1,6 @@
 # Email login UI proof
 
-Updated after the minimal-UI review of PR #25. Captured from built Storybook with synthetic `alex@example.test` data and mocked authentication callbacks. No production account or Google credentials are used.
+Updated after the minimal-UI and default-theme reviews of PR #25. The compact screens and account menu use the app’s existing blue palette, typography, inputs, buttons, dialog, and menu styling. Captured from built Storybook with synthetic `alex@example.test` data and mocked authentication callbacks. No production account or Google credentials are used.
 
 | Image | UI state |
 | --- | --- |
@@ -21,7 +21,7 @@ Reproduce with `npm run build-storybook`, serve `storybook-static`, and open its
 - `screens-workspace-account--desktop` (expand the account email; on mobile open the sidebar first)
 - `screens-workspace-account--with-password` (expand the email and choose Change password)
 
-Validation: `npm run typecheck`, `npm run lint`, `npm run build`, `npm run build-storybook`, and all 115 unit tests pass. The focused browser suite passes 38 stories across 12 affected files. Coverage includes account-menu arrows/Home/End, Tab/outside/Escape dismissal, focus restoration, pending-signout Escape, menu bounds, sign-out failure/retry, optional recovery help, and password save flows. Workspace stories run with one worker because their existing localStorage fixtures share keys.
+For the styling-only default-theme correction, `npm run typecheck`, `npm run lint`, `npm run build`, `npm run build-storybook`, and visual screenshot review pass. Behavior is unchanged; the preceding revision passed all 115 unit tests and 38 focused browser stories across 12 affected files. Coverage includes account-menu arrows/Home/End, Tab/outside/Escape dismissal, focus restoration, pending-signout Escape, menu bounds, sign-out failure/retry, optional recovery help, and password save flows. Workspace stories run with one worker because their existing localStorage fixtures share keys.
 
 The sandbox's default Playwright browser download was unavailable; browser checks ran with an npm-packaged Chromium executable through a temporary local Vitest launch override. Dependencies were restored with `npm ci` before tests. The override and browser package are not part of the change.
 

@@ -22,20 +22,20 @@ function GoogleMark() {
 export function LoginScreen({ busy, error, onSignIn, onEmailSignIn }: Props) {
   const [emailPending, setEmailPending] = useState(false)
   return (
-    <main className="grid min-h-dvh place-items-center bg-white px-6 py-10 text-[#18181b]">
-      <section className="w-full max-w-[320px]">
-        <h1 className="text-center text-xl font-semibold tracking-tight">Sign in to Lean Canvas</h1>
+    <main className="grid min-h-dvh place-items-center bg-linear-[135deg,#0747a6_0%,#0c66e4_48%,#579dff_100%] p-5 text-[#172b4d]">
+      <section className="w-full max-w-[420px] rounded-3xl border border-white/35 bg-white p-8 shadow-[0_24px_70px_rgba(9,30,66,0.35)]">
+        <h1 className="text-center text-2xl font-bold tracking-[-0.04em]">Sign in to Lean Canvas</h1>
         <button type="button" onClick={() => { setEmailPending(false); onSignIn() }} disabled={busy}
           aria-busy={busy && !emailPending}
-          className="mt-6 flex min-h-10 w-full items-center justify-center gap-2 rounded-md border border-[#e4e4e7] bg-white px-3 text-sm font-medium hover:bg-[#f4f4f5] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#18181b] disabled:opacity-50">
+          className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#c7d1e0] bg-white px-5 text-sm font-semibold shadow-sm transition hover:bg-[#f7f8f9] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4] disabled:cursor-wait disabled:opacity-65">
           <GoogleMark />{busy && !emailPending ? 'Connecting to Google…' : 'Continue with Google'}
         </button>
-        <p className="mt-2 text-center text-xs text-[#71717a]">New here? Create your account with Google.</p>
-        <div className="my-5 flex items-center gap-3 text-xs text-[#71717a]"><span className="h-px flex-1 bg-[#e4e4e7]" />or<span className="h-px flex-1 bg-[#e4e4e7]" /></div>
+        <p className="mt-2 text-center text-xs text-[#626f86]">New here? Create your account with Google.</p>
+        <div className="my-5 flex items-center gap-3 text-xs text-[#626f86]"><span className="h-px flex-1 bg-[#dcdfe4]" />or<span className="h-px flex-1 bg-[#dcdfe4]" /></div>
         <EmailSignInForm busy={busy} pending={busy && emailPending}
           onSignIn={(email, password) => { setEmailPending(true); onEmailSignIn(email, password) }} />
         <p role="status" aria-atomic="true" className="sr-only">{busy ? emailPending ? 'Signing in with email…' : 'Connecting to Google…' : ''}</p>
-        {error && <p className="mt-4 text-sm text-[#b91c1c]" role="alert">{error}</p>}
+        {error && <p className="mt-4 text-sm text-[#ae2e24]" role="alert">{error}</p>}
       </section>
     </main>
   )

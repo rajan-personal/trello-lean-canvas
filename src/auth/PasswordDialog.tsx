@@ -24,16 +24,16 @@ export function PasswordDialog({ email, hasPassword, onSave, onClose }: Props) {
     return () => dialog?.close()
   }, [])
   return <dialog ref={ref} aria-labelledby="password-title" aria-describedby="password-account"
-    className="m-auto max-h-[calc(100dvh-40px)] w-[calc(100%-40px)] max-w-[360px] overflow-y-auto rounded-lg border border-[#e4e4e7] bg-white p-5 text-[#18181b] shadow-lg backdrop:bg-black/40"
+    className="m-auto max-h-[calc(100dvh-40px)] w-[calc(100%-40px)] max-w-[440px] overflow-y-auto rounded-xl border-0 bg-white p-5 text-[#172b4d] shadow-[0_10px_30px_rgba(9,30,66,0.35)] backdrop:bg-[rgba(9,30,66,0.54)]"
     onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); if (!busy) close() } }}
     onCancel={(event) => { event.preventDefault(); if (!busy) close() }}>
     <div className="flex items-center justify-between gap-4">
-      <h2 id="password-title" className="text-base font-semibold">{saved ? 'Password saved' : title}</h2>
+      <h2 id="password-title" className="text-xl font-bold">{saved ? 'Password saved' : title}</h2>
       <button type="button" aria-label="Close password settings" disabled={busy} onClick={close}
-        className="rounded p-1 hover:bg-[#f1f2f4] focus-visible:outline-2 focus-visible:outline-[#0c66e4] disabled:opacity-50"><X size={20} /></button>
+        className="grid size-8 place-items-center rounded-md border-0 bg-transparent p-0 hover:bg-[#f1f2f4] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#0c66e4] disabled:opacity-65"><X size={20} /></button>
     </div>
-    <p id="password-account" className="mt-1 break-all text-sm text-[#71717a]">{email}</p>
-    {saved ? <><p role="status" className="mt-4 text-sm text-[#71717a]">You can now sign in with email.</p>
+    <p id="password-account" className="mt-1 break-all text-sm text-[#626f86]">{email}</p>
+    {saved ? <><p role="status" className="mt-4 text-sm text-[#626f86]">You can now sign in with email.</p>
       <button type="button" className={`${authSubmitClass} mt-5`} onClick={close}>Done</button></> :
       <form className="mt-5 space-y-4" onSubmit={async (event) => {
         event.preventDefault()
@@ -45,12 +45,12 @@ export function PasswordDialog({ email, hasPassword, onSave, onClose }: Props) {
         finally { setBusy(false) }
       }}>
         <input type="text" name="username" autoComplete="username" value={email} readOnly hidden />
-        <label className="block text-sm font-medium">New password
+        <label className="block text-sm font-semibold">New password
           <input className={authInputClass} name="new-password" type="password" autoComplete="new-password" minLength={8} required disabled={busy}
             aria-describedby="password-requirements" value={password} onChange={(event) => setPassword(event.target.value)} />
         </label>
-        <p id="password-requirements" className="text-xs text-[#71717a]">At least 8 characters.</p>
-        <label className="block text-sm font-medium">Confirm password
+        <p id="password-requirements" className="text-xs text-[#626f86]">At least 8 characters.</p>
+        <label className="block text-sm font-semibold">Confirm password
           <input className={authInputClass} name="confirm-password" type="password" autoComplete="new-password" minLength={8} required disabled={busy}
             value={confirm} onChange={(event) => setConfirm(event.target.value)} />
         </label>
