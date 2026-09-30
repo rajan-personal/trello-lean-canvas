@@ -8,10 +8,14 @@ test('About converts only selected text and preserves it after saving', async ({
   const editor = page.getByRole('textbox', { name: 'Project details', exact: true })
   const text = 'Keep this introduction. Run npm test before saving. Keep this conclusion.'
   await editor.fill(text)
+  await expect(editor).toHaveText(text)
   // Select the middle sentence with the keyboard, then use the real toolbar.
-  await editor.press('Home')
-  for (let index = 0; index < 'Keep this introduction. '.length; index++) await editor.press('ArrowRight')
-  for (let index = 0; index < 'Run npm test before saving.'.length; index++) await editor.press('Shift+ArrowRight')
+  await editor.click()
+  await page.keyboard.press('Control+Home')
+  for (let index = 0; index < 'Keep this introduction. '.length; index++) await page.keyboard.press('ArrowRight')
+  await page.keyboard.down('Shift')
+  for (let index = 0; index < 'Run npm test before saving.'.length; index++) await page.keyboard.press('ArrowRight')
+  await page.keyboard.up('Shift')
   expect(await page.evaluate(() => window.getSelection()?.toString())).toBe('Run npm test before saving.')
   await page.screenshot({ path: testInfo.outputPath('01-selected-text.png') })
   await page.getByRole('button', { name: 'Code block', exact: true }).click()
