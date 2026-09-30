@@ -26,7 +26,12 @@ async function selectText(editor: HTMLElement, start: Node, from: number, end: N
   selection.removeAllRanges()
   selection.addRange(range)
   document.dispatchEvent(new Event('selectionchange'))
-  await waitFor(() => expect(selection.toString()).toBe(range.toString()))
+  await waitFor(() => {
+    expect(selection.anchorNode).toBe(start)
+    expect(selection.anchorOffset).toBe(from)
+    expect(selection.focusNode).toBe(end)
+    expect(selection.focusOffset).toBe(to)
+  })
 }
 
 export const SelectedText: Story = {
