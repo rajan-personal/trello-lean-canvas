@@ -11,7 +11,7 @@
   "auth": {
     "providers": {
       "anonymous": false,
-      "emailPassword": false,
+      "emailPassword": true,
       "googleSignIn": {
         "oAuthBrandDisplayName": "Lean Canvas",
         "supportEmail": "bittu15388@gmail.com"

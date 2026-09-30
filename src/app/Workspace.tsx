@@ -23,10 +23,11 @@ import { useWorkspaceTicketList } from './useWorkspaceTicketList'
 interface Props {
   user: AppUser
   onSignOut: () => void | Promise<void>
+  onSetPassword?: (password: string) => Promise<void>
   persistence?: 'firestore' | 'local'
   browserRouting?: boolean
 }
-export function Workspace({ user, onSignOut, persistence, browserRouting = false }: Props) {
+export function Workspace({ user, onSignOut, onSetPassword, persistence, browserRouting = false }: Props) {
   const { history, route, allTickets, view, projectId, ticketId } = useWorkspaceRoute(browserRouting)
   const state = useCanvasState(user.uid, persistence, view === 'board', {
     id: projectId,
@@ -67,6 +68,7 @@ export function Workspace({ user, onSignOut, persistence, browserRouting = false
           onMove={(id, index) => { if (allow()) commands.moveCanvas(id, index) }}
           user={user}
           onSignOut={signOut}
+          onSetPassword={onSetPassword}
           open={panels.sidebarOpen}
           collapsed={panels.sidebarCollapsed}
           onClose={panels.closeSidebar}

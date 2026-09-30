@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fn, mocked, waitFor } from 'storybook/test'
+import { within, expect, fn, mocked, waitFor } from 'storybook/test'
 import { SidebarHarness } from './Sidebar.story-support'
 import { storyCanvas } from './component-story-fixtures'
 
@@ -19,8 +19,9 @@ export const PendingFailureAndRetry: Story = {
   play: async ({ args, canvas, userEvent }) => {
     let reject!: (error: Error) => void
     mocked(args.onSignOut).mockImplementationOnce(() => new Promise<void>((_, fail) => { reject = fail }))
-    await userEvent.click(canvas.getByRole('button', { name: 'Sign out reviewer@example.test' }))
-    const pending = canvas.getByRole('button', { name: 'Signing out reviewer@example.test' })
+    await userEvent.click(await canvas.findByRole('button', { name: 'Account reviewer@example.test' }))
+    await userEvent.click(within(document.body).getByRole('menuitem', { name: 'Sign out reviewer@example.test' }))
+    const pending = within(document.body).getByRole('menuitem', { name: 'Signing out reviewer@example.test' })
     await expect(pending).toBeDisabled()
     await expect(pending).toHaveAttribute('aria-busy', 'true')
     await userEvent.click(pending)
@@ -28,7 +29,7 @@ export const PendingFailureAndRetry: Story = {
     reject(new Error('Local sign-out failure'))
     await waitFor(() => expect(canvas.getByRole('alert')).toBeVisible())
     await expect(canvas.getByRole('button', { name: 'Team alignment' })).toBeVisible()
-    await userEvent.click(canvas.getByRole('button', { name: 'Sign out reviewer@example.test' }))
+    await userEvent.click(within(document.body).getByRole('menuitem', { name: 'Sign out reviewer@example.test' }))
     await expect(await canvas.findByText('Signed out')).toBeVisible()
     await expect(canvas.queryByRole('navigation')).not.toBeInTheDocument()
   },

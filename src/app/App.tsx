@@ -26,11 +26,13 @@ function WorkspaceScreen({
   local = false,
   browserRouting = false,
   onSignOut,
+  onSetPassword,
 }: {
   user: AppUser
   local?: boolean
   browserRouting?: boolean
   onSignOut: () => void | Promise<void>
+  onSetPassword?: (password: string) => Promise<void>
 }) {
   return (
     <Suspense fallback={<AppStatus />}>
@@ -38,6 +40,7 @@ function WorkspaceScreen({
         user={user}
         browserRouting={browserRouting}
         onSignOut={onSignOut}
+        onSetPassword={onSetPassword}
         persistence={local ? 'local' : 'firestore'}
       />
     </Suspense>
@@ -53,6 +56,7 @@ export function AuthenticatedApp({ local = false, browserRouting = false }: { lo
         busy={auth.busy}
         error={auth.error}
         onSignIn={() => void auth.signIn()}
+        onEmailSignIn={(email, password) => void auth.signInWithEmail(email, password)}
       />
     )
   return (
@@ -62,6 +66,7 @@ export function AuthenticatedApp({ local = false, browserRouting = false }: { lo
       local={local}
       browserRouting={browserRouting}
       onSignOut={() => auth.signOut()}
+      onSetPassword={auth.setPassword}
     />
     {auth.error && <SyncError message={auth.error} />}</>
   )

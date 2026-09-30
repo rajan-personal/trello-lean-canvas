@@ -9,7 +9,7 @@ A strict TypeScript Lean Canvas workspace with Trello-style editing. Start with 
 - Write project overviews, goals, and links in the **About** tab in a single rich-text editor with a formatting toolbar and explicit **Save** button
 - Keep separate project notes in the resizable **Notepad**, using the same rich-text tools as About with automatic saving
 - Add, edit, delete, clear, and drag cards between all 12 canvas sections
-- Sign in only with Google and sync each user's canvases privately with Cloud Firestore
+- Sign up with Google; sign in with Google or email/password and sync each user's canvases privately with Cloud Firestore
 - Discuss tasks in a shared user/agent comment thread; see [agent setup and CLI](docs/task-comments.md)
 - Download the current canvas as a portable YAML file
 - Upload additional YAML canvases
@@ -27,7 +27,7 @@ npm run dev
 
 Use Node.js 22.12 or newer (compatible with Vite and local Wrangler). Then open `http://127.0.0.1:5173`. The checked-in Firebase web configuration targets `trello-lean-canvas-7kvrv`; it contains public client identifiers only. You can override it with `VITE_FIREBASE_*` variables in `.env.local`.
 
-Google is the only enabled sign-in provider. Firestore stores ordering metadata at `users/{uid}/workspaces/default` and each canvas independently under its `canvases/{canvasId}` subcollection. Runtime Zod schemas reject malformed local or cloud data before it reaches application state.
+Account creation in the app uses Google only. Existing Google users can set a password from the sidebar, then sign in with either Google or email/password. Setting or changing a password requires Google verification and retains the same Firebase UID and workspace. See [email sign-in setup](docs/email-sign-in.md). Firestore stores ordering metadata at `users/{uid}/workspaces/default` and each canvas independently under its `canvases/{canvasId}` subcollection. Runtime Zod schemas reject malformed local or cloud data before it reaches application state.
 
 On first sign-in after this schema upgrade, the app idempotently copies and verifies canvases from the former workspace-array document before replacing it with the metadata document. Existing `lean-canvas:v2` browser data follows the same verified path for an empty cloud workspace. Local migration and recovery copies remain until cloud persistence succeeds. Concurrent edits to different canvases are isolated; simultaneous edits to the same canvas remain last-writer-wins.
 
@@ -36,7 +36,7 @@ On first sign-in after this schema upgrade, the app idempotently copies and veri
 The frontend is hosted on Cloudflare Workers Static Assets at `lean.addorimprove.com`, with SPA navigation fallback for clean project/ticket URLs. Firebase continues to supply Authentication and Firestore only; no backend Worker is needed. See [the deployment and rollback checklist](docs/cloudflare-hosting.md) before publishing.
 
 ```bash
-# Deploy Google Auth configuration, Firestore rules, and indexes
+# Deploy Google and email/password Auth configuration, Firestore rules, and indexes
 npm run deploy:firebase
 
 # Validate the frontend without publishing

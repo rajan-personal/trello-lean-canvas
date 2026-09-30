@@ -1,7 +1,11 @@
+import { useState } from 'react'
+import { EmailSignInForm } from './EmailSignInForm'
+
 interface Props {
   busy: boolean
   error: string | null
   onSignIn: () => void
+  onEmailSignIn: (email: string, password: string) => void
 }
 
 function GoogleMark() {
@@ -15,30 +19,23 @@ function GoogleMark() {
   )
 }
 
-export function LoginScreen({ busy, error, onSignIn }: Props) {
+export function LoginScreen({ busy, error, onSignIn, onEmailSignIn }: Props) {
+  const [emailPending, setEmailPending] = useState(false)
   return (
-    <main className="grid min-h-dvh place-items-center bg-linear-[135deg,#0747a6_0%,#0c66e4_48%,#579dff_100%] p-5">
-      <section className="w-full max-w-[420px] rounded-3xl border border-white/35 bg-white p-8 text-center shadow-[0_24px_70px_rgba(9,30,66,0.35)] sm:p-10">
-        <div className="mx-auto mb-5 grid size-14 place-items-center rounded-2xl bg-[#0c66e4] text-2xl font-bold text-white shadow-lg">
-          L
-        </div>
-        <h1 className="text-3xl font-bold tracking-[-0.04em] text-[#172b4d]">Lean Canvas</h1>
-        <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-[#44546f]">
-          Shape, test, and sync your business model from one focused workspace.
-        </p>
-        <button
-          type="button"
-          onClick={onSignIn}
-          disabled={busy}
-          aria-busy={busy}
-          className="mt-8 inline-flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#c7d1e0] bg-white px-5 font-semibold text-[#172b4d] shadow-sm transition hover:bg-[#f7f8f9] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4] disabled:cursor-wait disabled:opacity-65"
-        >
-          <GoogleMark />
-          {busy ? 'Connecting to Google…' : 'Continue with Google'}
+    <main className="grid min-h-dvh place-items-center bg-linear-[135deg,#0747a6_0%,#0c66e4_48%,#579dff_100%] p-5 text-[#172b4d]">
+      <section className="w-full max-w-[420px] rounded-3xl border border-white/35 bg-white p-8 shadow-[0_24px_70px_rgba(9,30,66,0.35)]">
+        <h1 className="text-center text-2xl font-bold tracking-[-0.04em]">Sign in to Lean Canvas</h1>
+        <button type="button" onClick={() => { setEmailPending(false); onSignIn() }} disabled={busy}
+          aria-busy={busy && !emailPending}
+          className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#c7d1e0] bg-white px-5 text-sm font-semibold shadow-sm transition hover:bg-[#f7f8f9] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4] disabled:cursor-wait disabled:opacity-65">
+          <GoogleMark />{busy && !emailPending ? 'Connecting to Google…' : 'Continue with Google'}
         </button>
-        <p role="status" aria-atomic="true" className="sr-only">{busy ? 'Connecting to Google…' : ''}</p>
-        {error && <p className="mt-4 text-sm font-medium text-[#ae2e24]" role="alert">{error}</p>}
-        <p className="mt-7 text-xs leading-5 text-[#626f86]">Your canvases are private and synced to your Google account.</p>
+        <p className="mt-2 text-center text-xs text-[#626f86]">New here? Create your account with Google.</p>
+        <div className="my-5 flex items-center gap-3 text-xs text-[#626f86]"><span className="h-px flex-1 bg-[#dcdfe4]" />or<span className="h-px flex-1 bg-[#dcdfe4]" /></div>
+        <EmailSignInForm busy={busy} pending={busy && emailPending}
+          onSignIn={(email, password) => { setEmailPending(true); onEmailSignIn(email, password) }} />
+        <p role="status" aria-atomic="true" className="sr-only">{busy ? emailPending ? 'Signing in with email…' : 'Connecting to Google…' : ''}</p>
+        {error && <p className="mt-4 text-sm text-[#ae2e24]" role="alert">{error}</p>}
       </section>
     </main>
   )

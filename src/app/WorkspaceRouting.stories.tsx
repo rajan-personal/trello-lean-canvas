@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fn, spyOn } from 'storybook/test'
+import { within, expect, fn, spyOn } from 'storybook/test'
 import { Workspace } from './Workspace'
 import { WorkspaceSeed } from './SeededWorkspace.story-support'
 import { blankCanvas } from './App.story-support'
@@ -52,7 +52,8 @@ export const DirtyDraftNavigation: Story = {
       await expect(confirm).toHaveBeenCalled()
       await expect(canvas.getByRole('tab', { name: 'Tickets' })).toHaveFocus()
       await expect(canvas.getByRole('textbox', { name: 'Card title' })).toHaveValue('Keep this draft')
-      await userEvent.click(canvas.getByRole('button', { name: 'Sign out alex@example.test' }))
+      await userEvent.click(await canvas.findByRole('button', { name: 'Account alex@example.test' }))
+      await userEvent.click(within(document.body).getByRole('menuitem', { name: 'Sign out alex@example.test' }))
       await expect(args.onSignOut).not.toHaveBeenCalled()
       await expect(canvas.getByRole('textbox', { name: 'Card title' })).toHaveValue('Keep this draft')
       confirm.mockReturnValue(true)

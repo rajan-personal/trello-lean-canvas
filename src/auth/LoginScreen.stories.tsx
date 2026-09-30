@@ -6,7 +6,7 @@ const meta = {
   title: 'Screens/Login',
   component: LoginScreen,
   parameters: { layout: 'fullscreen' },
-  args: { busy: false, error: null, onSignIn: fn() },
+  args: { busy: false, error: null, onSignIn: fn(), onEmailSignIn: fn() },
 } satisfies Meta<typeof LoginScreen>
 
 export default meta
@@ -36,5 +36,32 @@ export const Busy: Story = {
     await userEvent.click(button)
     await expect(args.onSignIn).not.toHaveBeenCalled()
     await expect(canvas.getByRole('status')).toHaveTextContent('Connecting to Google…')
+  },
+}
+
+export const EmailSignIn: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.type(canvas.getByLabelText('Email'), 'alex@example.test')
+    await userEvent.type(canvas.getByLabelText('Password'), 'example-password')
+    await userEvent.click(canvas.getByRole('button', { name: 'Sign in with email' }))
+    await expect(args.onEmailSignIn).toHaveBeenCalledWith('alex@example.test', 'example-password')
+    await expect(args.onSignIn).not.toHaveBeenCalled()
+  },
+}
+export const GoogleOnlySignUp: Story = {
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText('New here? Create your account with Google.')).toBeVisible()
+    await expect(canvas.queryByRole('button', { name: /sign up/i })).not.toBeInTheDocument()
+    await expect(canvas.getByRole('button', { name: 'Continue with Google' })).toBeEnabled()
+  },
+}
+export const PasswordHelp: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const help = canvas.getByRole('button', { name: 'Forgot or haven’t set a password?' })
+    await expect(help).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(help)
+    await expect(canvas.getByText(/open your account menu/)).toBeVisible()
+    await userEvent.click(help)
+    await expect(canvas.queryByText(/open your account menu/)).not.toBeInTheDocument()
   },
 }

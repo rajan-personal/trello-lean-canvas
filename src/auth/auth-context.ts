@@ -5,6 +5,7 @@ export interface AppUser {
   displayName: string | null
   email: string | null
   photoURL: string | null
+  hasPassword?: boolean
 }
 
 export interface AuthState {
@@ -13,6 +14,8 @@ export interface AuthState {
   busy: boolean
   error: string | null
   signIn: () => Promise<void>
+  signInWithEmail: (email: string, password: string) => Promise<void>
+  setPassword: (password: string) => Promise<void>
   signOut: () => Promise<void>
 }
 

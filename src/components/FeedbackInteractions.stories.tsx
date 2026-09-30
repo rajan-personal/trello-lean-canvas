@@ -30,7 +30,7 @@ export const LoginRetry: Story = {
   render: function Retry(args) {
     const [phase, setPhase] = useState('error')
     return <><LoginScreen busy={phase === 'pending'} error={phase === 'error' ? 'Synthetic sign-in failure' : null}
-      onSignIn={() => { args.onRetry?.(); setPhase('pending') }} />
+      onEmailSignIn={() => {}} onSignIn={() => { args.onRetry?.(); setPhase('pending') }} />
       {phase === 'pending' && <button className="bg-white p-3" onClick={() => setPhase('error')}>Simulate failed connection</button>}</>
   },
   play: async ({ canvas, userEvent, args }) => {
