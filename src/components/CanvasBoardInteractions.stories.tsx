@@ -19,11 +19,11 @@ export const EverySectionEditable: Story = {
       const section = within(element)
       await userEvent.click(section.getByRole('button', { name: '＋ Add a card' }))
       const composer = section.getByRole('textbox', { name: 'New card' })
-      const top = composer.getBoundingClientRect().top
+      const top = composer.getBoundingClientRect().top - element.getBoundingClientRect().top
       fireEvent.change(composer, { target: { value: `Section ${index + 1}` } })
       await userEvent.click(section.getByRole('button', { name: 'Add card' }))
       const card = section.getByRole('button', { name: `Section ${index + 1}` })
-      await expect(card.getBoundingClientRect().top).toBe(top)
+      await expect(card.getBoundingClientRect().top - element.getBoundingClientRect().top).toBe(top)
       await userEvent.dblClick(card)
       fireEvent.change(section.getByRole('textbox', { name: 'Edit card' }), { target: { value: `Updated ${index + 1}\nDetails` } })
       await userEvent.click(section.getByRole('button', { name: 'Save' }))
