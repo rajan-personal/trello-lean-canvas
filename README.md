@@ -35,6 +35,10 @@ On first sign-in after this schema upgrade, the app idempotently copies and veri
 
 The frontend is hosted on Cloudflare Workers Static Assets at `lean.addorimprove.com`, with SPA navigation fallback for clean project/ticket URLs. Firebase continues to supply Authentication and Firestore only; no backend Worker is needed. See [the deployment and rollback checklist](docs/cloudflare-hosting.md) before publishing.
 
+[GitHub Actions CI](.github/workflows/ci.yml) runs lint, type checking, unit tests, and a production deployment dry run on pull requests. Merging to `main` runs those checks and deploys to Cloudflare, then verifies that the live app shell matches the build. To redeploy `main`, run the **CI** workflow from the Actions tab (or `gh workflow run ci.yml --ref main`). Manual runs on other branches only validate; they do not deploy.
+
+The repository's Actions secrets must contain `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. The token needs Account / Workers Scripts / Edit and Account / Account Settings / Read for the deployment account, plus Zone / Zone / Read and Zone / Workers Routes / Edit for `addorimprove.com`. Credentials are supplied only to the production deployment step. Firebase configuration and rules are deployed separately.
+
 ```bash
 # Deploy Google and email/password Auth configuration, Firestore rules, and indexes
 npm run deploy:firebase
