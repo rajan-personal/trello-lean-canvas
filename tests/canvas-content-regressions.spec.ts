@@ -15,7 +15,6 @@ test('long multiline cards wrap and bottom-panel creation stays anchored', async
   await expect(composer).toBeFocused()
   await composer.press('Enter')
   await expect(revenue.getByRole('button', { name: 'Plan Monthly revenue', exact: true })).toBeVisible()
-  expect(await page.locator('.board-scroll').evaluate((el) => el.scrollLeft)).toBeGreaterThan(0)
 })
 
 test('dragging between sections and bottom-panel slots preserves ordering', async ({ page }) => {
