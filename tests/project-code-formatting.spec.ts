@@ -81,10 +81,26 @@ for (const surface of ['About', 'Notepad'] as const) {
       expect(metrics.blockWhiteSpace).toBe('pre')
       expect(metrics.inlineFont).toEqual(metrics.blockFont)
       const container = editor.locator('xpath=ancestor::div[contains(@class, "project-rich-text-editor")]')
-      for (const button of await container.getByRole('button').all()) {
+      const toolbar = container.locator('.rich-text-buttons')
+      const layout = await toolbar.evaluate((element) => ({
+        tops: Array.from(element.children, (button) => button.getBoundingClientRect().top),
+        width: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+      }))
+      expect(new Set(layout.tops).size).toBe(1)
+      if (width === 320) expect(layout.scrollWidth).toBeGreaterThan(layout.width)
+      // Buttons may start offscreen, but every action must be reachable by scrolling.
+      for (const button of await toolbar.getByRole('button').all()) {
+        await button.scrollIntoViewIfNeeded()
         const bounds = await button.boundingBox()
+        const toolbarBounds = await toolbar.boundingBox()
+        expect(bounds!.x).toBeGreaterThanOrEqual(toolbarBounds!.x)
+        expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(toolbarBounds!.x + toolbarBounds!.width)
         expect(bounds!.x).toBeGreaterThanOrEqual(0)
         expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width)
+      }
+      if (layout.scrollWidth > layout.width) {
+        expect(await toolbar.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0)
       }
     }
     const stored = await page.evaluate((surface) => JSON.parse(localStorage.getItem('lean-canvas:v2')!)[0][surface === 'About' ? 'about' : 'notes'], surface)
