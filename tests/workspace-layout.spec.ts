@@ -14,11 +14,14 @@ test('keeps the white canvas columns coherent and evenly sized', async ({
         Math.round(column.getBoundingClientRect().height),
       ),
     )
-  const secondRowTops = await page
-    .locator('.canvas-column')
+  await expect(page.locator('.canvas-column')).toHaveCount(3)
+  await expect(page.locator('.canvas-panel:not(.canvas-column):not(.bottom-panel)')).toHaveCount(4)
+  await expect(page.locator('.lean-grid > .canvas-panel')).toHaveCount(9)
+  const firstRowTops = await page
+    .locator('.canvas-column, .canvas-panel.solution, .canvas-panel.advantage')
     .evaluateAll((columns) =>
       columns.map((column) =>
-        Math.round(column.children[1].getBoundingClientRect().top),
+        Math.round(column.getBoundingClientRect().top),
       ),
     )
   const bottomPanelHeights = await page
@@ -28,8 +31,19 @@ test('keeps the white canvas columns coherent and evenly sized', async ({
     )
 
   expect(new Set(columnHeights).size).toBe(1)
-  expect(new Set(secondRowTops).size).toBe(1)
+  expect(new Set(firstRowTops).size).toBe(1)
   expect(new Set(bottomPanelHeights).size).toBe(1)
+  for (const section of await page.locator('.canvas-panel:not(.bottom-panel) .canvas-cell').all()) {
+    expect(await section.evaluate((element) => element.getBoundingClientRect().width <= element.parentElement!.getBoundingClientRect().width)).toBe(true)
+  }
+  await expect(page.locator('.canvas-panel.value')).toHaveCSS('border-top-width', '4px')
+  await expect(page.locator('.canvas-panel.value')).toHaveCSS('border-top-color', 'rgb(12, 102, 228)')
+  await expect(page.locator('.canvas-panel.value strong').first()).toHaveCSS('font-size', '15px')
+  for (const column of await page.locator('.canvas-column').all()) {
+    await expect(column.locator('section').first()).toHaveCSS('flex-grow', '1')
+    await expect(column.locator('section').last()).toHaveCSS('flex-grow', '0')
+    await expect(column.locator('strong').last()).toHaveCSS('font-size', '13px')
+  }
 })
 
 test('keeps the canvas grid intact and scrollable on mobile', async ({ page }) => {

@@ -15,6 +15,7 @@ export function CanvasSection(props: CanvasSectionProps) {
   const {
     section,
     bottom = false,
+    sub = false,
     addingSectionId,
     startAddingCard,
     dragHandlers,
@@ -31,7 +32,7 @@ export function CanvasSection(props: CanvasSectionProps) {
   }, [isAdding])
   return (
     <section
-      className={`canvas-cell flex min-h-0 min-w-0 flex-[1_0_auto] flex-col px-[9px] pt-[11px] pb-[9px] ${bottom ? 'bottom-cell min-h-[150px] w-full' : 'min-h-[200px]'}`}
+      className={`canvas-cell flex min-h-0 min-w-0 flex-[1_0_auto] flex-col px-[9px] pt-[11px] pb-[9px] ${bottom ? 'bottom-cell min-h-[150px] w-full' : 'min-h-[200px]'} ${sub ? 'flex-none border-t-2 border-[#d6dce5]' : 'flex-1'}`}
       onDragOver={(event) =>
         dragHandlers.onDragOver(event, section.id, section.cards.length)
       }
@@ -40,7 +41,7 @@ export function CanvasSection(props: CanvasSectionProps) {
       }
     >
       <header className="cell-heading flex min-h-5 items-start justify-between gap-[5px]">
-        <strong className="ps-px text-sm leading-[19px] font-bold text-[#172b4d]">
+        <strong className={`ps-px leading-[19px] ${sub ? 'text-[13px] font-semibold text-[#44546f]' : `${section.id === 'value' ? 'text-[15px]' : 'text-sm'} font-bold text-[#172b4d]`}`}>
           {section.title}
         </strong>
       </header>
