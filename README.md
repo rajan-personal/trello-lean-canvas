@@ -1,4 +1,4 @@
-# Lean
+# Lean Canvas
 
 A strict TypeScript Lean Canvas workspace with Trello-style editing. Start with an empty workspace, then create a canvas, upload YAML, or load the Airbnb, Facebook, Google, and Amazon samples.
 

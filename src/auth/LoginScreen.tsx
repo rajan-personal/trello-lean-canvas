@@ -27,7 +27,7 @@ export function LoginScreen({ busy, error, onSignIn, onEmailSignIn }: Props) {
         <h1 className="text-center text-2xl font-bold tracking-[-0.04em]">Sign in to Lean Canvas</h1>
         <button type="button" onClick={() => { setEmailPending(false); onSignIn() }} disabled={busy}
           aria-busy={busy && !emailPending}
-          className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#c7d1e0] bg-white px-5 text-sm font-semibold shadow-sm transition hover:bg-[#f7f8f9] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4] disabled:cursor-wait disabled:opacity-65">
+          className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#c7d1e0] bg-white px-5 text-sm font-semibold shadow-sm transition hover:bg-[#f7f8f9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4] disabled:cursor-wait disabled:opacity-65">
           <GoogleMark />{busy && !emailPending ? 'Connecting to Google…' : 'Continue with Google'}
         </button>
         <p className="mt-2 text-center text-xs text-[#626f86]">New here? Create your account with Google.</p>
