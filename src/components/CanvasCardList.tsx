@@ -7,7 +7,6 @@ import { CanvasCardSlot } from './CanvasCardSlot'
 export function CanvasCardList(props: CanvasSectionProps) {
   const {
     section,
-    bottom = false,
     addingSectionId,
     setAddingSectionId,
     cardDraft,
@@ -22,7 +21,7 @@ export function CanvasCardList(props: CanvasSectionProps) {
 
   return (
     <div
-      className={`canvas-cards relative min-h-0 flex-none ${hasHint ? '' : 'mt-[7px]'} ${bottom ? 'grid grid-cols-2 gap-[7px] [&>.card-composer]:col-span-full' : 'flex flex-col gap-1.5'}`}
+      className={`canvas-cards relative min-h-0 flex-none ${hasHint ? '' : 'mt-[7px]'} flex flex-col gap-1.5`}
       onDragOver={(event) => {
         event.preventDefault()
         event.stopPropagation()

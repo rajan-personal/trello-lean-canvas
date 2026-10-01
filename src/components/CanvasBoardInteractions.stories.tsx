@@ -52,7 +52,7 @@ export const LongContentOnMobile: Story = {
 }
 
 export const DragOrdering: Story = {
-  args: { sections: storySections.map((section, index) => ({ ...section, cards: index === 0 ? ['First', 'Second'] : [] })) },
+  args: { sections: storySections.map((section, index) => ({ ...section, cards: index === 0 ? ['First', 'Second'] : section.id === 'cost' ? ['Existing cost'] : [] })) },
   play: async ({ canvasElement }) => {
     const problem = canvasElement.querySelector<HTMLElement>('.problem .canvas-cell')!
     const cost = canvasElement.querySelector<HTMLElement>('.cost .canvas-cell')!
@@ -62,9 +62,15 @@ export const DragOrdering: Story = {
     fireEvent.dragOver(problem, { dataTransfer })
     fireEvent.drop(problem, { dataTransfer })
     await expect(Array.from(problem.querySelectorAll('.card-content'), (card) => card.textContent)).toEqual(['Second', 'First'])
-    fireEvent.dragStart(within(problem).getByRole('button', { name: 'First' }).parentElement!, { dataTransfer })
-    fireEvent.dragOver(cost, { dataTransfer })
-    fireEvent.drop(cost, { dataTransfer })
+    const moved = within(problem).getByRole('button', { name: 'First' }).parentElement!
+    const costList = cost.querySelector<HTMLElement>('.canvas-cards')!
+    const shift = moved.getBoundingClientRect().height + 6
+    const clientY = costList.getBoundingClientRect().top + 1
+    fireEvent.dragStart(moved, { dataTransfer })
+    fireEvent.dragOver(costList, { dataTransfer, clientY })
+    await waitFor(() => expect(cost.querySelector<HTMLElement>('.canvas-card-drop-slot')!.style.transform).toBe(`translate3d(0px, ${shift}px, 0px)`))
+    fireEvent.drop(costList, { dataTransfer, clientY })
+    await expect(Array.from(cost.querySelectorAll('.card-content'), (card) => card.textContent)).toEqual(['First', 'Existing cost'])
     await expect(within(cost).getByRole('button', { name: 'First' })).toBeVisible()
     await expect(within(problem).queryByRole('button', { name: 'First' })).not.toBeInTheDocument()
     await waitFor(() => expect(cost.querySelector('.canvas-card-drop-slot')).toHaveStyle({ opacity: '1' }))
