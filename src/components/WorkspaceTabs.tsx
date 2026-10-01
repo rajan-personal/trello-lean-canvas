@@ -18,7 +18,7 @@ export function WorkspaceTabs({ view, onChange, idPrefix }: Props) {
     {tabs.map((tab) => <button key={tab} id={`${prefix}${tab}-tab`} role="tab"
       ref={(button) => { buttons.current[tab] = button }}
       aria-selected={view === tab} aria-controls={`${prefix}${tab}-panel`} tabIndex={view === tab ? 0 : -1}
-      className={`flex min-h-8 items-center justify-center gap-1 rounded-md px-2.5 text-sm font-semibold max-[760px]:min-h-9 max-[760px]:px-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${view === tab ? 'bg-[#f4f7fa] hover:bg-white text-[#12344a] shadow-[0_1px_3px_rgba(0,0,0,0.2)]' : 'text-[#e2edf4] hover:bg-white/15 hover:text-white'}`}
+      className={`flex min-h-8 items-center justify-center gap-1 rounded-md px-2.5 text-sm font-semibold max-[760px]:min-h-9 max-[760px]:px-1.5 focus-visible:outline-2 focus-visible:-outline-offset-2 ${view === tab ? 'bg-[#f4f7fa] hover:bg-white text-[#12344a] shadow-[0_1px_3px_rgba(0,0,0,0.2)] focus-visible:outline-[#0c66e4]' : 'text-[#e2edf4] hover:bg-white/15 hover:text-white focus-visible:outline-white'}`}
       onClick={() => select(tab)} onKeyDown={(event) => {
         if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
         event.preventDefault()
