@@ -12,7 +12,7 @@ export function AppStatus({ message, onSignOut, onRetry = () => window.location.
   const signOut = usePendingAction(onSignOut ?? (() => {}))
   const pending = retry.pending || signOut.pending
   return (
-    <main className="grid min-h-dvh place-items-center bg-[#0c66e4] p-6 text-white">
+    <main className="grid min-h-dvh place-items-center bg-app-bg p-6 text-white">
       <div className="max-w-sm text-center" role={message ? 'alert' : 'status'}>
         <div className="mx-auto mb-5 grid size-14 place-items-center rounded-2xl bg-white/15 text-2xl font-bold shadow-lg">
           L

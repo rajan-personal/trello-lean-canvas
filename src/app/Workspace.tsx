@@ -57,7 +57,7 @@ export function Workspace({ user, onSignOut, onSetPassword, persistence, browser
   if (state.loading) return <AppStatus />
   if (state.error && !state.activeCanvas && !allTickets) return <AppStatus message={state.error} onSignOut={signOut} />
   return (
-    <div className="app-shell h-dvh min-h-[640px] overflow-hidden bg-linear-[130deg,#0c66e4_0%,#338bfa_100%] max-[760px]:min-h-0">
+    <div className="app-shell h-dvh min-h-[640px] overflow-hidden bg-linear-[130deg,var(--color-app-bg)_0%,var(--color-app-bg-end)_100%] max-[760px]:min-h-0">
       <WorkspaceHeader state={state} commands={commands} panels={panels} allow={allow}
         allTickets={allTickets} onOpenAllTickets={openAllTickets} setDialog={setDialog} view={view} setView={(next) => { if (projectId) history.navigate(projectPath(projectId, next)) }} />
       <div className={`workspace-layout flex h-[calc(100dvh-48px)] min-h-[592px] max-[760px]:min-h-0 ${state.activeCanvas ? 'max-[760px]:h-[calc(100dvh-92px)]' : ''}`}>

@@ -22,7 +22,7 @@ function GoogleMark() {
 export function LoginScreen({ busy, error, onSignIn, onEmailSignIn }: Props) {
   const [emailPending, setEmailPending] = useState(false)
   return (
-    <main className="grid min-h-dvh place-items-center bg-linear-[135deg,#0747a6_0%,#0c66e4_48%,#579dff_100%] p-5 text-[#172b4d]">
+    <main className="grid min-h-dvh place-items-center bg-linear-[135deg,var(--color-app-bg)_0%,var(--color-app-bg-end)_100%] p-5 text-[#172b4d]">
       <section className="w-full max-w-[420px] rounded-3xl border border-white/35 bg-white p-8 shadow-[0_24px_70px_rgba(9,30,66,0.35)]">
         <h1 className="text-center text-2xl font-bold tracking-[-0.04em]">Sign in to Lean Canvas</h1>
         <button type="button" onClick={() => { setEmailPending(false); onSignIn() }} disabled={busy}
