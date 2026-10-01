@@ -46,7 +46,8 @@ export function CanvasToolbarActions({
       >
         <Download size={17} />
       </ToolbarIconButton>
-      <ToolbarIconButton label="Delete canvas" onClick={onDelete}>
+      <span aria-hidden="true" className="mx-1.5 h-5 w-px bg-white/25" />
+      <ToolbarIconButton label="Delete canvas" onClick={onDelete} danger>
         <Trash2 size={17} />
       </ToolbarIconButton>
     </>

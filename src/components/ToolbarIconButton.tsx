@@ -10,6 +10,7 @@ interface Props {
   pressed?: boolean
   expanded?: boolean
   controls?: string
+  danger?: boolean
 }
 export function ToolbarIconButton({
   label,
@@ -20,10 +21,11 @@ export function ToolbarIconButton({
   pressed,
   expanded,
   controls,
+  danger = false,
 }: Props) {
   return (
     <button
-      className={`toolbar-icon ${toolbarButtonClass} ${active ? 'text-[#f5cd47]!' : ''} ${active && expanded ? 'bg-white/20!' : ''}`}
+      className={`toolbar-icon ${toolbarButtonClass} ${active ? 'text-[#f5cd47]!' : ''} ${active && expanded ? 'bg-white/20!' : ''} ${danger ? 'hover:bg-[#ae2e24]! hover:text-white! focus-visible:bg-[#ae2e24]' : ''}`}
       aria-label={label}
       aria-pressed={pressed}
       aria-expanded={expanded}
