@@ -9,10 +9,11 @@
   border-radius: 8px;
   background: white;
 }
-.rich-text-toolbar { flex-shrink: 0; padding: 6px; border-bottom: 1px solid #d0d5dd; }
-.rich-text-buttons { display: flex; flex-wrap: wrap; gap: 2px; }
-.rich-text-buttons button {
+.rich-text-toolbar { flex-shrink: 0; min-width: 0; padding: 6px; border-bottom: 1px solid #d0d5dd; }
+.rich-text-buttons { display: flex; flex-wrap: nowrap; gap: 2px; overflow-x: auto; }
+.rich-text-toolbar button {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   min-width: 40px;
@@ -21,11 +22,11 @@
   border-radius: 4px;
   color: #44546f;
 }
-.rich-text-buttons button:hover { background: #f1f2f4; }
-.rich-text-buttons button[aria-pressed="true"] { background: #e9f2ff; color: #0055cc; }
-.rich-text-buttons button:disabled { opacity: 0.4; cursor: default; }
+.rich-text-toolbar button:hover { background: #f1f2f4; }
+.rich-text-toolbar button[aria-pressed="true"] { background: #e9f2ff; color: #0055cc; }
+.rich-text-toolbar button:disabled { opacity: 0.4; cursor: default; }
 .project-rich-text-editor:focus-within { outline: 2px solid #0c66e4; outline-offset: 2px; }
-.rich-text-buttons :focus-visible { outline: 2px solid #0c66e4; outline-offset: -2px; }
+.rich-text-toolbar :focus-visible { outline: 2px solid #0c66e4; outline-offset: -2px; }
 .project-rich-text-content { display: flex; flex: 1; min-height: 0; overflow-y: auto; }
 .project-rich-text-content .tiptap {
   flex: 1;
@@ -87,7 +88,7 @@
 .project-rich-text-content ul[data-type="taskList"] { list-style: none; padding-left: 0; }
 .project-rich-text-content li[data-type="taskItem"] { display: flex; align-items: baseline; gap: 8px; }
 .project-rich-text-content li[data-type="taskItem"] > div { flex: 1; min-width: 0; }
-.rich-text-link { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; width: 100%; order: 1; font-size: 0.875rem; }
+.rich-text-link { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; width: 100%; margin-top: 6px; font-size: 0.875rem; }
 .rich-text-link input { flex: 1; min-width: 120px; padding: 8px; border: 1px solid #8590a2; border-radius: 4px; }
 .rich-text-link p { width: 100%; color: #b42318; }
 
@@ -97,5 +98,5 @@
 .notepad-panel .rich-text-toolbar { padding: 4px; }
 .notepad-panel .project-rich-text-content .tiptap { padding: 12px; }
 @media (pointer: fine) {
-  .notepad-panel .rich-text-buttons button { min-width: 32px; min-height: 32px; padding: 6px; }
+  .notepad-panel .rich-text-toolbar button { min-width: 32px; min-height: 32px; padding: 6px; }
 }

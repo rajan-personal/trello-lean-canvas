@@ -81,7 +81,11 @@ for (const surface of ['About', 'Notepad'] as const) {
       expect(metrics.blockWhiteSpace).toBe('pre')
       expect(metrics.inlineFont).toEqual(metrics.blockFont)
       const container = editor.locator('xpath=ancestor::div[contains(@class, "project-rich-text-editor")]')
-      for (const button of await container.getByRole('button').all()) {
+      const toolbar = container.locator('.rich-text-buttons')
+      const tops = await toolbar.getByRole('button').evaluateAll((buttons) => buttons.map((button) => button.getBoundingClientRect().top))
+      expect(new Set(tops).size).toBe(1)
+      for (const button of await toolbar.getByRole('button').all()) {
+        await button.scrollIntoViewIfNeeded()
         const bounds = await button.boundingBox()
         expect(bounds!.x).toBeGreaterThanOrEqual(0)
         expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width)
