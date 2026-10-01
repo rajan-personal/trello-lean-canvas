@@ -8,7 +8,7 @@ import { TicketListView } from './TicketListView'
 const project = (id: string, name: string, favorite = false, notes = ''): TicketListProject => ({
   canvas: { id, name, title: name, favorite, notes, about: '', sections: [] }, loading: false, error: null,
   summary: { activity: { timeZone: ACTIVITY_TIME_ZONE, throughDay: activityDay(), counts: [0, 1, 3, 0, 7, 12, 2] }, columns: defaultBoardColumns, cards: [
-    { id: 'plan', columnId: 'backlog', title: 'Plan release', rank: 'a' },
+    { id: 'plan', columnId: 'in-progress', title: 'Prepare release', rank: 'a' },
     { id: 'build', columnId: 'todo', title: 'Build release', rank: 'a' },
     { id: 'review', columnId: 'review', title: 'Review release', rank: 'a' },
     { id: 'review-again', columnId: 'review', title: 'Review documentation', rank: 'b' },
@@ -25,7 +25,7 @@ const projects = [
 const meta = {
   title: 'Lean Canvas/TicketListView', component: TicketListView, tags: ['autodocs'], parameters: { layout: 'fullscreen' },
   decorators: [(Story) => <div style={{ height: '100dvh', display: 'flex', background: 'linear-gradient(130deg, #0c66e4, #338bfa)' }}><Story /></div>],
-  args: { projects, blocked: false, onOpenProjectBoard: fn(), onRetry: fn() },
+  args: { projects, blocked: false, onOpenProjectBoard: fn(), onOpenTicket: fn(), onRetry: fn() },
 } satisfies Meta<typeof TicketListView>
 export default meta
 type Story = StoryObj<typeof meta>
@@ -37,7 +37,7 @@ export const Populated: Story = {
     await expect(canvas.queryByText(/High Priority|Low Priority/)).not.toBeInTheDocument()
     await expect(list.getByRole('button', { name: 'Open board for Product launch' })).toHaveAccessibleDescription('Starred project')
     const counts = within(canvas.getByRole('list', { name: 'Task counts for Product launch' }))
-    await expect(counts.getAllByRole('listitem').map((item) => item.textContent)).toEqual(['Backlog: 1', 'Todo: 1', 'In Review: 2'])
+    await expect(counts.getAllByRole('listitem').map((item) => item.textContent)).toEqual(['Todo: 1', 'In Progress: 1', 'In Review: 2'])
     await userEvent.click(list.getByRole('button', { name: 'Open board for Product launch' }))
     await expect(args.onOpenProjectBoard).toHaveBeenCalledWith('launch')
   },
@@ -46,7 +46,7 @@ export const Loading: Story = {
   args: { projects: [{ ...project('loading', 'Loading project'), loading: true, summary: undefined }] },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('status')).toHaveTextContent('Loading tickets')
-    await expect(canvas.getByRole('list', { name: 'Task counts for Loading project' })).toHaveTextContent('Backlog: —Todo: —In Review: —')
+    await expect(canvas.getByRole('list', { name: 'Task counts for Loading project' })).toHaveTextContent('Todo: —In Progress: —In Review: —')
     const activity = canvas.getByLabelText('Activity for Loading project: unavailable')
     await expect(activity.querySelector('svg')).toHaveAttribute('data-state', 'unknown')
     await expect(activity.querySelector('polyline')).toHaveAttribute('points', '2,26 102,26')
@@ -77,7 +77,7 @@ export const EmptyProject: Story = {
   args: { projects: [{ ...project('empty', 'Empty project'), summary: { columns: [], cards: [] } }] },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('button', { name: 'Open board for Empty project' })).toBeVisible()
-    await expect(canvas.getByRole('list', { name: 'Task counts for Empty project' })).toHaveTextContent('Backlog: 0Todo: 0In Review: 0')
+    await expect(canvas.getByRole('list', { name: 'Task counts for Empty project' })).toHaveTextContent('Todo: 0In Progress: 0In Review: 0')
     await expect(canvas.queryByText('No description yet.')).not.toBeInTheDocument()
     await expect(canvas.queryByText('7 days', { exact: true })).not.toBeInTheDocument()
     await expect(canvas.getByLabelText('Activity for Empty project: 0 recorded changes in the last 7 days')).toBeVisible()

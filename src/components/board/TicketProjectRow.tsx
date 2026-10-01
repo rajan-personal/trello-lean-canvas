@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Star } from 'lucide-react'
+import { Circle, GitPullRequest, LoaderCircle, Star } from 'lucide-react'
 import type { TicketListProject } from '../../app/useWorkspaceTicketList'
-import { projectTicketCounts, ticketCountStatuses } from '../../data/ticket-project-summary'
+import { projectActiveTickets, projectTicketCounts, ticketCountStatuses } from '../../data/ticket-project-summary'
 import { TicketActivity } from './TicketActivity'
 
 interface Props {
@@ -11,10 +11,11 @@ interface Props {
   statusPeak: number
   activityPeak: number
   onOpenProjectBoard: (projectId: string) => void
+  onOpenTicket: (projectId: string, ticketId: string) => void
   onRetry: (projectId: string) => void
 }
 
-export function TicketProjectRow({ project, blocked, today, statusPeak, activityPeak, onOpenProjectBoard, onRetry }: Props) {
+export function TicketProjectRow({ project, blocked, today, statusPeak, activityPeak, onOpenProjectBoard, onOpenTicket, onRetry }: Props) {
   const [activeStatus, setActiveStatus] = useState<string | null>(null)
   useEffect(() => {
     if (!activeStatus) return
@@ -24,8 +25,10 @@ export function TicketProjectRow({ project, blocked, today, statusPeak, activity
   }, [activeStatus])
   const { canvas, loading, error, summary } = project
   const counts = projectTicketCounts(summary)
+  const tickets = projectActiveTickets(summary)
   const unavailable = loading || Boolean(error) || !summary
   return <li className="ticket-project-row" data-project-id={canvas.id}>
+    <div className="ticket-project-header">
     <h2 className="ticket-project-title"><button type="button" className="ticket-project-open"
       aria-label={`Open board for ${canvas.name}`} aria-description={canvas.favorite ? 'Starred project' : undefined}
       disabled={blocked} onClick={() => onOpenProjectBoard(canvas.id)}>
@@ -53,5 +56,19 @@ export function TicketProjectRow({ project, blocked, today, statusPeak, activity
         <button type="button" disabled={blocked} aria-label={`Retry loading tickets for ${canvas.name}`} onClick={() => onRetry(canvas.id)}>Retry</button>
       </div> : null}
     <TicketActivity activity={summary?.activity} today={today} peak={activityPeak} projectName={canvas.name} unavailable={unavailable} />
+    </div>
+    {!unavailable && (tickets.length ? <ul className="ticket-active-list" aria-label={`Active tickets for ${canvas.name}`}>
+      {tickets.map((ticket) => {
+        const label = ticketCountStatuses.find(({ id }) => id === ticket.status)!.label
+        const Icon = ticket.status === 'in-progress' ? LoaderCircle : ticket.status === 'review' ? GitPullRequest : Circle
+        return <li key={ticket.id}>
+          <button type="button" className={`ticket-active-open ticket-active-${ticket.status}`} disabled={blocked}
+            aria-label={`${ticket.title}, ${label}`} title={label} onClick={() => onOpenTicket(canvas.id, ticket.id)}>
+            <Icon className="ticket-active-icon" size={15} aria-hidden="true" />
+            <span className="ticket-active-title">{ticket.title}</span>
+          </button>
+        </li>
+      })}
+    </ul> : <p className="ticket-active-empty">No active tickets.</p>)}
   </li>
 }

@@ -75,7 +75,9 @@ export function Workspace({ user, onSignOut, onSetPassword, persistence, browser
         />
         <WorkspaceRouteContent allTickets={allTickets} activeCanvas={state.activeCanvas}
           ticketList={{ projects: ticketList.projects, blocked: state.pending,
-            onOpenProjectBoard: openProjectBoard, onRetry: ticketList.retry }}
+            onOpenProjectBoard: openProjectBoard, onOpenTicket: (id, cardId) => {
+              if (allow()) history.navigate(projectPath(id, 'board', cardId))
+            }, onRetry: ticketList.retry }}
           workspaceView={{ view, board, sectionProps, user, ticket, blocked: state.pending, deleted: state.deleted,
             about: { onSave: async (about) => {
               state.updateActiveCanvas((canvas) => ({ ...canvas, about })); await state.flushCanvases() } },
