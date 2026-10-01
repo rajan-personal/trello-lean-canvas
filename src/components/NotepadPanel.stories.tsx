@@ -29,7 +29,7 @@ const meta = {
       </div>
     ),
   ],
-  args: { canvas: storyCanvas, open: true, onChange: fn() },
+  args: { canvas: storyCanvas, open: true, saving: false, saveFailed: false, onClose: fn(), onChange: fn() },
   render: (args) => <NotepadHarness key={args.canvas.id} {...args} />,
 } satisfies Meta<typeof NotepadPanel>
 

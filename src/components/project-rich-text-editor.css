@@ -94,7 +94,8 @@
 
 /* Let the scratchpad devote its full panel to writing and formatting. */
 .notepad-panel .project-rich-text-editor { border: 0; border-radius: 0; }
-.notepad-panel .project-rich-text-editor:focus-within { outline-offset: -2px; }
+.notepad-panel .project-rich-text-editor:focus-within { outline: none; }
+.notepad-panel .project-rich-text-editor:focus-within .rich-text-toolbar { box-shadow: inset 0 -2px 0 #0c66e4; }
 .notepad-panel .rich-text-toolbar { padding: 4px; }
 .notepad-panel .project-rich-text-content .tiptap { padding: 12px; }
 @media (pointer: fine) {
