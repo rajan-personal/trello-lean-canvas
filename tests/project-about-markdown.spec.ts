@@ -60,6 +60,7 @@ test('editor and formatting controls fit on a small phone', async ({ page }) => 
   const details = page.getByRole('textbox', { name: 'Project details', exact: true })
   await details.fill('long-text'.repeat(80))
   for (const button of await page.locator('.project-rich-text-editor button').all()) {
+    await button.scrollIntoViewIfNeeded()
     const bounds = await button.boundingBox()
     expect(bounds!.x).toBeGreaterThanOrEqual(0)
     expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(320)

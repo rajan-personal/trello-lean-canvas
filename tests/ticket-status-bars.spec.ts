@@ -60,7 +60,7 @@ test('rescales every project together when another project exceeds the current m
   await page.getByRole('button', { name: 'Open board for Beta project', exact: true }).click()
   const todo = page.getByRole('region', { name: 'Todo', exact: true })
   for (const title of ['New task one', 'New task two']) {
-    await todo.getByRole('button', { name: '+ Add a card' }).click()
+    await todo.getByRole('button', { name: 'Add a card' }).click()
     await page.getByRole('textbox', { name: 'Card title', exact: true }).fill(title)
     await page.getByRole('button', { name: 'Add card', exact: true }).click()
   }

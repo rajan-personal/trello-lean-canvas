@@ -35,7 +35,7 @@ export const CustomColumnLifecycle: Story = { args: { board: { columns: [], card
   } }
 export const DeletedColumnDraft: Story = { play: async ({ canvas, args, userEvent }) => {
   const todo = within(canvas.getByRole('region', { name: 'Todo' }))
-  await userEvent.click(todo.getByRole('button', { name: '+ Add a card' }))
+  await userEvent.click(todo.getByRole('button', { name: 'Add a card' }))
   await setBoardInput(todo.getByRole('textbox'), 'Copy my task')
   await remoteBoardChange({ type: 'delete-column', id: 'todo' })
   await expect(todo.getByRole('textbox')).toHaveValue('Copy my task')

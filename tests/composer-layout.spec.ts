@@ -12,7 +12,7 @@ test('expands the white column for the composer without nested scrolling', async
   const initialColumnHeight = await column.evaluate(
     (element) => element.getBoundingClientRect().height,
   )
-  await section.getByRole('button', { name: '＋ Add a card' }).click()
+  await section.getByRole('button', { name: 'Add a card' }).click()
 
   const layout = await section.evaluate((element) => {
     const composer = element.querySelector('.card-composer')
@@ -66,7 +66,7 @@ test('keeps the first card anchored when it changes from composer to saved card'
   expect(Math.min(...emptyBottomCellHeights)).toBeGreaterThanOrEqual(120)
 
   const section = page.locator('.canvas-column.problem .canvas-cell').first()
-  await section.getByRole('button', { name: '＋ Add a card' }).click()
+  await section.getByRole('button', { name: 'Add a card' }).click()
   const composerTop = await section
     .getByRole('textbox', { name: 'New card' })
     .evaluate((element) => element.getBoundingClientRect().top)

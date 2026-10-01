@@ -76,7 +76,7 @@ test('dismisses the add-card composer outside while preserving its draft', async
   await openSampleCanvas(page)
 
   const section = page.locator('.canvas-panel.solution .canvas-cell').first()
-  await section.getByRole('button', { name: '＋ Add a card' }).click()
+  await section.getByRole('button', { name: 'Add a card' }).click()
   const composer = section.getByRole('textbox', { name: 'New card' })
   await composer.fill('A draft worth keeping')
   await expect(
@@ -86,7 +86,7 @@ test('dismisses the add-card composer outside while preserving its draft', async
   await section.locator('.cell-heading').click()
   await expect(composer).toHaveCount(0)
 
-  await section.getByRole('button', { name: '＋ Add a card' }).click()
+  await section.getByRole('button', { name: 'Add a card' }).click()
   const reopenedComposer = section.getByRole('textbox', { name: 'New card' })
   await expect(reopenedComposer).toHaveValue('A draft worth keeping')
   await expect(reopenedComposer).toBeFocused()

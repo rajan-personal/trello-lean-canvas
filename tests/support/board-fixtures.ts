@@ -8,7 +8,7 @@ export async function openBoard(page: Page) {
 }
 export const column = (page: Page, name: string) => page.getByRole('region', { name, exact: true })
 export async function addBoardCard(page: Page, title: string, list = 'Backlog') {
-  await column(page, list).getByRole('button', { name: '+ Add a card', exact: true }).click()
+  await column(page, list).getByRole('button', { name: 'Add a card', exact: true }).click()
   await column(page, list).getByLabel('Card title', { exact: true }).fill(title)
   await column(page, list).getByRole('button', { name: 'Add card', exact: true }).click()
   await expect(page.getByRole('dialog')).toHaveCount(0)

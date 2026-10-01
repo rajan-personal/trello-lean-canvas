@@ -24,7 +24,7 @@
 .kanban-dialog .kanban-story-points-field label { font-size: 12px; color: #44546f; }
 .kanban-dialog .kanban-story-points-field select { width: 60px; min-height: 32px; padding: 4px 6px; font-size: 16px; }
 @media (pointer: coarse) { .kanban-dialog .kanban-story-points-field select { min-height: 48px; } }
-.kanban-add-card { width: 100%; min-height: 36px; padding: 8px; border-radius: 7px; color: #44546f; text-align: left; }
+.kanban-add-card { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; width: 100%; min-height: 36px; padding: 8px; border-radius: 7px; color: #44546f; text-align: left; }
 .kanban-add-column { flex: 0 0 272px; min-height: 48px; border-radius: 12px; padding: 12px 16px; background: #ffffffd9; box-shadow: 0 1px 2px #091e421a; text-align: left; }
 .kanban-add-card:hover { background: #dcdfe4; color: #172b4d; }
 button.kanban-add-column:hover { background: #fff; }

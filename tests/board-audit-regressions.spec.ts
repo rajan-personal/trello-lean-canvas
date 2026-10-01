@@ -3,7 +3,7 @@ import { addBoardCard, column, openBoard, openBoardCard } from './support/board-
 
 for (const kind of ['card', 'column'] as const) test(`inline ${kind} restores its trigger after save and Escape`, async ({ page }) => {
   await openBoard(page)
-  const trigger = kind === 'card' ? column(page, 'Backlog').getByRole('button', { name: '+ Add a card' }) :
+  const trigger = kind === 'card' ? column(page, 'Backlog').getByRole('button', { name: 'Add a card' }) :
     page.getByRole('button', { name: '+ Add another column' })
   await trigger.click()
   await page.getByLabel(`${kind === 'card' ? 'Card' : 'Column'} title`).press('Escape')

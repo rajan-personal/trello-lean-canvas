@@ -17,7 +17,7 @@ export const Populated: CanvasSectionStory = {
     await expect(
       canvas.queryByRole('button', { name: 'Clear Problem' }),
     ).not.toBeInTheDocument()
-    await userEvent.click(canvas.getByRole('button', { name: '＋ Add a card' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'Add a card' }))
     await expect(args.startAddingCard).toHaveBeenCalledWith('problem')
   },
 }

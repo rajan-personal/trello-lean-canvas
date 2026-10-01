@@ -77,7 +77,7 @@ export const AddCardDraftResume: AppStory = {
     )
     if (!section) throw new Error('Problem section is missing')
     const cell = within(section as HTMLElement)
-    await userEvent.click(cell.getByRole('button', { name: '＋ Add a card' }))
+    await userEvent.click(cell.getByRole('button', { name: 'Add a card' }))
     fireEvent.change(cell.getByRole('textbox', { name: 'New card' }), {
       target: { value: 'A draft worth keeping' },
     })
@@ -85,7 +85,7 @@ export const AddCardDraftResume: AppStory = {
     await expect(
       cell.queryByRole('textbox', { name: 'New card' }),
     ).not.toBeInTheDocument()
-    await userEvent.click(cell.getByRole('button', { name: '＋ Add a card' }))
+    await userEvent.click(cell.getByRole('button', { name: 'Add a card' }))
     const reopened = cell.getByRole('textbox', { name: 'New card' })
     await expect(reopened).toHaveValue('A draft worth keeping')
     await expect(reopened).toHaveFocus()

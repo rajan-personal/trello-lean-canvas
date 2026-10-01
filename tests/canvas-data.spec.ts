@@ -8,7 +8,7 @@ test('loads fresh sample data without removing custom canvases or creating dupli
   await page.getByRole('button', { name: 'Add canvas' }).click()
   await page.getByRole('button', { name: 'New', exact: true }).click()
   await page.getByRole('textbox', { name: 'Canvas name' }).fill('My startup')
-  await page.getByRole('button', { name: 'Create canvas' }).click()
+  await page.getByRole('dialog', { name: 'Create canvas' }).getByRole('button', { name: 'Create canvas', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'My startup' })).toBeVisible()
 
   await page.getByRole('button', { name: 'Add canvas' }).click()
@@ -77,7 +77,7 @@ canvas:
       title: Revenue streams
       cards: []
 `
-  await page.locator('input[type="file"]').setInputFiles({
+  await page.getByLabel('Upload canvas YAML file', { exact: true }).setInputFiles({
     name: 'imported.yaml',
     mimeType: 'application/yaml',
     buffer: Buffer.from(yaml),

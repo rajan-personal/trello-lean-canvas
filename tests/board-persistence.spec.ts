@@ -12,7 +12,7 @@ test('imports, reloads, exports and deletes board records without changing Lean 
   original.sections[0].cards = ['Separate Lean Canvas note']
   const chooser = page.waitForEvent('filechooser')
   await page.getByRole('button', { name: 'Add canvas' }).click()
-  await page.getByRole('button', { name: 'Upload' }).click()
+  await page.getByRole('button', { name: 'Upload', exact: true }).click()
   await (await chooser).setFiles({ name: 'board.yaml', mimeType: 'application/yaml',
     buffer: Buffer.from(canvasToYaml(original, populatedBoard())) })
   await expect(page.getByRole('heading', { name: 'Board transfer' })).toBeVisible()

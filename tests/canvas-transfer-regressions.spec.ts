@@ -12,7 +12,7 @@ test('invalid upload keeps the canvas, retry imports, and download contains rend
   await expect(upload).toHaveValue('')
   await uploadCanvas(page, { name: 'Retry canvas' }, 'retry.yaml')
   await expect(page.getByRole('heading', { name: 'Retry canvas' })).toBeVisible()
-  await page.locator('.canvas-cell').first().getByRole('button', { name: '＋ Add a card' }).click()
+  await page.locator('.canvas-cell').first().getByRole('button', { name: 'Add a card' }).click()
   await page.getByRole('textbox', { name: 'New card' }).fill('Export heading\nExport body')
   await page.getByRole('button', { name: 'Add card', exact: true }).click()
   await page.getByRole('button', { name: 'Favorite canvas' }).click()

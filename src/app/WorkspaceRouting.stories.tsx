@@ -46,7 +46,7 @@ export const DirtyDraftNavigation: Story = {
     const confirm = spyOn(window, 'confirm').mockReturnValue(false)
     try {
       await userEvent.click(await canvas.findByRole('tab', { name: 'Tickets' }))
-      await userEvent.click((await canvas.findAllByRole('button', { name: '+ Add a card' }))[0])
+      await userEvent.click((await canvas.findAllByRole('button', { name: 'Add a card' }))[0])
       await userEvent.type(canvas.getByRole('textbox', { name: 'Card title' }), 'Keep this draft')
       await userEvent.click(canvas.getByRole('tab', { name: 'Canvas' }))
       await expect(confirm).toHaveBeenCalled()

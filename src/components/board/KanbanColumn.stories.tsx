@@ -18,11 +18,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const EmptyToPopulated: Story = { play: async ({ canvas, args, userEvent }) => {
   await expect(canvas.getByLabelText('0 cards')).toBeVisible()
-  await userEvent.click(canvas.getByRole('button', { name: '+ Add a card' }))
+  await userEvent.click(canvas.getByRole('button', { name: 'Add a card' }))
   await setBoardInput(canvas.getByRole('textbox', { name: 'Card title' }), 'Standalone task')
   await userEvent.click(canvas.getByRole('button', { name: 'Add card' }))
   await expect(canvas.getByLabelText('1 card')).toBeVisible()
-  await expect(canvas.getByRole('button', { name: '+ Add a card' })).toHaveFocus()
+  await expect(canvas.getByRole('button', { name: 'Add a card' })).toHaveFocus()
   await userEvent.click(canvas.getByRole('button', { name: 'Standalone task' }))
   await expect(args.onOpen).toHaveBeenCalledWith(expect.objectContaining({ title: 'Standalone task', columnId: 'backlog' }))
   await expect(args.run).toHaveBeenCalledWith({ type: 'create-card', id: expect.any(String), title: 'Standalone task', columnId: 'backlog' })
