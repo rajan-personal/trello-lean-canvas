@@ -20,7 +20,11 @@ type Story = StoryObj<typeof meta>
 export const Populated: Story = { play: async ({ canvasElement }) => {
   await expect(canvasElement.querySelectorAll('.kanban-column')).toHaveLength(6)
   await expect(canvasElement.querySelectorAll('.kanban-card')).toHaveLength(3)
-  await expect(canvasElement.querySelectorAll('.kanban-card > *')).toHaveLength(0)
+  await expect(canvasElement.querySelectorAll('.kanban-card-meta')).toHaveLength(1)
+  const described = within(canvasElement).getByRole('button', { name: boardStoryData.cards[0].title })
+  await expect(described).toHaveAccessibleDescription('Has description. 1 comment.')
+  await expect(described.querySelector('.kanban-card-meta')).toHaveTextContent('1')
+  await expect(described.querySelectorAll('svg')).toHaveLength(2)
   await expect(within(canvasElement).queryByText(boardStoryData.cards[0].description)).not.toBeInTheDocument()
 } }
 export const Empty: Story = { args: { board: createBoard() }, play: async ({ canvas }) => {
@@ -38,6 +42,18 @@ export const EmptyColumnActions: Story = { ...Empty, play: async ({ canvasElemen
 export const Saving: Story = { args: { pending: true } }
 export const NoColumns: Story = { args: { board: { columns: [], cards: [], comments: [] } } }
 export const Mobile: Story = { ...Populated, globals: { viewport: { value: 'mobile1', isRotated: false } } }
+
+export const MetadataIndicators: Story = {
+  args: { board: { ...boardStoryData, cards: boardStoryData.cards.map((card, index) => index === 0
+    ? { ...card, storyPoints: 5 } : card), comments: [...boardStoryData.comments,
+    { ...boardStoryData.comments[0], id: 'second-discussion' }] } },
+  play: async ({ canvas }) => {
+    const card = canvas.getByRole('button', { name: 'Outline the launch plan 5 story points' })
+    await expect(card).toHaveAccessibleDescription('Has description. 2 comments.')
+    await expect(card.querySelector('.kanban-story-points-badge')).toHaveTextContent('5')
+    await expect(canvas.getByRole('button', { name: 'Talk to three early customers' }).children).toHaveLength(0)
+  },
+}
 
 export const InlineCardComposer: Story = { ...Populated, play: async ({ canvasElement }) => {
   const canvas = within(canvasElement)

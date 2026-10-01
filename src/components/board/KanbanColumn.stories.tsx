@@ -8,7 +8,7 @@ import './kanban.css'
 
 const meta = {
   title: 'Kanban/Column', component: KanbanColumn,
-  args: { column: boardStoryData.columns[0], cards: [], index: 0, count: 1, pending: false,
+  args: { column: boardStoryData.columns[0], cards: [], commentCounts: {}, index: 0, count: 1, pending: false,
     error: null, register: () => () => undefined, adding: false, onAddingChange: fn(),
     run: fn(async () => true), onOpen: fn(), onRename: fn(),
     drag: { target: null, start: fn(), end: fn(), over: fn(), drop: fn() } },
@@ -28,7 +28,7 @@ export const EmptyToPopulated: Story = { play: async ({ canvas, args, userEvent 
   await expect(args.run).toHaveBeenCalledWith({ type: 'create-card', id: expect.any(String), title: 'Standalone task', columnId: 'backlog' })
 } }
 export const LongTitleOnly: Story = { globals: { viewport: { value: 'mobile1', isRotated: false } },
-  args: { cards: [{ ...boardStoryData.cards[0], title: 'Unbroken'.repeat(60) }] },
+  args: { cards: [{ ...boardStoryData.cards[0], description: '   ', title: 'Unbroken'.repeat(60) }] },
   play: async ({ canvas, canvasElement }) => {
     const card = canvas.getByRole('button', { name: 'Unbroken'.repeat(60) })
     await expect(card.children).toHaveLength(0)

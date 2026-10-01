@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import { Plus } from 'lucide-react'
+import { AlignLeft, MessageSquare, Plus } from 'lucide-react'
 import type { RegisterDraftGuard } from '../../app/useNavigationGuard'
 import { BoardInlineComposer } from './BoardInlineComposer'
 import { storyPointLabel, type BoardCard, type BoardColumn } from '../../data/board'
@@ -10,12 +10,13 @@ import type { useBoardDrag } from './useBoardDrag'
 
 interface Props {
   column: BoardColumn; cards: BoardCard[]; index: number; count: number; pending: boolean
+  commentCounts: Readonly<Record<string, number>>
   deleted?: boolean; error: string | null; register: RegisterDraftGuard
   adding: boolean; onAddingChange: (adding: boolean) => void
   run: RunBoardCommand; drag: ReturnType<typeof useBoardDrag>
   onOpen: (card: BoardCard) => void; onRename: () => void
 }
-export function KanbanColumn({ column, cards, index, count, pending, deleted, error, register, run, drag,
+export function KanbanColumn({ column, cards, commentCounts, index, count, pending, deleted, error, register, run, drag,
   onOpen, onRename, adding, onAddingChange }: Props) {
   const label = useId()
   const composer = useComposerFocus(adding)
@@ -29,16 +30,28 @@ export function KanbanColumn({ column, cards, index, count, pending, deleted, er
         pending={pending || !!deleted} rename={onRename} run={run} />
     </header>
     <ol className="kanban-cards" aria-label={`${column.title} cards`}>
-      {cards.map((card) => <li key={card.id}>
+      {cards.map((card) => {
+        const commentCount = commentCounts[card.id] ?? 0
+        const hasDescription = Boolean(card.description.trim())
+        const summary = [hasDescription ? 'Has description.' : '', commentCount > 0
+          ? `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}.` : ''].filter(Boolean).join(' ')
+        const metaId = `${label}-${card.id}-meta`
+        return <li key={card.id}>
         <button className="kanban-card" type="button" disabled={pending || deleted} draggable={!pending && !deleted}
           aria-label={card.storyPoints == null ? undefined : `${card.title} ${storyPointLabel(card.storyPoints)} story ${card.storyPoints === 1 ? 'point' : 'points'}`}
+          aria-describedby={summary ? metaId : undefined}
           onDragStart={(event) => drag.start(event, card.id)} onDragEnd={drag.end}
           onDrop={(event) => drag.drop(event, column.id, card.id)}
-          onClick={() => onOpen(card)}>{card.title}{card.storyPoints != null &&
-            <span className="kanban-story-points-badge" aria-hidden="true">
-              {storyPointLabel(card.storyPoints)}
+          onClick={() => onOpen(card)}>{card.title}{(hasDescription || commentCount > 0 || card.storyPoints != null) &&
+            <span className="kanban-card-meta" aria-hidden="true">
+              {hasDescription && <AlignLeft size={14} />}
+              {commentCount > 0 && <span><MessageSquare size={14} />{commentCount}</span>}
+              {card.storyPoints != null && <span className="kanban-story-points-badge" aria-hidden="true">
+                {storyPointLabel(card.storyPoints)}
+              </span>}
             </span>}</button>
-      </li>)}
+        {summary && <span id={metaId} className="sr-only">{summary}</span>}
+      </li>})}
     </ol>
     <div ref={composer}>{adding ? <BoardInlineComposer kind="card" pending={pending} deleted={deleted} error={error} register={register}
       onClose={() => onAddingChange(false)} onSave={(id, title) => run({ type: 'create-card', id, columnId: column.id, title })} /> :

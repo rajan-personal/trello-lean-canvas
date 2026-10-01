@@ -26,11 +26,13 @@ export function KanbanBoard({ board, user, pending, deleted, error, run, registe
   const [composingColumns, setComposingColumns] = useState<BoardColumn[]>([])
   const removedColumns = composingColumns.filter((column) => !board.columns.some((item) => item.id === column.id))
   const drag = useBoardDrag(board, pending || !!deleted, run)
+  const commentCounts: Record<string, number> = {}
+  for (const comment of board.comments) commentCounts[comment.cardId] = (commentCounts[comment.cardId] ?? 0) + 1
   const close = () => setEditor(null)
   return <>
     <div className="kanban-lists" aria-label="Board columns">
       {[...board.columns, ...removedColumns].map((column, index) => <KanbanColumn key={column.id} column={column}
-        cards={orderedCards(board, column.id)} index={index} count={board.columns.length}
+        cards={orderedCards(board, column.id)} commentCounts={commentCounts} index={index} count={board.columns.length}
         adding={composingColumns.some((item) => item.id === column.id)}
         onAddingChange={(adding) => setComposingColumns((current) => adding ? [...current, column] :
           current.filter((item) => item.id !== column.id))}
