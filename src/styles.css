@@ -71,10 +71,3 @@
     transition: opacity 80ms linear;
   }
 }
-
-/* Only the workspace header with its mobile action row needs the extra offset. */
-@media (max-width: 760px) {
-  .app-shell:has(.topbar [role="tablist"]) .notepad-panel {
-    top: 92px;
-  }
-}

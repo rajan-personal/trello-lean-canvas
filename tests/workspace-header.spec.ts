@@ -6,7 +6,7 @@ test('keeps the mobile header compact without a Lean wordmark', async ({ page })
   await openSampleCanvas(page)
 
   await expect(page.getByText('Lean', { exact: true })).toHaveCount(0)
-  await expect(page.locator('.topbar-brand')).toHaveCSS('width', '44px')
+  await expect(page.locator('.topbar-brand')).toHaveCSS('width', '36px')
   const menu = page.getByRole('button', { name: 'Open sidebar' })
   const add = page.getByRole('button', { name: 'Add canvas' })
   await expect(menu).toBeVisible()

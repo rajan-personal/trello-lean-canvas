@@ -70,6 +70,7 @@ test('uses the full workspace for notes on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 667 })
   await openSampleCanvas(page)
 
+  await page.getByRole('button', { name: 'More actions', exact: true }).click()
   await page.getByRole('button', { name: 'Notepad', exact: true }).click()
 
   const panel = page.getByRole('complementary', { name: 'Notepad' })
@@ -86,5 +87,5 @@ test('uses the full workspace for notes on mobile', async ({ page }) => {
         bottom: Math.round(bounds.bottom),
       }
     }))
-    .toEqual({ left: 0, right: 375, top: 92, bottom: 667 })
+    .toEqual({ left: 0, right: 375, top: 48, bottom: 667 })
 })
