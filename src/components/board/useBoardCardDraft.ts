@@ -39,6 +39,6 @@ export function useBoardCardDraft(card: BoardCard, user: AppUser, run: RunBoardC
       }
     } finally { posting.current = false }
   }
-  return { draft, setDraft, comment, setComment, message, fieldsDirty,
+  return { draft, setDraft, comment, setComment, message, fieldsDirty, changedElsewhere,
     dirty: fieldsDirty || comment.length > 0, save, addComment }
 }

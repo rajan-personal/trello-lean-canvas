@@ -1,0 +1,24 @@
+.ticket-run { margin: 0 0 24px; padding: 14px 0; border-block: 1px solid #e4e7ec; font-size: .8125rem; overflow-wrap: anywhere; }
+.ticket-run-heading, .ticket-run h3, .ticket-run-status, .ticket-run a { display: flex; align-items: center; gap: 8px; }
+.ticket-run-heading { justify-content: space-between; }
+.ticket-run h3 { margin: 0; font-size: .875rem; font-weight: 500; }
+.ticket-run h3 svg { color: #667085; }
+.kanban-card-dialog .ticket-run button { min-height: 36px; padding: 6px 12px; border: 1px solid #d0d5dd; border-radius: 6px; background: #fff; color: #344054; font-size: .8125rem; }
+.kanban-card-dialog .ticket-run button:not(:disabled):hover { background: #f2f4f7; }
+.ticket-run button:disabled { opacity: .55; cursor: default; }
+.ticket-run p { margin: 8px 0 0; line-height: 1.5; }
+.ticket-run-status { flex-wrap: wrap; color: #344054; }
+.ticket-run-status time { margin-inline-start: auto; font-size: .75rem; color: #667085; }
+.ticket-run-dot { width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: #98a2b3; }
+.ticket-run-dot[data-status="running"] { background: #245fce; }
+.ticket-run-dot[data-status="ready_for_review"] { background: #15803d; }
+.ticket-run-dot[data-status="failed"], .ticket-run-dot[data-status="blocked"] { background: #b54708; }
+.ticket-run-hint { color: #667085; }
+.ticket-run-message, .ticket-run-summary { white-space: pre-wrap; }
+.ticket-run a { width: fit-content; min-height: 44px; margin-top: 4px; color: #245fce; text-decoration: underline; }
+.ticket-run-error { color: #b42318; }
+.ticket-run :is(button, a):focus-visible { outline: 2px solid #245fce; outline-offset: 2px; }
+@media (max-width: 760px) { .kanban-card-dialog .ticket-run button { min-height: 44px; } }
+
+.ticket-run-preview { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.ticket-run-text button, .ticket-run-recovery { margin-top: 8px; }

@@ -139,6 +139,41 @@ service cloud.firestore {
             && request.resource.data.revision == resource.data.revision + 1
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['revision', 'updatedAt']);
           allow delete: if ownsBoard() && resource.data.status == 'deleting' && !existsAfter(canvasRef());
+          // Subscription readiness is published only by the trusted Lean MCP service.
+          // Its webhook URL and signing secret must never be stored in this readable document.
+          match /integrations/{integrationId} {
+            allow read: if ownsBoard() && integrationId == 'codex';
+            allow delete: if ownsBoard() && get(boardRef()).data.status == 'deleting';
+          }
+          match /codexRuns/{cardId} {
+            function validRequest(data) {
+              let card = get(/databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId)/boards/default/cards/$(cardId)).data;
+              let integration = get(/databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId)/boards/default/integrations/codex).data;
+              return data.keys().hasOnly(['runId', 'cardId', 'requestedBy', 'title', 'description',
+                  'status', 'message', 'summary', 'prUrl', 'createdAt', 'updatedAt'])
+                && existsAfter(canvasRef()) && get(boardRef()).data.status == 'active'
+                && integration.enabled == true && integration.expiresAt > request.time
+                && data.runId is string && data.runId.matches('^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')
+                && data.cardId == cardId && data.requestedBy == userId
+                && data.title == card.title && data.description == card.description
+                && data.status == 'queued' && data.message == '' && data.summary == '' && data.prUrl == ''
+                && data.createdAt == request.time && data.updatedAt == request.time;
+            }
+            allow read: if ownsBoard();
+            allow create: if ownsBoard() && validRequest(request.resource.data);
+            allow update: if ownsBoard() && validRequest(request.resource.data)
+              && resource.data.status in ['ready_for_review', 'failed', 'cancelled']
+              && request.resource.data.runId != resource.data.runId;
+            allow update: if ownsBoard() && existsAfter(canvasRef())
+              && get(boardRef()).data.status == 'active'
+              && exists(/databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId)/boards/default/cards/$(cardId))
+              && resource.data.status in ['queued', 'running', 'blocked']
+              && !resource.data.keys().hasAny(['stopRequestedAt'])
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stopRequestedAt'])
+              && request.resource.data.stopRequestedAt == request.time;
+            // Status/result writes are trusted-server only; clients cannot claim completion.
+            allow delete: if ownsBoard() && canDeleteCard(cardId);
+          }
           match /cards/{cardId} {
             allow read: if readsBoard();
             allow create, update: if ownsBoard() && writable() && validCard(request.resource.data);
