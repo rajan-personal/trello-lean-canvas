@@ -10,8 +10,8 @@ export const projects = [
   { ...canvas('c'), name: 'Empty project', title: 'Empty project', favorite: false },
 ]
 export const boards: Record<string, BoardData> = {
-  a: { columns: [{ id: 'z-custom', title: 'Review' }, { id: 'a-custom', title: 'Backlog' }], cards: [
-    card('a-duplicate-late', 'z-custom', 'Duplicate title', 'b'), card('a-duplicate-first', 'z-custom', 'Duplicate title', 'a'), card('a-backlog', 'a-custom', 'A backlog', 'a'),
+  a: { columns: [{ id: 'z-custom', title: 'Review' }, { id: 'a-custom', title: 'Backlog' }, { id: 'running-custom', title: 'In Progress' }], cards: [
+    card('a-duplicate-late', 'z-custom', 'Duplicate title', 'b'), card('a-duplicate-first', 'z-custom', 'Duplicate title', 'a'), card('a-backlog', 'a-custom', 'A backlog', 'a'), card('a-running', 'running-custom', 'Build release', 'a'),
   ], comments: [] },
   b: { columns: [{ id: 'b-custom', title: 'Done' }, { id: 'c-custom', title: 'In Review' }, { id: 'todo', title: 'Todo' }], cards: [
     card('b-done', 'b-custom', 'B done', 'a'), card('b-review', 'c-custom', 'Review this', 'a'), card('b-todo', 'todo', 'Build this', 'a'),

@@ -9,10 +9,11 @@ interface Props {
   projects: TicketListProject[]
   blocked: boolean
   onOpenProjectBoard: (projectId: string) => void
+  onOpenTicket: (projectId: string, ticketId: string) => void
   onRetry: (projectId: string) => void
 }
 
-export function TicketListView({ projects, blocked, onOpenProjectBoard, onRetry }: Props) {
+export function TicketListView({ projects, blocked, onOpenProjectBoard, onOpenTicket, onRetry }: Props) {
   const today = useActivityDay()
   const statusPeak = projects.reduce((peak, project) => {
     if (project.loading || project.error || !project.summary) return peak
@@ -31,7 +32,7 @@ export function TicketListView({ projects, blocked, onOpenProjectBoard, onRetry 
       </header>
       {projects.length ? <ul className="ticket-project-list" role="list" aria-label="Projects">
         {projects.map((project) => <TicketProjectRow key={project.canvas.id} project={project} blocked={blocked} today={today} statusPeak={statusPeak} activityPeak={activityPeak}
-          onOpenProjectBoard={onOpenProjectBoard} onRetry={onRetry} />)}
+          onOpenProjectBoard={onOpenProjectBoard} onOpenTicket={onOpenTicket} onRetry={onRetry} />)}
       </ul> : <p className="ticket-list-message" role="status">No projects yet.</p>}
     </div>
   </main>
