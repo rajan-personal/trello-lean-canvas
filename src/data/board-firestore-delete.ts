@@ -1,4 +1,4 @@
-import { collection, doc, getDocsFromServer, limit, query, runTransaction, serverTimestamp, where, writeBatch, type Firestore } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDocsFromServer, limit, query, runTransaction, serverTimestamp, where, writeBatch, type Firestore } from 'firebase/firestore'
 import { createBoard } from './board'
 import { incrementActivity } from './board-activity'
 import { boardPath, boardRecordSchema, boardRecord } from './board-firestore-model'
@@ -38,6 +38,7 @@ export async function finishCardDeletion(db: Firestore, uid: string, canvasId: s
     if (current.status !== 'deleting-card' || current.deletingCardId !== cardId)
       throw new Error('Board deletion state changed; retry.')
     tx.delete(doc(db, `${path}/cards`, cardId))
+    tx.delete(doc(db, `${path}/codexRuns`, cardId))
     tx.update(ref, { status: 'active', deletingCardId: '', revision: current.revision + 1, updatedAt: serverTimestamp(),
       activity: incrementActivity(current.activity) })
   })
@@ -57,6 +58,8 @@ export async function prepareBoardDeletion(db: Firestore, uid: string, canvasId:
       revision: data.revision + 1, updatedAt: serverTimestamp() })
   })
   await drain(db, `${path}/comments`)
+  await drain(db, `${path}/codexRuns`)
+  await deleteDoc(doc(db, `${path}/integrations/codex`))
   await drain(db, `${path}/cards`)
   // Caller atomically removes this tombstone with the canvas, never before it.
 }

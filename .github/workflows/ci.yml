@@ -47,6 +47,13 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: Ticket run Firestore rules and concurrency tests
+        run: |
+          export JAVA_HOME="$JAVA_HOME_21_X64"
+          export PATH="$JAVA_HOME/bin:$PATH"
+          npx -y firebase-tools@15.28.2 emulators:exec --only firestore \
+            'npx vitest run --config vitest.emulator.config.ts emulator/ticket-runs.test.ts'
+
       - name: Validate production build and Worker configuration
         run: npm run deploy:dry-run
 

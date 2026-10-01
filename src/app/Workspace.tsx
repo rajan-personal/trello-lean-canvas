@@ -20,6 +20,7 @@ import { useNavigationGuard } from './useNavigationGuard'
 import { WorkspaceHeader } from './WorkspaceHeader'
 import { WorkspaceRouteContent } from './WorkspaceRouteContent'
 import { useWorkspaceTicketList } from './useWorkspaceTicketList'
+import { TicketRunProvider } from '../components/board/TicketRunProvider'
 interface Props {
   user: AppUser
   onSignOut: () => void | Promise<void>
@@ -73,6 +74,7 @@ export function Workspace({ user, onSignOut, onSetPassword, persistence, browser
           collapsed={panels.sidebarCollapsed}
           onClose={panels.closeSidebar}
         />
+        <TicketRunProvider uid={user.uid} canvasId={state.activeCanvas?.id} local={persistence === 'local'}>
         <WorkspaceRouteContent allTickets={allTickets} activeCanvas={state.activeCanvas}
           ticketList={{ projects: ticketList.projects, blocked: state.pending,
             onOpenProjectBoard: openProjectBoard, onRetry: ticketList.retry }}
@@ -81,6 +83,7 @@ export function Workspace({ user, onSignOut, onSetPassword, persistence, browser
               state.updateActiveCanvas((canvas) => ({ ...canvas, about })); await state.flushCanvases() } },
             onDismissDeleted: () => { if (allow()) state.setActiveId(null) }, register: guard.register, notify }}
           unavailable={{ route, onReturn: () => { if (allow()) history.navigate('/') } }} />
+        </TicketRunProvider>
         <WorkspaceNotepad state={state} panels={panels} />
       </div>
       <CreateCanvasDialog dialog={dialog} setDialog={setDialog} onCreate={commands.createCanvas} />
