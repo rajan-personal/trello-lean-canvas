@@ -45,7 +45,7 @@ export function CanvasSection(props: CanvasSectionProps) {
         </strong>
       </header>
       {hasHint && (
-        <p className="cell-hint mx-px mt-px mb-1.5 min-h-7 text-[11px] leading-3.5 text-[#626f86]">
+        <p className="cell-hint mx-px mt-px mb-1.5 min-h-7 text-xs leading-4 text-[#44546f]">
           {section.hint}
         </p>
       )}

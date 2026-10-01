@@ -30,8 +30,8 @@ export function LoginScreen({ busy, error, onSignIn, onEmailSignIn }: Props) {
           className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#c7d1e0] bg-white px-5 text-sm font-semibold shadow-sm transition hover:bg-[#f7f8f9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4] disabled:cursor-wait disabled:opacity-65">
           <GoogleMark />{busy && !emailPending ? 'Connecting to Google…' : 'Continue with Google'}
         </button>
-        <p className="mt-2 text-center text-xs text-[#626f86]">New here? Create your account with Google.</p>
-        <div className="my-5 flex items-center gap-3 text-xs text-[#626f86]"><span className="h-px flex-1 bg-[#dcdfe4]" />or<span className="h-px flex-1 bg-[#dcdfe4]" /></div>
+        <p className="mt-2 text-center text-xs text-[#44546f]">New here? Create your account with Google.</p>
+        <div className="my-5 flex items-center gap-3 text-xs text-[#44546f]"><span className="h-px flex-1 bg-[#dcdfe4]" />or<span className="h-px flex-1 bg-[#dcdfe4]" /></div>
         <EmailSignInForm busy={busy} pending={busy && emailPending}
           onSignIn={(email, password) => { setEmailPending(true); onEmailSignIn(email, password) }} />
         <p role="status" aria-atomic="true" className="sr-only">{busy ? emailPending ? 'Signing in with email…' : 'Connecting to Google…' : ''}</p>

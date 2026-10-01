@@ -4,7 +4,7 @@
 .kanban-column[data-drop-target] { outline: 3px solid #85b8ff; outline-offset: 2px; }
 .kanban-column > header { display: flex; align-items: flex-start; min-height: 40px; padding: 0 0 8px 8px; gap: 6px; }
 .kanban-column h2 { flex: 1; min-width: 0; padding: 6px 0; margin: 0; overflow-wrap: anywhere; font-size: 14px; font-weight: 650; line-height: 1.4; }
-.kanban-column-count { padding: 7px 2px; color: #626f86; font-size: 12px; line-height: 18px; font-variant-numeric: tabular-nums; }
+.kanban-column-count { padding: 7px 2px; color: #44546f; font-size: 12px; line-height: 18px; font-variant-numeric: tabular-nums; }
 .kanban-column-menu { flex: 0 0 auto; }
 .kanban-column-menu-trigger { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 6px; color: #626f86; cursor: pointer; }
 .kanban-column-menu-trigger:hover, .kanban-column-menu-trigger[aria-expanded="true"] { background: #dcdfe4; color: #172b4d; }
