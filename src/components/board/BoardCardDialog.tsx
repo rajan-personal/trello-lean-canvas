@@ -62,7 +62,7 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
             <BoardCardStoryPoints id={pointsId} helpId={pointsHelpId} value={draft.storyPoints ?? null}
               disabled={!exists} onChange={(storyPoints) => setDraft({ ...draft, storyPoints })} />
           </div>
-          <textarea id={descriptionId} ref={descriptionRef} name="description" rows={14} placeholder="Add a more detailed description…" maxLength={100000} readOnly={!exists} value={draft.description}
+          <textarea id={descriptionId} ref={descriptionRef} name="description" rows={6} placeholder="Add a more detailed description…" maxLength={100000} readOnly={!exists} value={draft.description}
             onChange={(event) => setDraft({ ...draft, description: event.target.value })} />
         </div>
         <div className="kanban-actions">

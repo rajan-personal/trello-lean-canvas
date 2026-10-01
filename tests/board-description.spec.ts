@@ -20,7 +20,8 @@ for (const fallback of [false, true]) test(`description grows with long text and
   const description = modal.getByRole('textbox', { name: 'Description', exact: true })
   await expect(description).toHaveCSS('field-sizing', fallback ? 'fixed' : 'content')
   const initial = (await description.boundingBox())!.height
-  expect(initial).toBeGreaterThanOrEqual(320)
+  expect(initial).toBeGreaterThanOrEqual(150)
+  expect(initial).toBeLessThanOrEqual(200)
   const text = Array.from({ length: 45 }, (_, index) => `${index + 1}. A detailed part of the plan with enough text to wrap on small screens.`).join('\n')
   await description.fill(text)
   await expect.poll(async () => (await description.boundingBox())!.height).toBeGreaterThan(1000)
@@ -42,4 +43,7 @@ for (const fallback of [false, true]) test(`description grows with long text and
   await description.fill('Short again')
   await expect.poll(async () => (await description.boundingBox())!.height).toBeLessThan(400)
   await expect(description).toHaveValue('Short again')
+  await description.fill('')
+  await expect.poll(async () => (await description.boundingBox())!.height).toBeLessThanOrEqual(initial)
+  await expect(description).toHaveValue('')
 })
