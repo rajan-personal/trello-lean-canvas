@@ -72,7 +72,7 @@ export async function uploadCanvas(
 ): Promise<void> {
   const fileChooser = page.waitForEvent('filechooser')
   await page.getByRole('button', { name: 'Add canvas' }).click()
-  await page.getByRole('button', { name: 'Upload' }).click()
+  await page.getByRole('button', { name: 'Upload', exact: true }).click()
   await (await fileChooser).setFiles({
     name: fileName,
     mimeType: 'application/yaml',
@@ -83,7 +83,7 @@ export async function uploadCanvas(
 export async function loadSamples(page: Page): Promise<void> {
   await page.goto('/')
   await page.getByRole('button', { name: 'Add canvas' }).click()
-  await page.getByRole('button', { name: 'Sample' }).click()
+  await page.getByRole('button', { name: 'Sample', exact: true }).click()
   await expect(page.getByRole('heading', { name: 'Airbnb — 2008' })).toBeVisible()
   await page.getByRole('tab', { name: 'Canvas', exact: true }).click()
 }

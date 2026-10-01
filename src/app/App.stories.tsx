@@ -12,9 +12,9 @@ export const Default: AppStory = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     const addCanvas = await canvas.findByRole('button', { name: 'Add canvas' })
-    await expect(canvas.queryAllByRole('heading')).toHaveLength(0)
+    await expect(await canvas.findByRole('heading', { name: 'Start your first Lean Canvas' })).toBeVisible()
     await userEvent.click(addCanvas)
-    await userEvent.click(canvas.getByRole('button', { name: 'Sample' }))
+    await userEvent.click(canvas.getByRole('button', { name: /^Sample$/ }))
     await expect(
       await canvas.findByRole('heading', { name: 'Airbnb — 2008' }),
     ).toBeInTheDocument()

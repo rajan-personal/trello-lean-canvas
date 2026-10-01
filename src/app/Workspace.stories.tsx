@@ -52,7 +52,10 @@ export const Empty: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await canvas.findByRole('button', { name: 'Add canvas' })
-    await expect(canvas.queryByRole('heading')).not.toBeInTheDocument()
+    await expect(await canvas.findByRole('heading', { name: 'Start your first Lean Canvas' })).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Create canvas' })).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Upload YAML' })).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Load sample data' })).toBeVisible()
     await expect(
       canvas.getByRole('button', { name: 'Add canvas' }),
     ).toBeInTheDocument()
