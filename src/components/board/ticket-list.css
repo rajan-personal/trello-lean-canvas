@@ -9,6 +9,8 @@
 }
 .ticket-list-content {
   container: ticket-list / inline-size;
+  max-inline-size: 880px;
+  margin-inline: auto;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 2px 4px #091e4226, 0 0 0 1px #091e4214;
