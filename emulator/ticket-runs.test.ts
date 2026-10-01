@@ -1,5 +1,5 @@
 import { assertFails } from '@firebase/rules-unit-testing'
-import { doc, getDoc, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore'
+import { doc, getDoc, serverTimestamp, setDoc, Timestamp, updateDoc } from 'firebase/firestore'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { boardTestEnvironment } from './board-fixtures'
 import { importBoard, mutateBoard, boardPath, prepareBoardDeletion } from '../src/data/board-firestore'
@@ -59,6 +59,26 @@ describe('Codex run requests', () => {
     }
     await ready(Date.now() - 1000)
     await assertFails(setDoc(ref, { ...stored, runId: secondId, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }))
+  })
+  it('requests a stop once, fences old requests and waits for trusted confirmation', async () => {
+    const client = createTicketRunClient(test.db, 'alice', 'a'), ref = doc(test.db, runPath)
+    await client.request(card, firstId)
+    await expect(client.requestStop(card.id, secondId)).rejects.toThrow('changed')
+    await assertFails(updateDoc(ref, { stopRequestedAt: serverTimestamp(), runId: secondId }))
+    await assertFails(test.environment.authenticatedContext('bob').firestore().doc(runPath).update({ stopRequestedAt: Timestamp.now() }))
+    await client.requestStop(card.id, firstId)
+    const stopped = (await getDoc(ref)).data()!
+    expect(stopped.stopRequestedAt).toBeInstanceOf(Timestamp)
+    await client.requestStop(card.id, firstId)
+    expect((await getDoc(ref)).data()).toEqual(stopped)
+    await client.request(card, secondId)
+    expect((await getDoc(ref)).data()?.runId).toBe(firstId)
+    await assertFails(updateDoc(ref, { status: 'cancelled' }))
+    await assertFails(updateDoc(ref, { stopRequestedAt: serverTimestamp() }))
+    await trustedWrite(runPath, { status: 'cancelled' })
+    await client.request(card, secondId)
+    expect((await getDoc(ref)).data()).toMatchObject({ runId: secondId, status: 'queued' })
+    expect((await getDoc(ref)).data()).not.toHaveProperty('stopRequestedAt')
   })
   it('receives trusted MCP updates live and cleans run data up on deletion', async () => {
     const client = createTicketRunClient(test.db, 'alice', 'a')

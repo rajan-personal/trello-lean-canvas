@@ -59,7 +59,7 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
               event.preventDefault(); event.currentTarget.form?.requestSubmit()
             }
           }} onChange={(event) => setDraft({ ...draft, title: event.target.value.replace(/\r?\n/g, ' ') })} /></div>
-        <TicketRunPanel key={card.id} card={card} disabled={pending || !exists} dirty={editor.fieldsDirty} />
+        <TicketRunPanel key={card.id} card={draft} changedElsewhere={editor.changedElsewhere} disabled={pending || !exists} dirty={editor.fieldsDirty} />
         <div className="kanban-description-field">
           <div className="kanban-description-heading">
             <label htmlFor={descriptionId}><AlignLeft size={17} aria-hidden="true" /> Description</label>

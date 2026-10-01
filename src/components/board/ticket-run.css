@@ -19,3 +19,6 @@
 .ticket-run-error { color: #b42318; }
 .ticket-run :is(button, a):focus-visible { outline: 2px solid #245fce; outline-offset: 2px; }
 @media (max-width: 760px) { .kanban-card-dialog .ticket-run button { min-height: 44px; } }
+
+.ticket-run-preview { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.ticket-run-text button, .ticket-run-recovery { margin-top: 8px; }

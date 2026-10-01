@@ -44,3 +44,6 @@ export const RequestFailure: Story = { args: { fail: true }, play: async ({ canv
   await userEvent.click(canvas.getByRole('button', { name: 'Retry' }))
   await waitFor(() => expect(canvas.getByRole('button', { name: 'Run Codex' })).toBeEnabled())
 } }
+
+export const LongResult: Story = { args: { status: 'ready_for_review', long: true } }
+export const RemoteEdit: Story = { args: { remote: true } }

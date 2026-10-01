@@ -23,6 +23,13 @@ export function useTicketRun(card: BoardCard) {
   }, [client, card.id, retry])
   const view = snapshot?.client === client && snapshot?.cardId === card.id ? snapshot.view : null
   return { view, now, error, pending, available: !!client, retry: () => setRetry((value) => value + 1),
+    async requestStop() {
+      if (!client || !view?.run || busy.current) return
+      busy.current = true; setPending(true)
+      try { await client.requestStop(card.id, view.run.runId) }
+      catch (cause) { setError(cause instanceof Error ? cause.message : 'Couldn’t request a stop. Retry.') }
+      finally { busy.current = false; setPending(false) }
+    },
     async request() {
       if (!client || busy.current) return
       busy.current = true; setPending(true); setError(null)

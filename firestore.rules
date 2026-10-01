@@ -162,8 +162,15 @@ service cloud.firestore {
             allow read: if ownsBoard();
             allow create: if ownsBoard() && validRequest(request.resource.data);
             allow update: if ownsBoard() && validRequest(request.resource.data)
-              && resource.data.status in ['ready_for_review', 'failed']
+              && resource.data.status in ['ready_for_review', 'failed', 'cancelled']
               && request.resource.data.runId != resource.data.runId;
+            allow update: if ownsBoard() && existsAfter(canvasRef())
+              && get(boardRef()).data.status == 'active'
+              && exists(/databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId)/boards/default/cards/$(cardId))
+              && resource.data.status in ['queued', 'running', 'blocked']
+              && !resource.data.keys().hasAny(['stopRequestedAt'])
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stopRequestedAt'])
+              && request.resource.data.stopRequestedAt == request.time;
             // Status/result writes are trusted-server only; clients cannot claim completion.
             allow delete: if ownsBoard() && canDeleteCard(cardId);
           }

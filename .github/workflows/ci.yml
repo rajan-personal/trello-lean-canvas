@@ -47,6 +47,11 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: Ticket run mobile regressions
+        run: |
+          npx playwright install --with-deps chromium
+          node scripts/verify-codex-preview.mjs
+
       - name: Ticket run Firestore rules and concurrency tests
         run: |
           export JAVA_HOME="$JAVA_HOME_21_X64"
@@ -58,6 +63,19 @@ jobs:
         run: npm run deploy:dry-run
 
       # PRs never receive deployment credentials or publish to production.
+      # Rules must succeed first: older rules reject run cleanup during ticket deletion.
+      - name: Deploy Firestore rules before the frontend
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          FIREBASE_RULES_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_RULES_SERVICE_ACCOUNT }}
+        run: |
+          test -n "$FIREBASE_RULES_SERVICE_ACCOUNT" || { echo "Missing FIREBASE_RULES_SERVICE_ACCOUNT Actions secret; frontend deployment blocked"; exit 1; }
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-rules.json"
+          trap 'rm -f "$GOOGLE_APPLICATION_CREDENTIALS"' EXIT
+          umask 077
+          printf '%s' "$FIREBASE_RULES_SERVICE_ACCOUNT" > "$GOOGLE_APPLICATION_CREDENTIALS"
+          npx -y firebase-tools@15.28.2 deploy --only firestore:rules --project trello-lean-canvas-7kvrv --non-interactive
+
       - name: Deploy to Cloudflare
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         env:

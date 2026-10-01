@@ -6,6 +6,7 @@ import { activeRun, ticketRunSchema, type TicketRunClient, type TicketRun } from
 function decode(data: Record<string, unknown>): TicketRun {
   return ticketRunSchema.parse({ ...data,
     createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toMillis() : undefined,
+    ...(data.stopRequestedAt instanceof Timestamp ? { stopRequestedAt: data.stopRequestedAt.toMillis() } : {}),
     updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toMillis() : undefined,
   })
 }
@@ -19,16 +20,18 @@ export function createTicketRunClient(db: Firestore, uid: string, canvasId: stri
   return {
     subscribe(cardId, changed, error) {
       let run: TicketRun | null = null, connectedUntil = 0
+      let failed = false
+      const fail = () => { failed = true; error() }
       let runReady = false, connectionReady = false, runCached = true, connectionCached = true
       const emit = () => {
-        if (runReady && connectionReady) changed({ run, connectedUntil, fromCache: runCached || connectionCached })
+        if (!failed && runReady && connectionReady) changed({ run, connectedUntil, fromCache: runCached || connectionCached })
       }
       const stopConnection = onSnapshot(connection, { includeMetadataChanges: true }, (snapshot) => {
         const data = snapshot.data()
         connectedUntil = data?.enabled === true && data?.expiresAt instanceof Timestamp ? data.expiresAt.toMillis() : 0
         connectionCached = snapshot.metadata.fromCache
         connectionReady = true; emit()
-      }, error)
+      }, fail)
       const stopRun = onSnapshot(runRef(cardId), { includeMetadataChanges: true }, (snapshot) => {
         if (snapshot.metadata.hasPendingWrites) return
         try {
@@ -36,9 +39,20 @@ export function createTicketRunClient(db: Firestore, uid: string, canvasId: stri
           if (run && run.cardId !== cardId) throw new Error('Run belongs to another ticket.')
           runCached = snapshot.metadata.fromCache
           runReady = true; emit()
-        } catch { error() }
-      }, error)
+        } catch { fail() }
+      }, fail)
       return () => { stopConnection(); stopRun() }
+    },
+    async requestStop(cardId, runId) {
+      const ref = runRef(cardId)
+      await runTransaction(db, async (tx) => {
+        const snapshot = await tx.get(ref)
+        if (!snapshot.exists()) throw new Error('This run is no longer available.')
+        const run = decode(snapshot.data())
+        if (run.runId !== runId) throw new Error('The run changed. Retry to refresh its status.')
+        if (!activeRun(run) || run.stopRequestedAt !== undefined) return
+        tx.update(ref, { stopRequestedAt: serverTimestamp() })
+      })
     },
     async request(card, runId) {
       const ref = runRef(card.id)
