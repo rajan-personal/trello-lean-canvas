@@ -21,7 +21,7 @@ for (const width of [320, 1428]) {
     const bottoms = await bars.evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().bottom))
     expect(new Set(bottoms).size).toBe(1)
     const tracks = await counts.locator('.ticket-status-track').evaluateAll(nodes => nodes.map(node => node.getBoundingClientRect().toJSON()))
-    expect(tracks.every(track => track.height > track.width)).toBe(true)
+    expect(tracks.every(track => track.width === 24 && track.height === 24)).toBe(true)
     expect(tracks[0].right).toBe(tracks[1].left)
     expect(tracks[1].right).toBe(tracks[2].left)
     await expect(counts.locator('.ticket-status-value:visible')).toHaveCount(0)
