@@ -40,7 +40,7 @@ export function SidebarCanvasItem(p: Props) {
         aria-label={p.canvas.name}
         aria-current={p.canvas.id === p.activeId ? 'page' : undefined}
         title="Drag to reorder. Press Alt+Up or Alt+Down to move."
-        className={`canvas-nav-item flex min-h-[38px] w-full items-center gap-2 overflow-hidden rounded-md border-0 px-2.5 py-2 ps-3.5 text-left text-sm leading-5 font-medium whitespace-nowrap text-white/90 hover:bg-white/10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white ${p.canvas.id === p.activeId ? 'bg-white/16 text-white' : 'bg-transparent'} ${p.draggedId === p.canvas.id ? 'outline-2 -outline-offset-2 outline-dashed outline-[#85b8ff]' : ''}`}
+        className={`canvas-nav-item flex min-h-[38px] w-full items-center gap-2 overflow-hidden rounded-md border-0 px-2.5 py-2 ps-3.5 text-left text-sm leading-5 whitespace-nowrap focus-visible:outline-2 focus-visible:-outline-offset-2 ${p.canvas.id === p.activeId ? 'bg-white text-[#12344a] font-semibold hover:bg-white focus-visible:outline-[#0c66e4]' : 'bg-transparent font-medium text-white/90 hover:bg-white/10 focus-visible:outline-white'} ${p.draggedId === p.canvas.id ? 'outline-2 -outline-offset-2 outline-dashed outline-[#85b8ff]' : ''}`}
         onClick={() => p.onSelect(p.canvas.id)}
         onDragStart={(event) => {
           event.dataTransfer.effectAllowed = 'move'
@@ -66,7 +66,7 @@ export function SidebarCanvasItem(p: Props) {
         </span>
         {p.canvas.favorite && (
           <Star
-            className="canvas-nav-favorite flex-none text-[#f5cd47]"
+            className={`canvas-nav-favorite flex-none ${p.canvas.id === p.activeId ? 'text-[#946f00]' : 'text-[#f5cd47]'}`}
             size={15}
             fill="currentColor"
             aria-hidden="true"
