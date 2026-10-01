@@ -19,7 +19,7 @@ const meta = {
     await expect(canvas.getByRole('textbox', { name: 'Description' })).toHaveValue(args.card.description)
     await expect(modal.querySelectorAll('form')).toHaveLength(2)
     await expect(modal.querySelectorAll('form form')).toHaveLength(0)
-    await expect(canvas.getByRole('combobox', { name: 'Story points' })).toHaveValue(String(args.card.storyPoints ?? ''))
+    await expect(canvas.getByRole('combobox', { name: 'Story points' }).textContent).toBe(args.card.storyPoints == null ? '—' : args.card.storyPoints === 13 ? '13+' : String(args.card.storyPoints))
     const status = canvas.getByRole('combobox', { name: 'Status' })
     await expect(status).toHaveTextContent(args.board.columns.find(({ id }) => id === args.card.columnId)?.title ?? 'Unavailable column')
     if (args.pending || args.deleted) await expect(status).toBeDisabled()

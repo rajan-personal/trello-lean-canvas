@@ -31,7 +31,7 @@ test('mobile card details change status without dragging and persist after reloa
   await addBoardCard(page, 'First')
   await openBoardCard(page, 'First')
   const modal = page.getByRole('dialog')
-  await expect(modal.getByRole('combobox', { name: 'Story points' })).toHaveValue('')
+  await expect(modal.getByRole('combobox', { name: 'Story points' })).toHaveText('—')
   await expect(modal.getByRole('combobox', { name: 'Status', exact: true })).toHaveText('Backlog')
   await setStatus(page, 'In Progress')
   await expect(modal.getByText('Unsaved changes', { exact: true })).toBeVisible()

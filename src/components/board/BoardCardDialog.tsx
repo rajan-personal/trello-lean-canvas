@@ -2,11 +2,12 @@ import { useId } from 'react'
 import { AlignLeft, Trash2 } from 'lucide-react'
 import type { AppUser } from '../../auth/auth-context'
 import type { RegisterDraftGuard } from '../../app/useNavigationGuard'
-import { storyPointValues, storyPointLabel, storyPointGuidance, storyPointsSchema, type BoardCard, type BoardData } from '../../data/board'
+import { type BoardCard, type BoardData } from '../../data/board'
 import { orderedComments } from '../../data/board-mutations'
 import { BoardDialog } from './BoardDialog'
 import { BoardComments } from './BoardComments'
 import { BoardCardStatus } from './BoardCardStatus'
+import { BoardCardStoryPoints } from './BoardCardStoryPoints'
 import { useGrowingDescription } from './useGrowingDescription'
 import type { RunBoardCommand } from './board-ui'
 import { useBoardCardDraft } from './useBoardCardDraft'
@@ -26,9 +27,6 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
   const pointsHelpId = useId()
   const editor = useBoardCardDraft(card, user, run)
   const { draft, setDraft } = editor
-  const pointsHelp = draft.storyPoints == null
-    ? 'Not estimated. Optional estimate of effort, complexity, and uncertainty.'
-    : storyPointGuidance[draft.storyPoints]
   const descriptionRef = useGrowingDescription(draft.description)
   const close = useDraftGuard(editor.dirty, pending, onClose, register)
   const exists = !deleted && board.cards.some((item) => item.id === card.id)
@@ -61,19 +59,8 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
         <div className="kanban-description-field">
           <div className="kanban-description-heading">
             <label htmlFor={descriptionId}><AlignLeft size={17} aria-hidden="true" /> Description</label>
-            <div className="kanban-story-points-field">
-              <label htmlFor={pointsId}>Story points</label>
-              <select id={pointsId} name="storyPoints" aria-describedby={pointsHelpId} title={pointsHelp} disabled={!exists}
-                value={draft.storyPoints ?? ''} onChange={(event) => setDraft({ ...draft,
-                  storyPoints: event.target.value === '' ? null : storyPointsSchema.parse(Number(event.target.value)),
-                })}>
-                <option value="" aria-label="Not estimated">—</option>
-                {storyPointValues.map((value) => <option key={value} value={value} title={storyPointGuidance[value]}>
-                  {storyPointLabel(value)}
-                </option>)}
-              </select>
-              <span id={pointsHelpId} className="sr-only">{pointsHelp}</span>
-            </div>
+            <BoardCardStoryPoints id={pointsId} helpId={pointsHelpId} value={draft.storyPoints ?? null}
+              disabled={!exists} onChange={(storyPoints) => setDraft({ ...draft, storyPoints })} />
           </div>
           <textarea id={descriptionId} ref={descriptionRef} name="description" rows={14} placeholder="Add a more detailed description…" maxLength={100000} readOnly={!exists} value={draft.description}
             onChange={(event) => setDraft({ ...draft, description: event.target.value })} />
