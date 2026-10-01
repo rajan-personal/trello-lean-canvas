@@ -21,11 +21,11 @@ The YAML files in [`examples/`](examples/) are retrospective reconstructions rat
 ## Run locally
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Use Node.js 22.12 or newer (compatible with Vite and local Wrangler). Then open `http://127.0.0.1:5173`. The checked-in Firebase web configuration targets `trello-lean-canvas-7kvrv`; it contains public client identifiers only. You can override it with `VITE_FIREBASE_*` variables in `.env.local`.
+Use Node.js 22.12+ **and** npm 11.17.0 (`npm install --global npm@11.17.0`) (compatible with Vite and local Wrangler). Then open `http://127.0.0.1:5173`. The checked-in Firebase web configuration targets `trello-lean-canvas-7kvrv`; it contains public client identifiers only. You can override it with `VITE_FIREBASE_*` variables in `.env.local`.
 
 Account creation in the app uses Google only. Existing Google users can set a password from the sidebar, then sign in with either Google or email/password. Setting or changing a password requires Google verification and retains the same Firebase UID and workspace. See [email sign-in setup](docs/email-sign-in.md). Firestore stores ordering metadata at `users/{uid}/workspaces/default` and each canvas independently under its `canvases/{canvasId}` subcollection. Runtime Zod schemas reject malformed local or cloud data before it reaches application state.
 
