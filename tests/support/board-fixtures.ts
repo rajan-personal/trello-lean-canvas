@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test'
+import { expect, type Locator, type Page } from '@playwright/test'
 import { openSampleCanvas } from './canvas-fixtures'
 
 export async function openBoard(page: Page) {
@@ -24,4 +24,11 @@ export async function setStatus(page: Page, title: string) {
 export async function openBoardCard(page: Page, title: string) {
   await page.getByRole('button', { name: title, exact: true }).click()
   await expect(page.getByRole('dialog', { name: 'Card details' })).toBeVisible()
+}
+
+export async function expectCardTitles(cards: Locator, titles: string[]) {
+  await expect(cards).toHaveCount(titles.length)
+  for (const [index, title] of titles.entries()) {
+    await expect(cards.nth(index)).toHaveAccessibleName(title)
+  }
 }

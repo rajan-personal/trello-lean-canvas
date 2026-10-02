@@ -24,7 +24,7 @@ const projects = [
 ]
 const meta = {
   title: 'Lean Canvas/TicketListView', component: TicketListView, tags: ['autodocs'], parameters: { layout: 'fullscreen' },
-  decorators: [(Story) => <div style={{ height: '100dvh', display: 'flex', background: 'linear-gradient(130deg, #0c66e4, #338bfa)' }}><Story /></div>],
+  decorators: [(Story) => <div style={{ height: '100dvh', display: 'flex', background: 'linear-gradient(130deg, var(--color-app-bg), var(--color-app-bg-end))' }}><Story /></div>],
   args: { projects, blocked: false, onOpenProjectBoard: fn(), onOpenTicket: fn(), onRetry: fn() },
 } satisfies Meta<typeof TicketListView>
 export default meta
@@ -36,8 +36,8 @@ export const Populated: Story = {
     await expect(list.getAllByRole('button', { name: /Open board for/ })).toHaveLength(6)
     await expect(canvas.queryByText(/High Priority|Low Priority/)).not.toBeInTheDocument()
     await expect(list.getByRole('button', { name: 'Open board for Product launch' })).toHaveAccessibleDescription('Starred project')
-    const counts = within(canvas.getByRole('list', { name: 'Task counts for Product launch' }))
-    await expect(counts.getAllByRole('listitem').map((item) => item.textContent)).toEqual(['Todo: 1', 'In Progress: 1', 'In Review: 2'])
+    await expect(canvas.getByLabelText('Active ticket count for Product launch')).toHaveTextContent('4 active tickets')
+    await expect(canvas.queryByRole('list', { name: 'Task status colors' })).not.toBeInTheDocument()
     await userEvent.click(list.getByRole('button', { name: 'Open board for Product launch' }))
     await expect(args.onOpenProjectBoard).toHaveBeenCalledWith('launch')
   },
@@ -46,13 +46,10 @@ export const Loading: Story = {
   args: { projects: [{ ...project('loading', 'Loading project'), loading: true, summary: undefined }] },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('status')).toHaveTextContent('Loading tickets')
-    await expect(canvas.getByRole('list', { name: 'Task counts for Loading project' })).toHaveTextContent('Todo: —In Progress: —In Review: —')
+    await expect(canvas.queryByLabelText('Active ticket count for Loading project')).not.toBeInTheDocument()
     const activity = canvas.getByLabelText('Activity for Loading project: unavailable')
     await expect(activity.querySelector('svg')).toHaveAttribute('data-state', 'unknown')
     await expect(activity.querySelector('polyline')).toHaveAttribute('points', '2,26 102,26')
-    const counts = canvas.getByRole('list', { name: 'Task counts for Loading project' })
-    await expect(counts.querySelectorAll('[data-unavailable]')).toHaveLength(3)
-    await expect(counts.querySelectorAll('.ticket-status-bar')).toHaveLength(0)
   },
 }
 export const PartialProjectStates: Story = {
@@ -63,9 +60,7 @@ export const PartialProjectStates: Story = {
     const activity = canvas.getByLabelText('Activity for Needs retry: unavailable')
     await expect(activity.querySelector('svg')).toHaveAttribute('data-state', 'unknown')
     await expect(activity.querySelector('polyline')).toHaveAttribute('points', '2,26 102,26')
-    const counts = canvas.getByRole('list', { name: 'Task counts for Needs retry' })
-    await expect(counts.querySelectorAll('[data-unavailable]')).toHaveLength(3)
-    await expect(counts.querySelectorAll('.ticket-status-bar')).toHaveLength(0)
+    await expect(canvas.queryByLabelText('Active ticket count for Needs retry')).not.toBeInTheDocument()
     await userEvent.click(canvas.getByRole('button', { name: 'Retry loading tickets for Needs retry' }))
     await expect(args.onRetry).toHaveBeenCalledWith('error')
     await expect(args.onOpenProjectBoard).not.toHaveBeenCalled()
@@ -77,7 +72,7 @@ export const EmptyProject: Story = {
   args: { projects: [{ ...project('empty', 'Empty project'), summary: { columns: [], cards: [] } }] },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('button', { name: 'Open board for Empty project' })).toBeVisible()
-    await expect(canvas.getByRole('list', { name: 'Task counts for Empty project' })).toHaveTextContent('Todo: 0In Progress: 0In Review: 0')
+    await expect(canvas.getByLabelText('Active ticket count for Empty project')).toHaveTextContent('0 active tickets')
     await expect(canvas.queryByText('No description yet.')).not.toBeInTheDocument()
     await expect(canvas.queryByText('7 days', { exact: true })).not.toBeInTheDocument()
     await expect(canvas.getByLabelText('Activity for Empty project: 0 recorded changes in the last 7 days')).toBeVisible()

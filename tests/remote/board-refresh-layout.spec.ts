@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { column } from '../support/board-fixtures'
+import { column, expectCardTitles } from '../support/board-fixtures'
 import { expectSteadyLayout, startLayoutWatch } from '../support/board-layout-watch'
 import { routingTransport } from '../support/routing-transport'
 
 test('background refresh keeps the board in place and announces progress', async ({ context, page }) => {
   await routingTransport(context)
   await page.goto('/project/a/ticket')
-  await expect(column(page, 'Backlog').locator('.kanban-card')).toHaveText(['First', 'Second'])
+  await expectCardTitles(column(page, 'Backlog').locator('.kanban-card'), ['First', 'Second'])
   await startLayoutWatch(page)
   await page.evaluate(() => {
     localStorage.setItem('test:hold-board', 'true')
@@ -26,7 +26,7 @@ test('a concurrent deletion is not resurrected by a pending optimistic move', as
   await routingTransport(context, ['hold-board-save'])
   await page.goto('/project/a/ticket')
   await column(page, 'Backlog').getByRole('button', { name: 'First', exact: true }).dragTo(column(page, 'Todo'))
-  await expect(column(page, 'Todo').locator('.kanban-card')).toHaveText(['First'])
+  await expectCardTitles(column(page, 'Todo').locator('.kanban-card'), ['First'])
   await page.evaluate(() => {
     const boards = JSON.parse(localStorage.getItem('lean-canvas:boards:v1')!)
     boards.a.cards = boards.a.cards.filter((card: { id: string }) => card.id !== 'card-a')
@@ -40,6 +40,6 @@ test('a concurrent deletion is not resurrected by a pending optimistic move', as
     window.dispatchEvent(new Event('test:finish-board-save'))
   })
   await expect(page.getByRole('alert')).toContainText('Card no longer exists')
-  await expect(column(page, 'Backlog').locator('.kanban-card')).toHaveText(['Second'])
+  await expectCardTitles(column(page, 'Backlog').locator('.kanban-card'), ['Second'])
   await expect(column(page, 'Todo').locator('.kanban-card')).toHaveCount(0)
 })

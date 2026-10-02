@@ -1,8 +1,5 @@
 .ticket-activity {
   position: relative;
-  grid-column: 3;
-  grid-row: 1;
-  justify-self: end;
   z-index: 1;
   color: #626f86;
   font-size: .6875rem;
@@ -20,7 +17,7 @@
 }
 .ticket-activity summary::-webkit-details-marker { display: none; }
 .ticket-activity summary:focus-visible { outline: 2px solid #0c66e4; outline-offset: 2px; }
-.ticket-activity-sparkline { display: block; inline-size: 104px; block-size: 28px; color: #308547; }
+.ticket-activity-sparkline { display: block; inline-size: 104px; block-size: 28px; color: var(--color-chrome); }
 .ticket-activity-sparkline polyline {
   fill: none;
   stroke: currentColor;
@@ -42,7 +39,7 @@
   padding: 12px;
   border: 1px solid #dcdfe4;
   border-radius: 8px;
-  background: #fff;
+  background: var(--color-surface);
   box-shadow: 0 4px 16px #091e4226;
   color: #44546f;
   font-size: .75rem;
@@ -51,7 +48,4 @@
 .ticket-activity-breakdown ul { margin: 0 0 8px; padding: 0; list-style: none; }
 .ticket-activity-breakdown li { display: flex; justify-content: space-between; padding-block: 2px; font-variant-numeric: tabular-nums; }
 .ticket-activity-breakdown small { display: block; line-height: 1.5; }
-@container ticket-list (max-width: 620px) {
-  .ticket-activity { grid-column: 1 / -1; grid-row: auto; }
-}
 @media (pointer: coarse) { .ticket-activity summary { min-block-size: 44px; } }
