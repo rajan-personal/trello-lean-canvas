@@ -8,6 +8,7 @@
   font-size: .6875rem;
 }
 .ticket-activity[open] { z-index: 2; }
+.ticket-activity summary::before { content: attr(data-total); font-size: 12px; color: #44546f; min-inline-size: 2ch; text-align: end; }
 .ticket-activity summary {
   display: flex;
   align-items: center;

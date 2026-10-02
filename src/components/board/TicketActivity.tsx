@@ -12,7 +12,7 @@ export function TicketActivity({ activity, today, peak, projectName, unavailable
   return <details className="ticket-activity" onKeyDown={(event) => {
     if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus() }
   }}>
-    <summary aria-label={label} aria-description="Daily activity, oldest to newest. Graphs share one scale across loaded projects.">
+    <summary data-total={unavailable ? '–' : total} aria-label={label} aria-description="Daily activity, oldest to newest. Graphs share one scale across loaded projects.">
       <svg className="ticket-activity-sparkline" viewBox="0 0 104 28" aria-hidden="true" focusable="false"
         data-state={unavailable ? 'unknown' : total === 0 ? 'empty' : 'recorded'}>
         <polyline points={unavailable ? '2,26 102,26' : points} />

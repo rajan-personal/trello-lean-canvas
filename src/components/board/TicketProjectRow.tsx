@@ -42,6 +42,7 @@ export function TicketProjectRow({ project, blocked, today, statusPeak, activity
           if (!event.currentTarget.contains(document.activeElement)) setActiveStatus(null)
         }}>
         <button type="button" className="ticket-status-trigger" aria-label={`${label}: ${unavailable ? 'Not available' : counts[id]}`}
+          data-count={unavailable ? '–' : counts[id]}
           onFocus={() => setActiveStatus(id)} onBlur={() => setActiveStatus(null)} onClick={() => setActiveStatus(id)}>
           <span className="ticket-status-track" data-unavailable={unavailable || undefined}
             data-zero={!unavailable && counts[id] === 0 || undefined} aria-hidden="true">

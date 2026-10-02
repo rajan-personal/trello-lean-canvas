@@ -26,6 +26,8 @@ export function TicketListView({ projects, blocked, onOpenProjectBoard, onOpenTi
     <div className="ticket-list-content">
       <header className="ticket-list-heading">
         <h1 id="all-tickets-heading" className="ticket-list-visually-hidden">All tickets</h1>
+        <div className="ticket-list-columns" aria-hidden="true"><span>Project</span><span>Active tickets</span><span>Last 7 days</span></div>
+        <span className="ticket-list-legend-title" aria-hidden="true">Active tickets by status:</span>
         <ul className="ticket-list-legend" role="list" aria-label="Task status colors">
           {ticketCountStatuses.map(({ id, label }) => <li key={id}><span className={`ticket-count ticket-count-${id}`} aria-hidden="true" />{label}</li>)}
         </ul>
