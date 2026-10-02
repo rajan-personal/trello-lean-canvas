@@ -13,7 +13,6 @@ interface Props {
 export function CanvasCardSlot({ card, index, sectionProps }: Props) {
   const {
     section,
-    bottom = false,
     editCard,
     deleteCard,
     editingCard,
@@ -51,15 +50,13 @@ export function CanvasCardSlot({ card, index, sectionProps }: Props) {
   const isDragged =
     dragHandlers.draggedCard?.sectionId === section.id &&
     dragHandlers.draggedCard.index === index
-  const shift = bottom
-    ? 0
-    : getCardShift(
-        section.id,
-        index,
-        dragHandlers.draggedCard,
-        dragHandlers.dropTarget,
-        6,
-      )
+  const shift = getCardShift(
+    section.id,
+    index,
+    dragHandlers.draggedCard,
+    dragHandlers.dropTarget,
+    6,
+  )
 
   return (
     <div

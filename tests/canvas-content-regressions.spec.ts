@@ -22,6 +22,14 @@ test('dragging between sections and bottom-panel slots preserves ordering', asyn
   await openSampleCanvas(page)
   const problem = page.locator('.problem .canvas-cell').first()
   const cost = page.locator('.cost .canvas-cell')
+  for (const list of await page.locator('.bottom-panel .canvas-cards').all()) {
+    await expect(list).toHaveCSS('display', 'flex')
+    await expect(list).toHaveCSS('flex-direction', 'column')
+    const cards = await list.locator('.canvas-card').all()
+    for (const card of cards) {
+      expect(Math.round((await card.boundingBox())!.width)).toBe(Math.round((await list.boundingBox())!.width))
+    }
+  }
   const moved = await problem.locator('.card-content').first().innerText()
   await problem.locator('.canvas-card').first().dragTo(cost.locator('.canvas-card').first(), {
     targetPosition: { x: 5, y: 2 },
