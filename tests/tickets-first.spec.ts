@@ -26,7 +26,7 @@ test('the first created project opens Tickets, with Home/End matching visual ord
   await page.getByRole('button', { name: 'Add canvas' }).click()
   await page.getByRole('button', { name: 'New', exact: true }).click()
   await page.getByRole('textbox', { name: 'Canvas name' }).fill('New project')
-  await page.getByRole('button', { name: 'Create canvas', exact: true }).click()
+  await page.getByRole('dialog', { name: 'Create canvas' }).getByRole('button', { name: 'Create canvas', exact: true }).click()
   await expect(page).toHaveURL(/\/project\/[^/]+\/ticket$/)
   const tickets = page.getByRole('tab', { name: 'Tickets', exact: true })
   const about = page.getByRole('tab', { name: 'About', exact: true })

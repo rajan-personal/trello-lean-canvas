@@ -82,7 +82,10 @@ export function Workspace({ user, onSignOut, onSetPassword, persistence, browser
             about: { onSave: async (about) => {
               state.updateActiveCanvas((canvas) => ({ ...canvas, about })); await state.flushCanvases() } },
             onDismissDeleted: () => { if (allow()) state.setActiveId(null) }, register: guard.register, notify }}
-          unavailable={{ route, onReturn: () => { if (allow()) history.navigate('/') } }} />
+          unavailable={{ route, onReturn: () => { if (allow()) history.navigate('/') }, empty: state.canvases.length === 0,
+            onNew: () => { if (allow()) setDialog({ heading: 'Create canvas', submitLabel: 'Create canvas', value: '' }) },
+            onImport: (event) => { if (allow()) void commands.importYaml(event); else event.target.value = '' },
+            onLoadSamples: () => { if (allow()) void commands.loadSampleData() } }} />
         <WorkspaceNotepad state={state} panels={panels} />
       </div>
       <CreateCanvasDialog dialog={dialog} setDialog={setDialog} onCreate={commands.createCanvas} />
