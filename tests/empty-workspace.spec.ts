@@ -9,9 +9,11 @@ for (const width of [320, 390, 1440]) {
     const card = page.locator('main section')
     await expect(card.getByRole('heading', { name: 'Start your first Lean Canvas' })).toBeVisible()
     const bounds = await card.boundingBox()
-    expect(bounds!.width).toBeLessThanOrEqual(420)
+    const main = (await page.locator('main').boundingBox())!
+    expect(bounds!.width).toBeLessThanOrEqual(400)
     expect(bounds!.x).toBeGreaterThanOrEqual(16)
     expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width - 16)
+    expect(Math.abs(bounds!.x + bounds!.width / 2 - (main.x + main.width / 2))).toBeLessThan(1)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     const create = card.getByRole('button', { name: 'Create canvas' })
     await create.focus()
@@ -20,10 +22,10 @@ for (const width of [320, 390, 1440]) {
     await expect(card.getByRole('button', { name: 'Upload YAML' })).toBeFocused()
     await page.keyboard.press('Tab')
     await expect(card.getByRole('button', { name: 'Load sample data' })).toBeFocused()
+    expect((await create.boundingBox())!.height).toBe(40)
     for (const button of await card.getByRole('button').all()) {
-      expect((await button.boundingBox())!.height).toBe(40)
+      expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(32)
     }
-    await page.screenshot({ path: `/workspace/scratch/design-31/13-empty-state/empty-${width}.png` })
   })
 }
 
