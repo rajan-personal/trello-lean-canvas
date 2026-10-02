@@ -31,7 +31,9 @@ type Story = StoryObj<typeof meta>
 
 export const CompleteCanvas: Story = {
   play: async ({ canvasElement }) => {
-    await expect(canvasElement.querySelectorAll('.canvas-column')).toHaveLength(5)
+    await expect(canvasElement.querySelectorAll('.canvas-column')).toHaveLength(3)
+    await expect(canvasElement.querySelectorAll('.lean-grid > .canvas-panel')).toHaveLength(9)
+    await expect(canvasElement.querySelectorAll('.canvas-panel:not(.canvas-column):not(.bottom-panel)')).toHaveLength(4)
     await expect(canvasElement.querySelectorAll('.bottom-panel')).toHaveLength(2)
     await expect(canvasElement.querySelectorAll('.canvas-cell')).toHaveLength(12)
   },

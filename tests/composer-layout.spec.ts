@@ -7,7 +7,7 @@ test('expands the white column for the composer without nested scrolling', async
   await page.setViewportSize({ width: 1424, height: 797 })
   await openSampleCanvas(page)
 
-  const column = page.locator('.canvas-column.solution')
+  const column = page.locator('.canvas-panel.solution')
   const section = column.locator('.canvas-cell').first()
   const initialColumnHeight = await column.evaluate(
     (element) => element.getBoundingClientRect().height,
@@ -53,7 +53,7 @@ test('keeps the first card anchored when it changes from composer to saved card'
   await uploadCanvas(page, { name: 'Blank canvas' }, 'blank-canvas.yaml')
 
   const emptyMainCellHeights = await page
-    .locator('.canvas-column .canvas-cell')
+    .locator('.canvas-panel:not(.bottom-panel) .canvas-cell')
     .evaluateAll((cells) =>
       cells.map((cell) => Math.round(cell.getBoundingClientRect().height)),
     )

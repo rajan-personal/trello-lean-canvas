@@ -42,6 +42,7 @@ export interface CanvasDragHandlers {
 export interface CanvasSectionProps {
   section: CanvasSectionData
   bottom?: boolean
+  sub?: boolean
   addingSectionId: SectionId | null
   setAddingSectionId: Dispatch<SetStateAction<SectionId | null>>
   cardDraft: string

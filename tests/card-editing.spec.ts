@@ -75,7 +75,7 @@ test('dismisses the add-card composer outside while preserving its draft', async
   await page.setViewportSize({ width: 1424, height: 797 })
   await openSampleCanvas(page)
 
-  const section = page.locator('.canvas-column.solution .canvas-cell').first()
+  const section = page.locator('.canvas-panel.solution .canvas-cell').first()
   await section.getByRole('button', { name: '＋ Add a card' }).click()
   const composer = section.getByRole('textbox', { name: 'New card' })
   await composer.fill('A draft worth keeping')
