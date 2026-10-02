@@ -24,6 +24,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - run: npm install --global npm@11.17.0
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test tests/active-ticket-list.spec.ts tests/ticket-list.spec.ts tests/ticket-status-bars.spec.ts tests/ticket-activity.spec.ts
