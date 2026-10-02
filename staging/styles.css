@@ -1,0 +1,11 @@
+.staging-banner { height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 3px 12px; background: #fff3cd; color: #493600; font-size: 12px; line-height: 16px; }
+.staging-banner button { flex-shrink: 0; border: 1px solid #806000; border-radius: 5px; padding: 3px 8px; font-weight: 600; }
+.staging-banner button:focus-visible { outline: 2px solid #0b4a6f; outline-offset: 2px; }
+.app-shell { height: calc(100dvh - 40px); min-height: 600px; }
+.workspace-layout { height: calc(100dvh - 88px); min-height: 552px; }
+@media (max-width: 760px) {
+  .app-shell, .workspace-layout { min-height: 0; }
+  .workspace-layout { height: calc(100dvh - 88px); }
+  .sidebar { top: 88px; }
+  .sidebar-scrim { top: 88px; height: calc(100dvh - 88px); }
+}

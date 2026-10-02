@@ -20,6 +20,7 @@
   "include": [
     "src",
     "preview",
+    "staging",
     "scripts/comment-agent.ts",
     "vite.comments-preview.config.ts",
     ".storybook",
@@ -29,6 +30,7 @@
     "eslint.config.ts",
     "playwright.config.ts",
     "vite.config.ts",
+    "vite.staging.config.ts",
     "vitest.config.ts",
     "vitest.storybook.config.ts",
     "vitest.emulator.config.ts"

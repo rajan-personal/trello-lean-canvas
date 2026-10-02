@@ -11,6 +11,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:staging": "vite build --config vite.staging.config.ts",
+    "deploy:staging": "npm run build:staging && wrangler deploy --config wrangler.staging.jsonc",
+    "verify:staging": "node scripts/verify-staging.mjs",
     "build:comments-preview": "vite build --config vite.comments-preview.config.ts",
     "preview:comments": "vite preview --config vite.comments-preview.config.ts",
     "deploy": "npm run build && wrangler deploy",

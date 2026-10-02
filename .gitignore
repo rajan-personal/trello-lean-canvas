@@ -20,3 +20,4 @@ chromatic-diagnostics.json
 .wrangler/
 .dev.vars
 .dev.vars.*
+dist-staging/
