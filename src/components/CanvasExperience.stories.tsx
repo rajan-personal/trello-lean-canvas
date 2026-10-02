@@ -48,6 +48,7 @@ export const MobilePanels: Story = {
     await expect(sidebar).not.toHaveAttribute('inert')
     await userEvent.keyboard('{Escape}')
     await expect(opener).toHaveFocus()
+    await userEvent.click(canvas.getByRole('button', { name: 'More actions' }))
     await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
     const notes = await canvas.findByRole('textbox', { name: 'Canvas notes' })
     await userEvent.clear(notes)

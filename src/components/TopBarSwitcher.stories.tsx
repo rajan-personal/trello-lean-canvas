@@ -14,22 +14,29 @@ type Story = StoryObj<typeof meta>
 export const DesktopCanvas: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const tabs = canvas.getByRole('tablist')
-    const favorite = canvas.getByRole('button', { name: 'Favorite canvas' })
+    const mobile = window.innerWidth <= 760
+    const action = canvas.getByRole('button', { name: mobile ? 'More actions' : 'Favorite canvas' })
     const selected = canvas.getAllByRole('tab').find((tab) => tab.getAttribute('aria-selected') === 'true')!
     await expect(selected).toHaveAccessibleName(args.initialView === 'board' ? 'Tickets' : 'Canvas')
     const bounds = tabs.getBoundingClientRect()
-    const star = favorite.getBoundingClientRect()
-    await expect(tabs.nextElementSibling).toBe(favorite)
+    const star = action.getBoundingClientRect()
+    await expect(mobile ? tabs.parentElement?.lastElementChild?.firstElementChild : tabs.nextElementSibling?.firstElementChild).toBe(action)
     await expect(star.left - bounds.right).toBeGreaterThanOrEqual(0)
     await expect(star.left - bounds.right).toBeLessThanOrEqual(8)
     await expect(star.top + star.height / 2).toBe(bounds.top + bounds.height / 2)
     await userEvent.click(selected)
     await userEvent.tab()
-    await expect(favorite).toHaveFocus()
-    await userEvent.keyboard(' ')
-    await expect(favorite).toHaveAttribute('aria-pressed', 'true')
-    await userEvent.keyboard(' ')
-    await expect(favorite).toHaveAttribute('aria-pressed', 'false')
+    await expect(action).toHaveFocus()
+    for (const pressed of ['true', 'false']) {
+      if (mobile) await userEvent.click(action)
+      const favorite = canvas.getByRole('button', { name: 'Favorite canvas' })
+      if (mobile) await userEvent.click(favorite)
+      else await userEvent.keyboard(' ')
+      if (mobile) await userEvent.click(action)
+      await expect(canvas.getByRole('button', { name: 'Favorite canvas' })).toHaveAttribute('aria-pressed', pressed)
+      if (mobile) await userEvent.click(action)
+    }
+    action.focus()
     await userEvent.tab({ shift: true })
     await expect(selected).toHaveFocus()
     for (const key of ['{End}', '{ArrowRight}', '{ArrowLeft}', '{Home}']) {

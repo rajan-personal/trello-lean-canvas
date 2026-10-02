@@ -14,7 +14,7 @@ export const MobileSidebar: AppStory = {
     await expect(
       canvas.getByRole('navigation', { name: 'Workspace navigation' }),
     ).toBeVisible()
-    await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
+    await userEvent.click(canvas.getByRole('button', { name: 'More actions' })); await userEvent.click(canvas.getByRole('button', { name: 'Notepad' }))
     await expect(open).toHaveAttribute('aria-expanded', 'false')
     await expect(canvasElement.querySelector('.sidebar-scrim')).not
       .toBeInTheDocument()

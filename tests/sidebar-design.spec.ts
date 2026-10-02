@@ -5,6 +5,7 @@ for (const width of [1440, 390]) {
   test(`sidebar has distinct chrome and a high-contrast active item at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
     await loadSamples(page)
+    if (width <= 760) await page.getByRole('button', { name: 'More actions', exact: true }).click()
     await page.getByRole('button', { name: 'Favorite canvas', exact: true }).click()
     if (width <= 760) await page.getByRole('button', { name: 'Open sidebar', exact: true }).click()
 

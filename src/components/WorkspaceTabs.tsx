@@ -15,10 +15,10 @@ export function WorkspaceTabs({ view, onChange, idPrefix }: Props) {
     buttons.current[onChange(next) ? next : view]?.focus()
   }
   return <div role="tablist" aria-label="Canvas views" className="workspace-tabs me-1 flex w-fit shrink-0 gap-0.5 rounded-lg bg-[#073650] p-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.18)]">
-    {tabs.map((tab) => <button key={tab} id={`${prefix}${tab}-tab`} role="tab"
+    {tabs.map((tab) => <button key={tab} id={`${prefix}${tab}-tab`} role="tab" title={labels[tab]}
       ref={(button) => { buttons.current[tab] = button }}
       aria-selected={view === tab} aria-controls={`${prefix}${tab}-panel`} tabIndex={view === tab ? 0 : -1}
-      className={`flex min-h-8 items-center justify-center gap-1 rounded-md px-2.5 text-sm font-semibold max-[760px]:min-h-9 max-[760px]:px-1.5 focus-visible:outline-2 focus-visible:-outline-offset-2 ${view === tab ? 'bg-[#f4f7fa] hover:bg-white text-[#12344a] shadow-[0_1px_3px_rgba(0,0,0,0.2)] focus-visible:outline-[#0c66e4]' : 'text-[#e2edf4] hover:bg-white/15 hover:text-white focus-visible:outline-white'}`}
+      className={`flex min-h-8 items-center justify-center gap-1 rounded-md px-2.5 text-sm font-semibold max-[761px]:min-h-9 max-[761px]:size-9 max-[761px]:px-0 focus-visible:outline-2 focus-visible:-outline-offset-2 ${view === tab ? 'bg-[#f4f7fa] hover:bg-white text-[#12344a] shadow-[0_1px_3px_rgba(0,0,0,0.2)] focus-visible:outline-[#0c66e4]' : 'text-[#e2edf4] hover:bg-white/15 hover:text-white focus-visible:outline-white'}`}
       onClick={() => select(tab)} onKeyDown={(event) => {
         if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
         event.preventDefault()
@@ -26,7 +26,7 @@ export function WorkspaceTabs({ view, onChange, idPrefix }: Props) {
         select(event.key === 'Home' ? tabs[0] : event.key === 'End' ? tabs[tabs.length - 1] : tabs[(tabs.indexOf(tab) + offset + tabs.length) % tabs.length])
       }}>
         {tab === 'canvas' ? <LayoutDashboard size={14} aria-hidden="true" /> : tab === 'about' ? <FileText size={14} aria-hidden="true" /> : <Columns3 size={14} aria-hidden="true" />}
-        {labels[tab]}
+        <span className="max-[761px]:sr-only">{labels[tab]}</span>
       </button>)}
   </div>
 }

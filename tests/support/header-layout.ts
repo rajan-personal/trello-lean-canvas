@@ -3,27 +3,24 @@ import { expect, type Page } from '@playwright/test'
 export async function expectHeaderLayout(page: Page, width: number) {
   const header = page.locator('.topbar')
   const tabs = header.getByRole('tablist')
-  const favorite = header.getByRole('button', { name: 'Favorite canvas' })
+  const firstAction = header.getByRole('button', { name: width <= 760 ? 'More actions' : 'Favorite canvas', exact: true })
   await expect(tabs).toHaveCount(1)
-  expect(await tabs.evaluate((element) => element.nextElementSibling?.getAttribute('aria-label'))).toBe('Favorite canvas')
-  const [tabBox, starBox, groupBox, titleBox, headerBox] = await Promise.all([
-    tabs.boundingBox(), favorite.boundingBox(), header.locator('.topbar-actions').boundingBox(),
-    header.getByRole('heading').boundingBox(), header.boundingBox(),
-  ])
-  expect(starBox!.x - (tabBox!.x + tabBox!.width)).toBeGreaterThanOrEqual(0)
-  expect(starBox!.x - (tabBox!.x + tabBox!.width)).toBeLessThanOrEqual(8)
-  expect(starBox!.y + starBox!.height / 2).toBe(tabBox!.y + tabBox!.height / 2)
-  expect(headerBox!.height).toBe(width <= 760 ? 92 : 48)
-  const lastBox = await header.getByRole('button', { name: 'Delete canvas' }).boundingBox()
-  expect(width - (lastBox!.x + lastBox!.width)).toBe(width <= 760 ? 6 : 12)
-  if (width <= 760) {
-    expect(groupBox!.y).toBe(48)
-    expect(titleBox!.y + titleBox!.height).toBeLessThanOrEqual(groupBox!.y)
-  } else {
-    expect(titleBox!.x + titleBox!.width).toBeLessThanOrEqual(tabBox!.x)
-    expect(await header.locator('.toolbar-spacer').evaluate((element) =>
-      element.nextElementSibling?.classList.contains('topbar-actions'))).toBe(true)
+  if (width > 760) {
+    expect(await tabs.evaluate((element) => element.nextElementSibling?.firstElementChild?.getAttribute('aria-label'))).toBe('Favorite canvas')
   }
+  const [tabBox, actionBox, titleBox, headerBox] = await Promise.all([
+    tabs.boundingBox(), firstAction.boundingBox(), header.getByRole('heading').boundingBox(), header.boundingBox(),
+  ])
+  expect(actionBox!.x - (tabBox!.x + tabBox!.width)).toBeGreaterThanOrEqual(0)
+  expect(actionBox!.x - (tabBox!.x + tabBox!.width)).toBeLessThanOrEqual(8)
+  expect(actionBox!.y + actionBox!.height / 2).toBe(tabBox!.y + tabBox!.height / 2)
+  expect(headerBox!.height).toBe(48)
+  const lastBox = await header.getByRole('button', { name: width <= 760 ? 'More actions' : 'Delete canvas', exact: true }).boundingBox()
+  expect(width - (lastBox!.x + lastBox!.width)).toBe(width <= 760 ? 6 : 12)
+  expect(titleBox!.width).toBeGreaterThan(0)
+  expect(titleBox!.x + titleBox!.width).toBeLessThanOrEqual(tabBox!.x)
+  expect(await header.locator('.toolbar-spacer').evaluate((element) =>
+    element.nextElementSibling?.classList.contains('topbar-actions'))).toBe(true)
   const controls = await header.locator('button:visible, input:visible').all()
   const boxes = await Promise.all(controls.map((control) => control.boundingBox()))
   for (const [index, control] of controls.entries()) {

@@ -1,6 +1,7 @@
 import { Download, NotebookPen, Star, Trash2 } from 'lucide-react'
 import type { LeanCanvas } from '../data/types'
 import { ToolbarIconButton } from './ToolbarIconButton'
+import { CanvasMoreMenu } from './CanvasMoreMenu'
 
 interface Props {
   canvas: LeanCanvas
@@ -21,6 +22,7 @@ export function CanvasToolbarActions({
 }: Props) {
   return (
     <>
+      <div className="flex items-center max-[761px]:hidden">
       <ToolbarIconButton
         label="Favorite canvas"
         onClick={onFavorite}
@@ -50,6 +52,9 @@ export function CanvasToolbarActions({
       <ToolbarIconButton label="Delete canvas" onClick={onDelete} danger>
         <Trash2 size={17} />
       </ToolbarIconButton>
+      </div>
+      <CanvasMoreMenu canvas={canvas} notepadOpen={notepadOpen} onFavorite={onFavorite}
+        onToggleNotepad={onToggleNotepad} onDownload={onDownload} onDelete={onDelete} />
     </>
   )
 }
