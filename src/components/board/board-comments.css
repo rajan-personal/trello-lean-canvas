@@ -27,6 +27,7 @@
 .kanban-comments .kanban-comment-composer textarea:focus { outline: none; }
 .kanban-comments .kanban-comment-composer textarea::placeholder { color: #667085; }
 .kanban-comments .kanban-comment-composer .kanban-comment-send { width: 36px; min-height: 36px; padding: 0; border-radius: 5px; }
+.kanban-comments .kanban-comment-composer .kanban-comment-send:disabled { opacity: 1; background: #f2f4f7; color: #667085; box-shadow: inset 0 0 0 1px #d0d5dd; cursor: not-allowed; }
 .kanban-comment-shortcut { display: none; margin-block-start: 6px; color: #667085; font-size: .6875rem; line-height: 1.5; }
 .kanban-comment-form:focus-within .kanban-comment-shortcut { display: block; }
 .kanban-comment-shortcut kbd { font: inherit; }
