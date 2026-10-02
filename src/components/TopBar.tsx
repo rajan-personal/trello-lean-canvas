@@ -37,6 +37,7 @@ export function TopBar(props: Props) {
         className={`mobile-sidebar-button ms-2 me-[7px] hidden ${toolbarButtonClass} max-[760px]:grid`}
         onClick={props.onOpenSidebar}
         aria-label="Open sidebar"
+        title="Open sidebar"
         aria-expanded={props.sidebarOpen}
         aria-controls="canvas-sidebar"
       >
@@ -48,6 +49,7 @@ export function TopBar(props: Props) {
         aria-label={
           props.sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
         }
+        title={props.sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         aria-expanded={!props.sidebarCollapsed}
         aria-controls="canvas-sidebar"
       >

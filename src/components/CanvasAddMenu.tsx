@@ -38,6 +38,7 @@ export function CanvasAddMenu({ onNew, onImport, onLoadSamples }: Props) {
         type="button"
         className={`${brandActionButtonClass} new-canvas-button ms-auto`}
         aria-label="Add canvas"
+        title="Add canvas"
         aria-controls={menuId}
         aria-expanded={open}
         popoverTarget={menuId}
