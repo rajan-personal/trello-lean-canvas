@@ -16,13 +16,25 @@ for (const width of [320, 390, 1440]) {
     expect(bounds!.x).toBeGreaterThanOrEqual(24)
     expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width - 24)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    const actions = content.getByRole('button', { name: 'Canvas actions' })
+    await expect(actions).toHaveAttribute('aria-expanded', 'false')
+    await expect(content.getByRole('button', { name: 'New canvas' })).not.toBeVisible()
+    await actions.press('Enter')
+    await expect(actions).toHaveAttribute('aria-expanded', 'true')
+    const menu = content.getByRole('group', { name: 'Canvas actions' })
+    const menuBounds = await menu.boundingBox()
+    expect(menuBounds!.x).toBeGreaterThanOrEqual(8)
+    expect(menuBounds!.x + menuBounds!.width).toBeLessThanOrEqual(width - 8)
     const create = content.getByRole('button', { name: 'New canvas' })
+    await actions.press('Tab')
+    await expect(create).toBeFocused()
     await create.focus()
     await expect(create).toBeFocused()
     await create.press('Tab')
     await expect(content.getByRole('button', { name: 'Import YAML' })).toBeFocused()
     await page.keyboard.press('Tab')
     await expect(content.getByRole('button', { name: 'Try sample canvases' })).toBeFocused()
+    expect((await actions.boundingBox())!.height).toBe(44)
     expect((await create.boundingBox())!.height).toBe(36)
     for (const button of await content.getByRole('button').all()) {
       expect((await button.boundingBox())!.height).toBeGreaterThan(0)
@@ -32,12 +44,21 @@ for (const width of [320, 390, 1440]) {
       await expect(button).toHaveCSS('outline-offset', '2px')
       await expect(button).toHaveCSS('outline-color', 'rgb(255, 255, 255)')
     }
+    await page.keyboard.press('Escape')
+    await expect(actions).toBeFocused()
+    await expect(actions).toHaveAttribute('aria-expanded', 'false')
+    await actions.click()
+    await expect(menu).toBeVisible()
+    await content.getByRole('heading').click()
+    await expect(menu).not.toBeVisible()
+    await expect(actions).toHaveAttribute('aria-expanded', 'false')
     await page.screenshot({ path: test.info().outputPath(`empty-${width}.png`) })
   })
 }
 
 test('starter create opens the dialog and removes the empty state after creation', async ({ page }) => {
   await page.goto('/')
+  await page.getByRole('button', { name: 'Canvas actions' }).click()
   await page.getByRole('button', { name: 'New canvas', exact: true }).click()
   const dialog = page.getByRole('dialog', { name: 'Create canvas' })
   await expect(dialog).toBeVisible()
@@ -49,6 +70,7 @@ test('starter create opens the dialog and removes the empty state after creation
 
 test('starter upload opens the imported canvas', async ({ page }) => {
   await page.goto('/')
+  await page.getByRole('button', { name: 'Canvas actions' }).click()
   const chooser = page.waitForEvent('filechooser')
   await page.getByRole('button', { name: 'Import YAML' }).click()
   const yaml = dump({ canvas: { name: 'Imported research', title: 'Imported research', sections: sectionTemplate.map((section) => ({ ...section, cards: [] })) } })
@@ -59,6 +81,7 @@ test('starter upload opens the imported canvas', async ({ page }) => {
 
 test('starter samples open Airbnb and remove the empty state', async ({ page }) => {
   await page.goto('/')
+  await page.getByRole('button', { name: 'Canvas actions' }).click()
   await page.getByRole('button', { name: 'Try sample canvases' }).click()
   await expect(page.getByRole('heading', { name: 'Airbnb — 2008' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'No canvases yet' })).toHaveCount(0)

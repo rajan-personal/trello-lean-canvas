@@ -1,5 +1,5 @@
-import { useRef, type ChangeEvent } from 'react'
-import { LayoutGrid, Plus } from 'lucide-react'
+import { useId, useRef, useState, type ChangeEvent } from 'react'
+import { Plus } from 'lucide-react'
 import type { WorkspaceRoute } from './workspace-route'
 
 interface Props {
@@ -12,21 +12,41 @@ interface Props {
 }
 
 const buttonClass = 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
+const itemClass = `${buttonClass} flex min-h-9 w-full items-center rounded-md px-3 text-left text-sm text-white/80 hover:bg-white/10 hover:text-white`
 
 export function WorkspaceUnavailable({ route, onReturn, empty, onNew, onImport, onLoadSamples }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const menuId = useId()
+  const [open, setOpen] = useState(false)
+  const positionMenu = () => {
+    const trigger = triggerRef.current
+    const menu = menuRef.current
+    if (!trigger || !menu) return
+    const { bottom, left, width } = trigger.getBoundingClientRect()
+    menu.style.left = `${Math.max(8, Math.min(left + width / 2 - 100, innerWidth - 208))}px`
+    menu.style.top = `${Math.max(8, Math.min(bottom + 8, innerHeight - 130))}px`
+  }
+  const run = (action: () => void) => {
+    menuRef.current?.hidePopover()
+    action()
+  }
   return <main className={`main-area h-full min-w-0 flex-1 ${route.kind === 'root' && empty ? 'flex items-center justify-center p-6' : ''}`}>
     {route.kind === 'root' && empty && <section className="w-full max-w-[360px] text-center">
-      <LayoutGrid size={28} strokeWidth={1.5} className="mx-auto mb-5 text-white/60" aria-hidden="true" />
       <h1 className="text-lg font-semibold text-white">No canvases yet</h1>
       <p className="mt-1.5 text-sm text-white/65">Create a Lean Canvas to map your idea on one page.</p>
-      <button type="button" className={`${buttonClass} mt-6 inline-flex h-9 items-center gap-1.5 rounded-md bg-white px-4 text-sm font-medium text-[#172b4d] hover:bg-white/90`} onClick={onNew}>
-        <Plus size={16} aria-hidden="true" />New canvas
+      <button ref={triggerRef} type="button" aria-label="Canvas actions" title="New or import canvas"
+        aria-controls={menuId} aria-expanded={open} popoverTarget={menuId} onClick={positionMenu}
+        className={`${buttonClass} mx-auto mt-6 grid size-11 place-items-center rounded-full border border-white/30 text-white/80 hover:bg-white/10 hover:text-white`}>
+        <Plus size={22} strokeWidth={1.5} aria-hidden="true" />
       </button>
-      <div className="mt-4 flex items-center justify-center gap-2 text-[13px] text-white/65">
-        <button type="button" className={`${buttonClass} underline-offset-4 hover:text-white hover:underline`} onClick={() => inputRef.current?.click()}>Import YAML</button>
-        <span aria-hidden="true">·</span>
-        <button type="button" className={`${buttonClass} underline-offset-4 hover:text-white hover:underline`} onClick={onLoadSamples}>Try sample canvases</button>
+      <div ref={menuRef} id={menuId} popover="auto" role="group" aria-label="Canvas actions"
+        onToggle={() => setOpen(menuRef.current?.matches(':popover-open') ?? false)}
+        className="fixed inset-auto m-0 w-[200px] rounded-lg border border-white/20 bg-app-bg p-1.5">
+        <button type="button" className={itemClass} onClick={() => run(onNew)}>New canvas</button>
+        <button type="button" className={itemClass} onClick={() => run(() => inputRef.current?.click())}>Import YAML</button>
+        <button type="button" className={itemClass} onClick={() => run(onLoadSamples)}>Try sample canvases</button>
       </div>
       <input ref={inputRef} type="file" className="hidden" aria-label="Upload starter canvas YAML file"
         accept=".yaml,.yml,text/yaml,application/yaml" onChange={onImport} />
