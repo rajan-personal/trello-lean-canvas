@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react'
+import { Loader2, RefreshCw } from 'lucide-react'
 import { usePendingAction } from './usePendingAction'
 
 interface Props {
@@ -20,6 +20,7 @@ export function AppStatus({ message, onSignOut, onRetry = () => window.location.
         <h1 className="text-2xl font-bold">
           {message ? 'We could not open your workspace' : 'Opening your workspace…'}
         </h1>
+        {!message && <Loader2 size={20} aria-hidden="true" className="mx-auto mt-5 animate-spin motion-reduce:animate-none text-white/70" />}
         {message && <p className="mt-3 text-sm leading-6 text-white/95">{message}</p>}
         {message && (
           <div className="mt-6 flex justify-center gap-3">

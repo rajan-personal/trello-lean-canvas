@@ -53,9 +53,18 @@ button.kanban-add-column:hover { background: #fff; }
 .kanban-dialog .kanban-danger:not(:disabled):hover { background: #ffedeb; }
 .kanban-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .kanban-error { background: #fff0ed; color: #ae2e24; padding: 10px 12px; border-radius: 6px; overflow-wrap: anywhere; }
-.kanban-status { padding: 8px 16px; background: #ffffffed; }
-.kanban-status button { margin-left: 12px; text-decoration: underline; }
-.kanban-sync-status { position: absolute; inset-inline-end: 16px; bottom: 12px; z-index: 1; margin: 0; padding: 6px 10px; border-radius: 6px; background: #172b4de6; color: white; font-size: 12px; pointer-events: none; }
+.kanban-status { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 12px; padding: 12px; border: 1px solid #fecdca; border-radius: 8px; background: var(--color-surface); }
+.kanban-status > svg, .kanban-load-error-card > svg { flex-shrink: 0; color: var(--color-destructive); }
+.kanban-status > span { flex: 1; min-width: 160px; overflow-wrap: anywhere; }
+.kanban-status button, .kanban-load-error button { min-height: 36px; padding: 8px 12px; border-radius: 6px; background: var(--color-panel); font-weight: 600; }
+.kanban-status button:not(:disabled):hover { background: #dcdfe4; } .kanban-load-error { flex: 1; display: grid; place-items: center; padding: 24px; }
+.kanban-load-error-card { width: 100%; max-width: 360px; padding: 24px; border-radius: 12px; background: var(--color-surface); box-shadow: 0 8px 24px #091e4226; text-align: center; }
+.kanban-load-error-card > svg { margin: 0 auto 12px; }
+.kanban-load-error h2 { margin: 0; font-size: 18px; font-weight: 650; }
+.kanban-load-error p { margin: 10px 0 20px; color: var(--color-muted-foreground); line-height: 1.5; overflow-wrap: anywhere; }
+.kanban-load-error .kanban-primary { background: #0c66e4; color: white; }
+.kanban-load-error .kanban-primary:not(:disabled):hover { background: #0055cc; }
+.kanban-sync-status { position: absolute; inset-inline-end: 16px; bottom: 12px; z-index: 1; margin: 0; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; box-shadow: 0 2px 8px #091e4233; background: #172b4de6; color: white; font-size: 12px; pointer-events: none; }
 @media (max-width: 360px) { .kanban-sync-status { bottom: 64px; } }
 /* Keep the board visually steady while writes temporarily lock interaction. */
 .kanban-area[data-syncing] .kanban-card:disabled { opacity: 1; }
@@ -72,4 +81,16 @@ button.kanban-add-column:hover { background: #fff; }
   .kanban-dialog button, .kanban-add-card, .kanban-column-menu-trigger, .kanban-column-popover button, .kanban-composer button { min-height: 44px; }
   .kanban-column-menu-trigger, .kanban-dialog .kanban-dialog-header-actions button { width: 44px; }
 }
-@media (prefers-reduced-motion: reduce) { .kanban-card { transition: none; } }
+.kanban-sync-status[hidden] { display: none; }
+.kanban-spinner { animation: kanban-spin 1s linear infinite; }
+.kanban-skeleton .sk-column { background: color-mix(in srgb, var(--color-panel) 55%, transparent); }
+.sk-block { background: #ffffff; opacity: .55; border-radius: 8px; margin-bottom: 8px; position: relative; overflow: hidden; }
+.sk-header { height: 14px; width: 45%; border-radius: 4px; margin: 10px 8px 14px; background: #091e4214; }
+.sk-add-card { height: 32px; width: 60%; margin-bottom: 0; background: #091e4214; }
+.sk-add-column { height: 48px; opacity: .5; }
+.sk-block::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #ffffff99, transparent); transform: translateX(-100%); animation: kanban-shimmer 1.4s infinite; animation-delay: calc(var(--i) * 80ms); }
+.kanban-lists.is-entering > * { animation: kanban-enter 180ms ease-out both; }
+@keyframes kanban-shimmer { to { transform: translateX(100%); } }
+@keyframes kanban-enter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes kanban-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .kanban-card { transition: none; } .sk-block { opacity: .5; } .sk-block::after, .kanban-spinner, .kanban-lists.is-entering > * { animation: none; } }

@@ -2,6 +2,7 @@ import type { TicketSelection } from '../components/board/RoutedTicketDialog'
 import { lazy, Suspense, type ComponentProps } from 'react'
 import type { AppUser } from '../auth/auth-context'
 import { CanvasBoard } from '../components/CanvasBoard'
+import { BoardLoadingBoundary, BoardSkeleton } from '../components/board/BoardSkeleton'
 import { workspaceViews, type WorkspaceView } from '../data/workspace-view'
 import { ProjectAbout } from '../components/ProjectAbout'
 import type { LeanCanvas } from '../data/types'
@@ -23,10 +24,10 @@ export function WorkspaceViewPanel({ canvas, view, board, sectionProps, user, bl
       <div key={tab} id={`${tab}-panel`} role="tabpanel" aria-labelledby={`${tab}-tab`} hidden />)}
     <div id={`${view}-panel`} role="tabpanel" aria-labelledby={`${view}-tab`} tabIndex={0} className="flex min-w-0 flex-1">
       {view === 'about' ? <ProjectAbout key={canvas.id} canvas={canvas} register={register} {...about} /> : view === 'canvas' ? <CanvasBoard sections={canvas.sections} sectionProps={sectionProps} /> :
-        <Suspense fallback={<p role="status" className="p-3 text-white">Loading board…</p>}>
+        <BoardLoadingBoundary key={canvas.id}><Suspense fallback={<div className="kanban-area"><BoardSkeleton /></div>}>
           <WorkspaceBoard key={canvas.id} state={board} user={user}
             ticket={ticket} blocked={blocked} deleted={deleted} onDismissDeleted={onDismissDeleted} register={register} notify={notify} />
-        </Suspense>}
+        </Suspense></BoardLoadingBoundary>}
     </div>
   </main>
 }

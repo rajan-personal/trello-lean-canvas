@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { expect, fn } from 'storybook/test'
+import { expect, fn, waitFor } from 'storybook/test'
 import { BoardScreenFixture } from './WorkspaceBoard.story-support'
 import { boardStoryData, boardStoryUser } from '../components/board/board-story-fixtures'
 
@@ -27,7 +27,7 @@ export const Retry: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Retry loading board' }))
     await expect(args.state.reload).toHaveBeenCalledOnce()
     await expect(canvas.queryByRole('alert')).not.toBeInTheDocument()
-    await expect(await canvas.findByRole('button', { name: 'Outline the launch plan' })).toBeVisible()
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Outline the launch plan' })).toBeVisible())
   },
 }
 export const Saving: Story = {
