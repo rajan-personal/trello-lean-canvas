@@ -11,7 +11,7 @@ export const InsertBeforeAndAfter: Story = { play: async ({ canvas, args }) => {
   const plan = canvas.getByRole('button', { name: 'Outline the launch plan' })
   const research = canvas.getByRole('button', { name: 'Talk to three early customers' })
   const prototype = canvas.getByRole('button', { name: 'Build a focused prototype' })
-  const titles = () => backlog.getAllByRole('listitem').map((item) => item.textContent)
+  const titles = () => backlog.getAllByRole('listitem').map((item) => item.querySelector('.kanban-card')!.firstChild!.textContent)
   await dragBoardCard(plan, plan)
   await expect(args.run).not.toHaveBeenCalled()
   await dragBoardCard(prototype, plan, true)
