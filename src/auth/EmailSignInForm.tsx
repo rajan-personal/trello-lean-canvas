@@ -21,7 +21,7 @@ export function EmailSignInForm({ busy, pending, onSignIn }: { busy: boolean; pe
     </label>
     <button className={authSubmitClass} type="submit" disabled={busy} aria-busy={pending}>{pending ? 'Signing in…' : 'Sign in with email'}</button>
     <button type="button" aria-expanded={help} aria-controls="password-help" onClick={() => setHelp(!help)}
-      className="block text-xs text-[#626f86] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4]">Forgot or haven’t set a password?</button>
-    {help && <p id="password-help" className="text-xs leading-5 text-[#626f86]">Continue with Google, then open your account menu to set or change your password.</p>}
+      className="block text-xs text-[#44546f] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4]">Forgot or haven’t set a password?</button>
+    {help && <p id="password-help" className="text-xs leading-5 text-[#44546f]">Continue with Google, then open your account menu to set or change your password.</p>}
   </form>
 }

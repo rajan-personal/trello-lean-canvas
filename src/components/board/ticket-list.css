@@ -243,7 +243,7 @@
 .ticket-active-in-progress .ticket-active-icon { color: #0c66e4; animation: ticket-active-spin 1s linear infinite; }
 .ticket-active-review { color: #172b4d; font-weight: 700; }
 .ticket-active-review .ticket-active-icon { color: #946f00; }
-.ticket-active-empty { margin: 0; padding: 0 16px 12px 40px; color: #626f86; font-size: .75rem; }
+.ticket-active-empty { margin: 0; padding: 0 16px 12px 40px; color: #44546f; font-size: .75rem; }
 @keyframes ticket-active-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ticket-active-in-progress .ticket-active-icon { animation: none; } }
 @media (pointer: coarse) { .ticket-active-open { min-block-size: 44px; } }

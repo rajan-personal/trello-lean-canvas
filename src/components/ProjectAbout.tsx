@@ -42,7 +42,7 @@ export function ProjectAbout({ canvas, onSave, register }: Props) {
         <ProjectRichTextEditor id={id} value={value} disabled={save.pending} invalid={tooLong}
           onChange={(next) => { if (!save.pending) setDraft(next) }} />
       </Suspense>
-      <p id={`${id}-status`} role="status" className="mt-3 shrink-0 text-xs text-[#626f86]">{saveStatus(tooLong, failed, save.pending, dirty)}</p>
+      <p id={`${id}-status`} role="status" className="mt-3 shrink-0 text-xs text-[#44546f]">{saveStatus(tooLong, failed, save.pending, dirty)}</p>
     </form>
   </div>
 }
