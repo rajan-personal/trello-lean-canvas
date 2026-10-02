@@ -49,22 +49,13 @@ export const Populated: Story = {
 
 export const Empty: Story = {
   render: () => <SeededWorkspace canvases={[]} />,
-  play: async ({ canvasElement, userEvent }) => {
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await canvas.findByRole('button', { name: 'Add canvas' })
     await expect(await canvas.findByRole('heading', { name: 'No canvases yet' })).toBeVisible()
-    const actions = canvas.getByRole('button', { name: 'Canvas actions' })
-    await expect(actions).toBeVisible()
-    await expect(actions).toHaveAttribute('aria-expanded', 'false')
-    await expect(canvas.queryByRole('button', { name: 'New canvas' })).not.toBeInTheDocument()
-    await userEvent.click(actions)
-    await expect(actions).toHaveAttribute('aria-expanded', 'true')
     await expect(canvas.getByRole('button', { name: 'New canvas' })).toBeVisible()
     await expect(canvas.getByRole('button', { name: 'Import YAML' })).toBeVisible()
     await expect(canvas.getByRole('button', { name: 'Try sample canvases' })).toBeVisible()
-    await userEvent.click(actions)
-    await expect(actions).toHaveFocus()
-    await waitFor(() => expect(actions).toHaveAttribute('aria-expanded', 'false'))
     await expect(
       canvas.getByRole('button', { name: 'Add canvas' }),
     ).toBeInTheDocument()

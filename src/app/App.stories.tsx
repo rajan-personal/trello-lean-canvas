@@ -11,10 +11,12 @@ export default meta
 export const Default: AppStory = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
-    const addCanvas = await canvas.findByRole('button', { name: 'Add canvas' })
+    await canvas.findByRole('button', { name: 'Add canvas' })
     await expect(await canvas.findByRole('heading', { name: 'No canvases yet' })).toBeVisible()
-    await userEvent.click(addCanvas)
-    await userEvent.click(canvas.getByRole('button', { name: /^Sample$/ }))
+    await expect(canvas.getByRole('button', { name: 'New canvas' })).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Import YAML' })).toBeVisible()
+    await expect(canvas.getByRole('button', { name: 'Try sample canvases' })).toBeVisible()
+    await userEvent.click(canvas.getByRole('button', { name: 'Try sample canvases' }))
     await expect(
       await canvas.findByRole('heading', { name: 'Airbnb — 2008' }),
     ).toBeInTheDocument()
