@@ -54,7 +54,7 @@ export function NotepadPanel({ canvas, open, saving, saveFailed, onClose, onChan
       inert={!open}
     >
       <div
-        className="group absolute inset-y-0 start-0 z-10 w-2 -translate-x-1/2 cursor-col-resize touch-pan-y focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#0c66e4] max-[761px]:hidden"
+        className={`group absolute inset-y-0 start-0 z-10 w-2 -translate-x-1/2 cursor-col-resize touch-pan-y focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#0c66e4] max-[761px]:hidden ${expanded ? 'hidden' : ''}`}
         role="separator"
         aria-label="Resize notepad"
         aria-orientation="vertical"

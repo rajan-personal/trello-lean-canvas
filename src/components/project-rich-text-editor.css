@@ -105,3 +105,9 @@
 @media (pointer: fine) {
   .notepad-panel .rich-text-toolbar button { min-width: 32px; min-height: 32px; padding: 6px; }
 }
+@media (min-width: 762px) {
+  .notepad-panel[data-expanded="true"] { box-shadow: none; }
+  .notepad-panel[data-expanded="true"] > header { padding-inline: 24px; }
+  .notepad-panel[data-expanded="true"] .rich-text-toolbar { padding-inline: 24px; }
+  .notepad-panel[data-expanded="true"] .project-rich-text-content .tiptap { padding: 24px; }
+}

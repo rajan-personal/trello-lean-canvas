@@ -20,6 +20,9 @@ test('desktop notes expand, restore, and follow the available workspace', async 
   const availableWidth = () => page.locator('.workspace-content').evaluate((element) => element.clientWidth)
   const panelWidth = () => panel.evaluate((element) => Math.round(element.getBoundingClientRect().width))
   await expect.poll(panelWidth).toBe(await availableWidth())
+  await expect(handle).not.toBeVisible()
+  await expect(notes).toHaveCSS('padding-left', '24px')
+  await expect(panel.locator('header')).toHaveCSS('padding-left', '24px')
   await expect(page.getByRole('main', { name: 'Lean canvas' })).not.toBeVisible()
   const updatedNotes = 'Customer research\n\nInterview five teams about their workflow.\n\nCapture blockers, decisions, and next steps here.\n\nNext interview: Tuesday.'
   await notes.fill(updatedNotes)
@@ -34,6 +37,8 @@ test('desktop notes expand, restore, and follow the available workspace', async 
   await expect.poll(panelWidth).toBe(1024)
   await panel.getByRole('button', { name: 'Restore notepad width' }).click()
   await expect.poll(panelWidth).toBe(720)
+  await expect(handle).toBeVisible()
+  await expect(notes).toHaveCSS('padding-left', '12px')
   await expect(notes).toContainText('Next interview: Tuesday.')
   await expect(page.getByRole('main', { name: 'Lean canvas' })).toBeVisible()
   await handle.focus()
@@ -61,6 +66,7 @@ test('mobile notes still fill the screen without a redundant expand button', asy
   const panel = page.getByRole('complementary', { name: 'Notepad' })
   await expect(panel.getByRole('button', { name: 'Expand notepad' })).not.toBeVisible()
   await expect(panel.getByRole('separator')).not.toBeVisible()
+  await expect(panel.getByRole('textbox', { name: 'Canvas notes' })).toHaveCSS('padding-left', '12px')
   await expect.poll(() => panel.evaluate((element) => {
     const { left, right, top, bottom } = element.getBoundingClientRect()
     return { left, right, top, bottom }
