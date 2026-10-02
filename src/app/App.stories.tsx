@@ -12,7 +12,7 @@ export const Default: AppStory = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement)
     const addCanvas = await canvas.findByRole('button', { name: 'Add canvas' })
-    await expect(await canvas.findByRole('heading', { name: 'Start your first Lean Canvas' })).toBeVisible()
+    await expect(await canvas.findByRole('heading', { name: 'No canvases yet' })).toBeVisible()
     await userEvent.click(addCanvas)
     await userEvent.click(canvas.getByRole('button', { name: /^Sample$/ }))
     await expect(
