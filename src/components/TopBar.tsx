@@ -32,7 +32,7 @@ export function TopBar(props: Props) {
   const { canvas } = props
 
   return (
-    <header className="topbar relative z-20 flex h-12 items-center bg-[#0b4a6f] text-white shadow-[0_1px_0_rgba(9,30,66,0.25)]">
+    <header className="topbar relative z-20 flex h-12 items-center bg-chrome text-white shadow-[0_1px_0_rgba(9,30,66,0.25)]">
       <button
         className={`mobile-sidebar-button ms-2 me-[7px] hidden ${toolbarButtonClass} max-[760px]:grid`}
         onClick={props.onOpenSidebar}

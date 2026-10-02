@@ -1,6 +1,6 @@
 .kanban-area { position: relative; min-width: 0; flex: 1; height: 100%; display: flex; flex-direction: column; color: #172b4d; font-size: 14px; }
 .kanban-lists { display: flex; flex: 1; min-height: 0; align-items: flex-start; gap: 12px; padding: 18px 16px 28px; overflow: auto; scrollbar-color: #ffffff80 transparent; }
-.kanban-column { width: 272px; flex: 0 0 272px; max-height: 100%; padding: 8px; overflow-y: auto; border-radius: 12px; background: #f1f2f4; box-shadow: 0 2px 4px #091e4226, 0 0 0 1px #091e4214; scrollbar-width: thin; }
+.kanban-column { width: 272px; flex: 0 0 272px; max-height: 100%; padding: 8px; overflow-y: auto; border-radius: 12px; background: var(--color-panel); box-shadow: 0 2px 4px #091e4226, 0 0 0 1px #091e4214; scrollbar-width: thin; }
 .kanban-column[data-drop-target] { outline: 3px solid #85b8ff; outline-offset: 2px; }
 .kanban-column > header { display: flex; align-items: flex-start; min-height: 40px; padding: 0 0 8px 8px; gap: 6px; }
 .kanban-column h2 { flex: 1; min-width: 0; padding: 6px 0; margin: 0; overflow-wrap: anywhere; font-size: 14px; font-weight: 650; line-height: 1.4; }
