@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { within, expect, fn, spyOn } from 'storybook/test'
+import { within, expect, fn, spyOn, waitFor } from 'storybook/test'
 import { Workspace } from './Workspace'
 import { WorkspaceSeed } from './SeededWorkspace.story-support'
 import { blankCanvas } from './App.story-support'
@@ -24,12 +24,12 @@ export const IsolatedBoardsAndKeyboard: Story = {
     const boardTab = canvas.getByRole('tab', { name: 'Tickets' })
     await expect(boardTab).toHaveFocus()
     await expect(canvas.getByRole('tabpanel')).toHaveAccessibleName('Tickets')
-    await expect(await canvas.findByRole('button', { name: 'Outline the launch plan' })).toBeVisible()
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Outline the launch plan' })).toBeVisible())
     await userEvent.click(canvas.getByRole('button', { name: 'Second canvas' }))
     await expect(await canvas.findByRole('heading', { name: 'Second canvas' })).toBeVisible()
     await expect(canvas.queryByRole('button', { name: 'Outline the launch plan' })).not.toBeInTheDocument()
     await userEvent.click(canvas.getByRole('button', { name: 'Blank canvas' }))
-    await expect(await canvas.findByRole('button', { name: 'Outline the launch plan' })).toBeVisible()
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Outline the launch plan' })).toBeVisible())
     await userEvent.click(boardTab)
     await userEvent.keyboard('{ArrowRight}')
     await expect(canvas.getByRole('tab', { name: 'Canvas' })).toHaveFocus()

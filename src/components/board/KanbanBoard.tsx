@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { AppUser } from '../../auth/auth-context'
 import type { RegisterDraftGuard } from '../../app/useNavigationGuard'
 import type { BoardCard, BoardColumn, BoardData } from '../../data/board'
@@ -20,6 +20,15 @@ interface Props {
   run: RunBoardCommand; register: RegisterDraftGuard
 }
 export function KanbanBoard({ board, user, pending, deleted, error, run, register, ticket, loading = false }: Props) {
+  const lists = useRef<HTMLDivElement>(null)
+  const initialBoard = useRef(board)
+  useLayoutEffect(() => {
+    if (board !== initialBoard.current) lists.current?.classList.remove('is-entering')
+  }, [board])
+  useEffect(() => {
+    const timer = setTimeout(() => lists.current?.classList.remove('is-entering'), 200)
+    return () => clearTimeout(timer)
+  }, [])
   const [editor, setEditor] = useState<Editor | null>(null)
   const [addingColumn, setAddingColumn] = useState(false)
   const composer = useComposerFocus(addingColumn)
@@ -30,7 +39,7 @@ export function KanbanBoard({ board, user, pending, deleted, error, run, registe
   for (const comment of board.comments) commentCounts[comment.cardId] = (commentCounts[comment.cardId] ?? 0) + 1
   const close = () => setEditor(null)
   return <>
-    <div className="kanban-lists" aria-label="Board columns">
+    <div ref={lists} className="kanban-lists is-entering" aria-label="Board columns">
       {[...board.columns, ...removedColumns].map((column, index) => <KanbanColumn key={column.id} column={column}
         cards={orderedCards(board, column.id)} commentCounts={commentCounts} index={index} count={board.columns.length}
         adding={composingColumns.some((item) => item.id === column.id)}
