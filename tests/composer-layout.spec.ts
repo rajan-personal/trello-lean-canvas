@@ -62,8 +62,8 @@ test('keeps the first card anchored when it changes from composer to saved card'
     .evaluateAll((cells) =>
       cells.map((cell) => Math.round(cell.getBoundingClientRect().height)),
     )
-  expect(Math.min(...emptyMainCellHeights)).toBeGreaterThanOrEqual(200)
-  expect(Math.min(...emptyBottomCellHeights)).toBeGreaterThanOrEqual(150)
+  expect(Math.min(...emptyMainCellHeights)).toBeGreaterThanOrEqual(112)
+  expect(Math.min(...emptyBottomCellHeights)).toBeGreaterThanOrEqual(120)
 
   const section = page.locator('.canvas-column.problem .canvas-cell').first()
   await section.getByRole('button', { name: '＋ Add a card' }).click()

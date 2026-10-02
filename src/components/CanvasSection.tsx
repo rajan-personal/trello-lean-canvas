@@ -32,7 +32,7 @@ export function CanvasSection(props: CanvasSectionProps) {
   }, [isAdding])
   return (
     <section
-      className={`canvas-cell flex min-h-0 min-w-0 flex-[1_0_auto] flex-col px-[9px] pt-[11px] pb-[9px] ${bottom ? 'bottom-cell min-h-[150px] w-full' : 'min-h-[200px]'} ${sub ? 'flex-none border-t-2 border-[#d6dce5]' : 'flex-1'}`}
+      className={`canvas-cell flex min-h-0 min-w-0 flex-[1_0_auto] flex-col px-[9px] pt-[11px] pb-[9px] ${bottom ? 'bottom-cell min-h-[120px] w-full' : sub ? 'min-h-[112px]' : 'min-h-[160px]'} ${sub ? 'flex-none border-t-2 border-[#d6dce5]' : 'flex-1'}`}
       onDragOver={(event) =>
         dragHandlers.onDragOver(event, section.id, section.cards.length)
       }

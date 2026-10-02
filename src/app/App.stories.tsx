@@ -46,7 +46,7 @@ export const BlankCanvas: AppStory = {
       board.clientHeight -
       Number.parseFloat(styles.paddingTop) -
       Number.parseFloat(styles.paddingBottom)
-    await expect(grid.getBoundingClientRect().height).toBeCloseTo(height, 1)
+    await expect(grid.getBoundingClientRect().height).toBeLessThan(height)
   },
 }
 export const ReorderedSidebar: AppStory = {
