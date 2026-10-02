@@ -27,7 +27,7 @@ test('updates visible tickets and counts when a ticket moves out of an active st
     window.dispatchEvent(new Event('storage'))
   }, boards)
   await expect(page.getByRole('button', { name: 'Build release, In Progress', exact: true })).toHaveCount(0)
-  await expect(page.getByRole('list', { name: 'Task counts for Alpha project' })).toHaveText('Todo: 0In Progress: 0In Review: 2')
+  await expect(page.getByLabel('Active ticket count for Alpha project', { exact: true })).toHaveText('2 active tickets')
 })
 
 test('stops the working animation when reduced motion is requested', async ({ page }) => {
