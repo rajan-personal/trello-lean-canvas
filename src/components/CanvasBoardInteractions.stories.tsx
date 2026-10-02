@@ -38,6 +38,7 @@ export const EverySectionEditable: Story = {
 
 export const LongContentOnMobile: Story = {
   globals: { viewport: { value: 'mobile1', isRotated: false } },
+  decorators: [(Story) => <div className="h-dvh"><Story /></div>],
   args: { sections: storySections.map((section) => ({ ...section, cards: ['Long heading\n' + 'unbroken'.repeat(60)] })) },
   play: async ({ canvasElement }) => {
     await expect(window.innerWidth).toBe(320)
@@ -45,8 +46,9 @@ export const LongContentOnMobile: Story = {
     for (const card of canvasElement.querySelectorAll<HTMLElement>('.card-content')) {
       await expect(card.scrollWidth).toBeLessThanOrEqual(card.clientWidth)
     }
-    scroll.scrollLeft = scroll.scrollWidth
-    await expect(scroll.scrollLeft).toBeGreaterThan(0)
+    await expect(scroll.scrollWidth).toBeLessThanOrEqual(scroll.clientWidth)
+    scroll.scrollTop = scroll.scrollHeight
+    await expect(scroll.scrollTop).toBeGreaterThan(0)
     await expect(canvasElement.querySelector('.segments')!.getBoundingClientRect().right).toBeLessThanOrEqual(window.innerWidth)
   },
 }

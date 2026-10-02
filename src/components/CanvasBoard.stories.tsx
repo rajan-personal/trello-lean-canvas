@@ -72,7 +72,7 @@ export const MobileScrollable: Story = {
       throw new Error('Mobile canvas layout is incomplete')
     }
     await expect(getComputedStyle(grid).display).toBe('grid')
-    await expect(grid.getBoundingClientRect().width).toBeGreaterThan(
+    await expect(grid.getBoundingClientRect().width).toBeLessThanOrEqual(
       board.clientWidth,
     )
   },

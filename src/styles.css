@@ -71,3 +71,17 @@
     transition: opacity 80ms linear;
   }
 }
+
+@media (max-width: 760px) {
+  .lean-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .lean-grid > * { grid-column: auto; grid-row: auto; }
+  .lean-grid > .problem { order: 1; }
+  .lean-grid > .segments { order: 2; }
+  .lean-grid > .value { order: 3; }
+  .lean-grid > .solution { order: 4; }
+  .lean-grid > .channels { order: 5; }
+  .lean-grid > .revenue { order: 6; }
+  .lean-grid > .cost { order: 7; }
+  .lean-grid > .metrics { order: 8; }
+  .lean-grid > .advantage { order: 9; }
+}

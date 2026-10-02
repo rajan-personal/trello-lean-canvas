@@ -46,20 +46,34 @@ test('keeps the white canvas columns coherent and evenly sized', async ({
   }
 })
 
-test('keeps the canvas grid intact and scrollable on mobile', async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 667 })
+for (const width of [320, 375, 390, 760]) {
+test(`keeps the canvas grid intact and scrollable on mobile at ${width}px`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 667 })
   await openSampleCanvas(page)
 
   const layout = await page.locator('.lean-grid').evaluate((grid) => ({
     display: getComputedStyle(grid).display,
     gridWidth: Math.round(grid.getBoundingClientRect().width),
     boardWidth: grid.parentElement?.clientWidth ?? 0,
-    columnTops: [...grid.querySelectorAll('.canvas-column')].map((column) =>
-      Math.round(column.getBoundingClientRect().top),
+    panelTops: ['problem', 'segments', 'value', 'solution', 'channels', 'revenue', 'cost', 'metrics', 'advantage'].map((id) =>
+      Math.round(grid.querySelector(`:scope > .${id}`)!.getBoundingClientRect().top),
     ),
+    scrollWidth: grid.parentElement!.scrollWidth,
   }))
 
   expect(layout.display).toBe('grid')
-  expect(layout.gridWidth).toBeGreaterThan(layout.boardWidth)
-  expect(new Set(layout.columnTops).size).toBe(1)
+  expect(layout.gridWidth).toBeLessThanOrEqual(layout.boardWidth)
+  expect(layout.scrollWidth).toBeLessThanOrEqual(layout.boardWidth)
+  for (let index = 1; index < layout.panelTops.length; index++) {
+    expect(layout.panelTops[index]).toBeGreaterThan(layout.panelTops[index - 1])
+  }
+})
+}
+
+test('retains desktop grid placement at 761px', async ({ page }) => {
+  await page.setViewportSize({ width: 761, height: 900 })
+  await openSampleCanvas(page)
+  await expect(page.locator('.lean-grid')).toHaveCSS('min-width', '1000px')
+  const tops = await page.locator('.canvas-column').evaluateAll((columns) => columns.map((column) => column.getBoundingClientRect().top))
+  expect(new Set(tops).size).toBe(1)
 })
