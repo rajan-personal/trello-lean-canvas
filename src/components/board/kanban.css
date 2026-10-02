@@ -56,6 +56,7 @@ button.kanban-add-column:hover { background: #fff; }
 .kanban-status { padding: 8px 16px; background: #ffffffed; }
 .kanban-status button { margin-left: 12px; text-decoration: underline; }
 .kanban-sync-status { position: absolute; inset-inline-end: 16px; bottom: 12px; z-index: 1; margin: 0; padding: 6px 10px; border-radius: 6px; background: #172b4de6; color: white; font-size: 12px; pointer-events: none; }
+@media (max-width: 360px) { .kanban-sync-status { bottom: 64px; } }
 /* Keep the board visually steady while writes temporarily lock interaction. */
 .kanban-area[data-syncing] .kanban-card:disabled { opacity: 1; }
 .kanban-composer label { display: grid; gap: 6px; color: #44546f; font-size: 12px; font-weight: 600; }
