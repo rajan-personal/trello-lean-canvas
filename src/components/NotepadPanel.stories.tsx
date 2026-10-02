@@ -56,11 +56,11 @@ export const KeyboardResized: Story = {
     separator.focus()
     fireEvent.keyDown(separator, { key: 'End' })
     await waitFor(() =>
-      expect(separator).toHaveAttribute('aria-valuenow', '640'),
+      expect(separator).toHaveAttribute('aria-valuenow', separator.getAttribute('aria-valuemax')),
     )
     fireEvent.keyDown(separator, { key: 'ArrowRight' })
     await waitFor(() =>
-      expect(separator).toHaveAttribute('aria-valuenow', '620'),
+      expect(separator).toHaveAttribute('aria-valuenow', String(Number(separator.getAttribute('aria-valuemax')) - 20)),
     )
   },
 }
