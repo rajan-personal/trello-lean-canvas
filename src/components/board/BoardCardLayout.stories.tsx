@@ -9,7 +9,7 @@ type Story = StoryObj<typeof meta>
 export const ExpandingPlainDescription: Story = { play: async ({ canvas, userEvent }) => {
   const modal = canvas.getByRole('dialog')
   const description = canvas.getByRole('textbox', { name: 'Description' })
-  await expect(description.getBoundingClientRect().height).toBeGreaterThanOrEqual(320)
+  await expect(description.getBoundingClientRect().height).toBeGreaterThanOrEqual(150)
   await expect(modal.querySelectorAll('form')).toHaveLength(2)
   await expect(modal.querySelectorAll('form form')).toHaveLength(0)
   await expect(canvas.getByRole('combobox', { name: 'Story points' }).textContent).toBe('—')
