@@ -4,7 +4,7 @@ import { column, openBoard } from './support/board-fixtures'
 test('retains an inline card draft read-only when its column is deleted remotely', async ({ page }) => {
   await openBoard(page)
   const backlog = column(page, 'Backlog')
-  await backlog.getByRole('button', { name: '+ Add a card', exact: true }).click()
+  await backlog.getByRole('button', { name: 'Add a card', exact: true }).click()
   await backlog.getByRole('textbox', { name: 'Card title' }).fill('Keep this unfinished task')
   await page.evaluate(() => {
     const boards = JSON.parse(localStorage.getItem('lean-canvas:boards:v1')!)

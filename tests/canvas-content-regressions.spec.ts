@@ -9,7 +9,7 @@ test('long multiline cards wrap and bottom-panel creation stays anchored', async
   const card = page.locator('.card-content').first()
   expect(await card.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
   const revenue = page.locator('.revenue .canvas-cell')
-  await revenue.getByRole('button', { name: '＋ Add a card' }).click()
+  await revenue.getByRole('button', { name: 'Add a card' }).click()
   const composer = revenue.getByRole('textbox', { name: 'New card' })
   await composer.fill('Plan\nMonthly revenue')
   await expect(composer).toBeFocused()

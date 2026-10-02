@@ -39,7 +39,7 @@ export const HeaderEditingAndCreation: Story = {
     await expect(canvas.queryByRole('dialog')).not.toBeInTheDocument()
     await expect(canvas.getByRole('tab', { name: 'Tickets' })).toHaveAttribute('aria-selected', 'true')
     await userEvent.click(canvas.getByRole('tab', { name: 'Canvas' }))
-    await expect(canvas.getAllByRole('button', { name: '＋ Add a card' })).toHaveLength(12)
+    await expect(canvas.getAllByRole('button', { name: 'Add a card' })).toHaveLength(12)
   },
 }
 

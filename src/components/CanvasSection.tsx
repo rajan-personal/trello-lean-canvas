@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
+import { Plus } from 'lucide-react'
 import { CanvasCardList } from './CanvasCardList'
 import type { CanvasSectionProps } from './CanvasSection.types'
 
@@ -54,10 +55,10 @@ export function CanvasSection(props: CanvasSectionProps) {
       {!isAdding && (
         <button
           ref={addButtonRef}
-          className="add-card-button mt-[7px] min-h-7 w-full rounded-md border-0 bg-transparent px-[7px] py-1 text-left text-xs leading-[18px] text-[#44546f] hover:bg-[#dcdfe4] hover:text-[#172b4d]"
+          className="add-card-button mt-[7px] min-h-7 w-full rounded-md border-0 bg-transparent px-[7px] py-1 text-left flex items-center gap-1.5 text-sm leading-5 font-medium text-[#44546f] hover:bg-[#dcdfe4] hover:text-[#172b4d]"
           onClick={() => startAddingCard(section.id)}
         >
-          ＋ Add a card
+          <Plus size={16} aria-hidden="true" />Add a card
         </button>
       )}
     </section>

@@ -24,7 +24,7 @@ for (const width of [320, 1440]) {
     await summary.press('Escape')
     await expect(activity).not.toHaveAttribute('open', '')
     await page.getByRole('button', { name: 'Open board for Beta project' }).click()
-    await page.getByRole('region', { name: 'Todo', exact: true }).getByRole('button', { name: '+ Add a card' }).click()
+    await page.getByRole('region', { name: 'Todo', exact: true }).getByRole('button', { name: 'Add a card' }).click()
     await page.getByRole('textbox', { name: 'Card title', exact: true }).fill('Count this activity')
     await page.getByRole('button', { name: 'Add card', exact: true }).click()
     await page.getByRole('button', { name: 'All tickets', exact: true }).click()

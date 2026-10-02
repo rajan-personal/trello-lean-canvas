@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { Plus } from 'lucide-react'
 import type { RegisterDraftGuard } from '../../app/useNavigationGuard'
 import { BoardInlineComposer } from './BoardInlineComposer'
 import { storyPointLabel, type BoardCard, type BoardColumn } from '../../data/board'
@@ -41,6 +42,6 @@ export function KanbanColumn({ column, cards, index, count, pending, deleted, er
     </ol>
     <div ref={composer}>{adding ? <BoardInlineComposer kind="card" pending={pending} deleted={deleted} error={error} register={register}
       onClose={() => onAddingChange(false)} onSave={(id, title) => run({ type: 'create-card', id, columnId: column.id, title })} /> :
-      <button className="kanban-add-card" disabled={pending || deleted} onClick={() => onAddingChange(true)}>+ Add a card</button>}</div>
+      <button className="kanban-add-card" disabled={pending || deleted} onClick={() => onAddingChange(true)}><Plus size={16} aria-hidden="true" />Add a card</button>}</div>
   </section>
 }

@@ -3,7 +3,7 @@ import { column, openBoard } from './support/board-fixtures'
 
 for (const kind of ['card', 'column'] as const) test(`inline ${kind} composer retains failed drafts and stable IDs, guards exits`, async ({ page }) => {
   await openBoard(page)
-  const trigger = kind === 'card' ? column(page, 'Backlog').getByRole('button', { name: '+ Add a card', exact: true }) :
+  const trigger = kind === 'card' ? column(page, 'Backlog').getByRole('button', { name: 'Add a card', exact: true }) :
     page.getByRole('button', { name: '+ Add another column', exact: true })
   await trigger.click()
   await expect(page.getByRole('dialog')).toHaveCount(0)

@@ -50,7 +50,7 @@ test('Canvas draft survives cancelled browser Back; confirmation navigates and f
   const first = page.url()
   await page.getByRole('button', { name: 'Facebook', exact: true }).click()
   const second = page.url()
-  await page.getByRole('button', { name: '＋ Add a card', exact: true }).first().click()
+  await page.getByRole('button', { name: 'Add a card', exact: true }).first().click()
   await page.getByLabel('New card', { exact: true }).fill('Unsaved Canvas draft')
   await answerHistoryNavigation(page, -1, false)
   await expect(page).toHaveURL(second)

@@ -41,7 +41,7 @@ export const Mobile: Story = { ...Populated, globals: { viewport: { value: 'mobi
 
 export const InlineCardComposer: Story = { ...Populated, play: async ({ canvasElement }) => {
   const canvas = within(canvasElement)
-  await userEvent.click(canvas.getAllByRole('button', { name: '+ Add a card' })[0])
+  await userEvent.click(canvas.getAllByRole('button', { name: 'Add a card' })[0])
   await userEvent.type(canvas.getByRole('textbox', { name: 'Card title' }), 'New inline card draft')
   await userEvent.click(canvas.getByRole('button', { name: 'Add card' }))
   await expect(canvas.getByRole('button', { name: 'New inline card draft' })).toBeVisible()

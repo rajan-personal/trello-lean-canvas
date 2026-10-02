@@ -53,7 +53,7 @@ test('updates the star when favorited and counts after a card is added', async (
   await page.getByRole('button', { name: 'Open board for Beta project', exact: true }).click()
   await page.getByRole('button', { name: 'Favorite canvas', exact: true }).click()
   const todo = page.getByRole('region', { name: 'Todo', exact: true })
-  await todo.getByRole('button', { name: '+ Add a card', exact: true }).click()
+  await todo.getByRole('button', { name: 'Add a card', exact: true }).click()
   await page.getByRole('textbox', { name: 'Card title', exact: true }).fill('Another task')
   await page.getByRole('button', { name: 'Add card', exact: true }).click()
   await page.getByRole('button', { name: 'All tickets', exact: true }).click()
@@ -90,7 +90,7 @@ test('wraps long names and omits descriptions on mobile', async ({ page }) => {
 test('honors the dirty ticket guard when leaving a project board for the list', async ({ page }) => {
   await openList(page)
   await page.getByRole('button', { name: 'Open board for Alpha project', exact: true }).click()
-  await page.getByRole('button', { name: '+ Add a card', exact: true }).first().click()
+  await page.getByRole('button', { name: 'Add a card', exact: true }).first().click()
   await page.getByRole('textbox', { name: 'Card title', exact: true }).fill('Keep this draft')
   page.once('dialog', (dialog) => dialog.dismiss())
   await page.getByRole('button', { name: 'All tickets', exact: true }).click()

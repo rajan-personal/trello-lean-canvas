@@ -17,7 +17,7 @@ export const EverySectionEditable: Story = {
     await expect(sections).toHaveLength(12)
     for (const [index, element] of Array.from(sections).entries()) {
       const section = within(element)
-      await userEvent.click(section.getByRole('button', { name: '＋ Add a card' }))
+      await userEvent.click(section.getByRole('button', { name: 'Add a card' }))
       const composer = section.getByRole('textbox', { name: 'New card' })
       const top = composer.getBoundingClientRect().top - element.getBoundingClientRect().top
       fireEvent.change(composer, { target: { value: `Section ${index + 1}` } })

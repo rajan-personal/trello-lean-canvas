@@ -8,7 +8,7 @@ for (const fallback of [false, true]) for (const populated of [false, true]) {
     if (populated) await addBoardCard(page, 'Next board control')
     const backlog = column(page, 'Backlog')
     const trigger = backlog.getByRole('button', { name: 'Column actions for Backlog' })
-    const next = backlog.getByRole('button', { name: populated ? 'Next board control' : '+ Add a card', exact: true })
+    const next = backlog.getByRole('button', { name: populated ? 'Next board control' : 'Add a card', exact: true })
     const panel = page.getByRole('group', { name: 'Column actions for Backlog' })
     await trigger.focus()
     await page.keyboard.press('Enter')

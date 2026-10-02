@@ -76,7 +76,7 @@ test('cancelled Forward preserves Board composer and confirmed Forward opens tic
   await openBoardCard(page, 'Forward ticket')
   const ticket = page.url()
   await page.goBack()
-  await page.getByRole('button', { name: '+ Add a card', exact: true }).first().click()
+  await page.getByRole('button', { name: 'Add a card', exact: true }).first().click()
   await page.getByRole('textbox', { name: 'Card title', exact: true }).fill('Keep composer')
   await answerHistoryNavigation(page, 1, false)
   await expect(page).toHaveURL(parent)
