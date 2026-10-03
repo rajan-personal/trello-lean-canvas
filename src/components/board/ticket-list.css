@@ -5,6 +5,8 @@
   --ticket-indent: calc(var(--ticket-gutter) + 23px);
 }
 .ticket-list-area {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-inline-size: 0;
   min-block-size: 0;
@@ -14,6 +16,7 @@
   scrollbar-gutter: stable;
 }
 .ticket-list-content {
+  flex: 1 0 auto;
   container: ticket-list / inline-size;
   border-radius: 12px;
   background: var(--color-panel);
