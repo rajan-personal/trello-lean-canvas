@@ -20,6 +20,7 @@ export const blankCanvas: LeanCanvas = {
   favorite: false,
   notes: '',
   about: '',
+  aboutTabs: [],
   sections: sectionTemplate.map((section) => ({ ...section, cards: [] })),
 }
 const emptyCanvases: LeanCanvas[] = []
