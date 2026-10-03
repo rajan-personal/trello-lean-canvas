@@ -1,3 +1,4 @@
+import { createHttpBoardRepository } from './http-board-repository'
 import { readLocalBoards, readPendingImports, stageBoardImport, writeLocalBoards, LOCAL_BOARD_EVENT, type PendingImport } from './board-storage'
 import { applyBoardCommand, type BoardCommand } from './board-mutations'
 import { getFirestore } from 'firebase/firestore'
@@ -20,7 +21,8 @@ export interface BoardRepository {
   removeLocal(canvasIds: string[]): void
   deletingCanvasIds(canvasIds: string[]): Promise<string[]>
 }
-export function createBoardRepository(uid: string, persistence: 'local' | 'firestore', storage: Storage = globalThis.localStorage): BoardRepository {
+export function createBoardRepository(uid: string, persistence: 'local' | 'firestore' | 'postgres', storage: Storage = globalThis.localStorage): BoardRepository {
+  if (persistence === 'postgres') return createHttpBoardRepository(uid, storage)
   const isLocal = persistence === 'local'
   const db = () => getFirestore(firebaseApp)
   const pendingKey = `lean-canvas:board-imports:${isLocal ? 'local' : uid}`
@@ -59,8 +61,7 @@ export function createBoardRepository(uid: string, persistence: 'local' | 'fires
     },
     subscribe(canvasId, changed, error) {
       if (!isLocal) return access.subscribe(canvasId, changed, error)
-      const listener = () => changed()
-      changed()
+      const listener = () => changed(); changed()
       globalThis.addEventListener?.('storage', listener)
       globalThis.addEventListener?.(LOCAL_BOARD_EVENT, listener)
       return () => { globalThis.removeEventListener?.('storage', listener); globalThis.removeEventListener?.(LOCAL_BOARD_EVENT, listener) }
@@ -92,9 +93,7 @@ export function createBoardRepository(uid: string, persistence: 'local' | 'fires
       const removed = new Set(canvasIds)
       storage.setItem(pendingKey, JSON.stringify(pendingImports().filter((entry) => !removed.has(entry.canvas.id))))
     },
-    async deletingCanvasIds(canvasIds) {
-      return isLocal ? [] : remote.deletingBoardIds(db(), uid, canvasIds)
-    },
+    async deletingCanvasIds(canvasIds) { return isLocal ? [] : remote.deletingBoardIds(db(), uid, canvasIds) },
   }
   return repository
 }

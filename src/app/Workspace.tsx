@@ -23,7 +23,7 @@ import { useWorkspaceTicketList } from './useWorkspaceTicketList'
 interface Props {
   user: AppUser; onSignOut: () => void | Promise<void>
   onSetPassword?: (password: string) => Promise<void>
-  persistence?: 'firestore' | 'local'
+  persistence?: 'firestore' | 'local' | 'postgres'
   browserRouting?: boolean
 }
 export function Workspace({ user, onSignOut, onSetPassword, persistence, browserRouting = false }: Props) {

@@ -31,6 +31,10 @@ Account creation in the app uses Google only. Existing Google users can set a pa
 
 On first sign-in after this schema upgrade, the app idempotently copies and verifies canvases from the former workspace-array document before replacing it with the metadata document. Existing `lean-canvas:v2` browser data follows the same verified path for an empty cloud workspace. Local migration and recovery copies remain until cloud persistence succeeds. Concurrent edits to different canvases are isolated; simultaneous edits to the same canvas remain last-writer-wins.
 
+## PostgreSQL migration candidate
+
+An opt-in PostgreSQL and Better Auth backend is implemented behind `VITE_DATA_BACKEND=postgres` and the Worker `DATA_BACKEND=postgres` setting. Production remains on Firebase by default. See [the implementation, staging setup, migration commands and cutover gates](docs/postgres-migration.md). Do not switch production until live OAuth, source-data rehearsal and the write barrier have been verified.
+
 ## Firebase backend and deployment
 
 The frontend is hosted on Cloudflare Workers Static Assets at `lean.addorimprove.com`, with SPA navigation fallback for clean project/ticket URLs. Firebase continues to supply Authentication and Firestore only; no backend Worker is needed. See [the deployment and rollback checklist](docs/cloudflare-hosting.md) before publishing.
