@@ -1,4 +1,4 @@
-import { useId } from 'react'
+import { useId, useState } from 'react'
 import { AlignLeft, Trash2 } from 'lucide-react'
 import type { AppUser } from '../../auth/auth-context'
 import type { RegisterDraftGuard } from '../../app/useNavigationGuard'
@@ -12,14 +12,20 @@ import { useGrowingDescription } from './useGrowingDescription'
 import type { RunBoardCommand } from './board-ui'
 import { useBoardCardDraft } from './useBoardCardDraft'
 import { useDraftGuard } from './useDraftGuard'
+import { TicketChildren } from './TicketChildren'
+import { TicketBreadcrumbs } from './TicketBreadcrumbs'
+import { ticketAncestors } from '../../data/ticket-hierarchy'
 import './card-details.css'
-
 interface Props {
+  navigationGuarded?: boolean
   deleted?: boolean
+  onOpenTicket?: (id: string) => void
+  onOpenBoard?: (id: string | null) => void
   card: BoardCard; board: BoardData; user: AppUser; pending: boolean; error: string | null
   run: RunBoardCommand; onClose: () => void; register: RegisterDraftGuard
 }
-export function BoardCardDialog({ card, board, user, pending, deleted, error, run, onClose, register }: Props) {
+export function BoardCardDialog({ card, board, user, pending, deleted, error, run, onClose, register, onOpenTicket, onOpenBoard, navigationGuarded }: Props) {
+  const [childTitle, setChildTitle] = useState('')
   const titleId = useId()
   const descriptionId = useId()
   const formId = useId()
@@ -28,14 +34,19 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
   const editor = useBoardCardDraft(card, user, run)
   const { draft, setDraft } = editor
   const descriptionRef = useGrowingDescription(draft.description)
-  const close = useDraftGuard(editor.dirty, pending, onClose, register)
+  const close = useDraftGuard(editor.dirty || !!childTitle, pending, onClose, register)
+  const hasChildren = board.cards.some((item) => item.parentTicketId === card.id)
+  const navigate = (action: () => void) => {
+    if (pending || (!navigationGuarded && (editor.dirty || !!childTitle) && !window.confirm('Discard unsaved changes?'))) return
+    action()
+  }
   const exists = !deleted && board.cards.some((item) => item.id === card.id)
   return <BoardDialog title="Card details" onClose={close} lightDismiss className="kanban-card-dialog"
     headerContext={<BoardCardStatus columnId={draft.columnId} columns={board.columns} formId={formId}
       disabled={pending || !exists} onChange={(columnId) => setDraft({ ...draft, columnId })} />}
-    headerActions={<button className="kanban-danger kanban-dialog-delete" disabled={pending || !exists}
-      type="button" aria-label="Delete card" title="Delete card" onClick={async () => {
-        if (!window.confirm(`Delete “${card.title}” and all its comments?${editor.dirty ? ' Unsaved changes will also be discarded.' : ''}`)) return
+    headerActions={<button className="kanban-danger kanban-dialog-delete" disabled={pending || !exists || hasChildren}
+      type="button" aria-label="Delete card" title={hasChildren ? 'Delete child tickets first' : 'Delete card'} onClick={async () => {
+        if (!window.confirm(`Delete “${card.title}” and all its comments?${editor.dirty || childTitle ? ' Unsaved changes will also be discarded.' : ''}`)) return
         if (await run({ type: 'delete-card', id: card.id })) onClose()
       }}><Trash2 size={17} aria-hidden="true" /></button>}>
     {pending && <p role="status">Saving changes…</p>}
@@ -45,9 +56,11 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
     {editor.message && <p role="status">{editor.message}</p>}
     <div className="kanban-card-layout">
     <div className="kanban-card-editor">
+    {onOpenTicket && onOpenBoard && card.parentTicketId && <TicketBreadcrumbs cards={ticketAncestors(board.cards, card.id)}
+      onBoard={(id) => navigate(() => onOpenBoard(id))} onTicket={(id) => navigate(() => onOpenTicket(id))} disabled={pending} />}
     <form id={formId} onSubmit={async (event) => {
       event.preventDefault()
-      if (!pending && exists && draft.title.trim() && await editor.save() && !editor.comment) onClose()
+      if (!pending && exists && draft.title.trim() && await editor.save() && !editor.comment && !childTitle) onClose()
     }}>
       <fieldset disabled={pending}>
         <div className="kanban-title-field"><label htmlFor={titleId}>Title</label><textarea id={titleId} name="title" rows={2} required maxLength={500} readOnly={!exists} value={draft.title}
@@ -72,6 +85,10 @@ export function BoardCardDialog({ card, board, user, pending, deleted, error, ru
         </div>
       </fieldset>
     </form>
+    {onOpenTicket && onOpenBoard && <TicketChildren card={card} board={board} pending={pending} deleted={!exists}
+      error={error} run={run} title={childTitle} onTitle={setChildTitle}
+      onOpenTicket={(id) => navigate(() => onOpenTicket(id))}
+      onOpenBoard={() => navigate(() => onOpenBoard(card.id))} />}
     </div>
     <BoardComments comments={orderedComments(board, card.id)} text={editor.comment}
       onText={editor.setComment} pending={pending} readOnly={!exists} onAdd={editor.addComment} />

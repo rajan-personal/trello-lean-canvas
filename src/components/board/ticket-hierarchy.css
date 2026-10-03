@@ -1,0 +1,18 @@
+.ticket-breadcrumbs { display: flex; align-items: center; gap: 6px; min-width: 0; flex: 0 0 auto; overflow-x: auto; padding: 12px 16px 0; color: #fff; font-size: 13px; }
+.ticket-breadcrumbs > span { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.ticket-breadcrumbs button { max-width: 240px; min-height: 36px; padding: 6px 8px; border-radius: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; }
+.ticket-breadcrumbs button:not(:disabled):hover { background: #ffffff26; }
+.ticket-breadcrumbs [aria-current] { font-weight: 600; opacity: 1 !important; }
+.kanban-card-dialog .ticket-breadcrumbs { padding: 0 0 16px; margin-top: -8px; color: #667085; }
+.kanban-dialog .ticket-breadcrumbs button { background: transparent; padding: 4px 6px; font-size: 12px; font-weight: 400; }
+.ticket-children { margin-top: 28px; padding-top: 20px; border-top: 1px solid #e4e7ec; }
+.ticket-children > header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.kanban-dialog .ticket-children h3 { margin: 0; font-size: 14px; }
+.ticket-children h3 > span { color: #667085; font-size: 12px; font-weight: 400; }
+.ticket-children ul { list-style: none; margin: 0 0 8px; padding: 0; }
+.kanban-dialog .ticket-children .ticket-child-row { display: flex; justify-content: flex-start; gap: 12px; width: 100%; min-height: 44px; padding: 8px 4px; background: transparent; border-radius: 4px; text-align: left; border-bottom: 1px solid #f2f4f7; font-size: 13px; font-weight: 400; }
+.ticket-child-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.ticket-child-status { flex-shrink: 0; color: #667085; font-size: 12px; }
+.ticket-child-row .kanban-story-points-badge { margin: 0; }
+.kanban-dialog .ticket-children :is(.ticket-board-link, .ticket-add-child) { padding: 6px 8px; background: transparent; color: #475467; font-size: 12px; font-weight: 500; }
+@media (max-width: 760px) { .ticket-breadcrumbs button { min-height: 44px; max-width: 180px; } }

@@ -1,9 +1,8 @@
 import { boardDataSchema, type BoardData, type BoardCard, type BoardComment } from './board'
 import { appendComment } from './board-comments'
 export { orderedComments } from './board-comments'
-
-export function orderedCards(board: BoardData, columnId: string): BoardCard[] {
-  return board.cards.filter((card) => card.columnId === columnId)
+export function orderedCards(board: BoardData, columnId: string, parentTicketId: string | null = null): BoardCard[] {
+  return board.cards.filter((card) => card.columnId === columnId && (card.parentTicketId ?? null) === parentTicketId)
     .sort((a, b) => a.rank < b.rank ? -1 : a.rank > b.rank ? 1 : a.id.localeCompare(b.id))
 }
 // Variable-length lexical ranks move one record, without rewriting an entire column.
@@ -24,7 +23,7 @@ export type BoardCommand =
   | { type: 'rename-column'; id: string; title: string }
   | { type: 'move-column'; id: string; index: number }
   | { type: 'delete-column'; id: string }
-  | { type: 'create-card'; id: string; columnId: string; title: string }
+  | { type: 'create-card'; id: string; columnId: string; title: string; parentTicketId?: string | null }
   | { type: 'edit-card'; id: string; title: string; description: string; columnId: string; storyPoints?: BoardCard['storyPoints']; expected: Pick<BoardCard, 'title' | 'description' | 'columnId' | 'storyPoints'> }
   | { type: 'move-card'; id: string; columnId: string; index: number }
   | { type: 'delete-card'; id: string }
@@ -43,7 +42,7 @@ export function applyBoardCommand(source: BoardData, command: BoardCommand): Boa
   }
   const move = (item: BoardCard, columnId: string, index: number) => {
     column(columnId)
-    const others = orderedCards(board, columnId).filter(({ id }) => id !== item.id)
+    const others = orderedCards(board, columnId, item.parentTicketId).filter(({ id }) => id !== item.id)
     const at = Math.max(0, Math.min(Math.trunc(index), others.length))
     if (!Number.isFinite(at)) throw new Error('Invalid move position.')
     item.columnId = columnId
@@ -67,8 +66,9 @@ export function applyBoardCommand(source: BoardData, command: BoardCommand): Boa
       break
     case 'create-card': {
       column(command.columnId)
-      const others = orderedCards(board, command.columnId)
-      board.cards.push({ id: command.id, columnId: command.columnId, title: command.title,
+      if (command.parentTicketId) card(command.parentTicketId)
+      const others = orderedCards(board, command.columnId, command.parentTicketId)
+      board.cards.push({ id: command.id, ...(command.parentTicketId ? { parentTicketId: command.parentTicketId } : {}), columnId: command.columnId, title: command.title,
         description: '', rank: rankBetween(others.at(-1)?.rank) })
       break
     }
@@ -86,6 +86,7 @@ export function applyBoardCommand(source: BoardData, command: BoardCommand): Boa
     case 'move-card': move(card(command.id), command.columnId, command.index); break
     case 'delete-card':
       card(command.id)
+      if (board.cards.some((item) => item.parentTicketId === command.id)) throw new Error('Delete child tickets before deleting their parent.')
       board.cards = board.cards.filter(({ id }) => id !== command.id)
       board.comments = board.comments.filter(({ cardId }) => cardId !== command.id)
       break

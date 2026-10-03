@@ -1,5 +1,6 @@
 import { doc, runTransaction, serverTimestamp, writeBatch, type Firestore } from 'firebase/firestore'
 import { boardDataSchema, type BoardData } from './board'
+import { hierarchyLayers } from './ticket-hierarchy'
 import { canvasesPath } from './firestore-model'
 import { boardPath, boardRecordSchema, boardRecord, childPayload } from './board-firestore-model'
 
@@ -21,12 +22,12 @@ export async function importBoard(db: Firestore, uid: string, canvasId: string, 
     return false
   })
   if (complete) return
-  const entries = [
-    ...data.cards.map((item) => ({ kind: 'cards', item })),
-    ...data.comments.map((item) => ({ kind: 'comments', item })),
+  const layers = [
+    ...hierarchyLayers(data.cards).map((cards) => cards.map((item) => ({ kind: 'cards', item }))),
+    data.comments.map((item) => ({ kind: 'comments', item })),
   ]
   // Each comment rule reads its card; stay below the 20-access batch rule limit.
-  for (let start = 0; start < entries.length; start += 10) {
+  for (const entries of layers) for (let start = 0; start < entries.length; start += 10) {
     const batch = writeBatch(db)
     entries.slice(start, start + 10).forEach(({ kind, item }) =>
       batch.set(doc(db, `${path}/${kind}`, item.id), childPayload(item, canvasId)))

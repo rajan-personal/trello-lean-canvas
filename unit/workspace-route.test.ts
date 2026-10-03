@@ -24,3 +24,14 @@ describe('workspace-route', () => {
     expect(parseWorkspaceRoute(path)).toEqual({ kind: 'missing' })
   })
 })
+
+it('parses nested board links independently of ticket detail links', () => {
+  expect(parseWorkspaceRoute('/project/a/ticket/child/board')).toEqual({
+    kind: 'project', projectId: 'a', view: 'board', parentTicketId: 'child',
+  })
+  expect(parseWorkspaceRoute('/project/a/ticket/child/board/')).toEqual({
+    kind: 'project', projectId: 'a', view: 'board', parentTicketId: 'child',
+  })
+  expect(parseWorkspaceRoute('/project/a/about/child/board')).toEqual({ kind: 'missing' })
+  expect(parseWorkspaceRoute('/project/a/ticket/child/board/extra')).toEqual({ kind: 'missing' })
+})

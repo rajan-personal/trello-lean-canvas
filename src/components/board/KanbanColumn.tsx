@@ -11,12 +11,14 @@ import type { useBoardDrag } from './useBoardDrag'
 interface Props {
   column: BoardColumn; cards: BoardCard[]; index: number; count: number; pending: boolean
   commentCounts: Readonly<Record<string, number>>
+  columnEmpty?: boolean
+  childProgress?: Readonly<Record<string, { done: number; total: number }>>
   deleted?: boolean; error: string | null; register: RegisterDraftGuard
   adding: boolean; onAddingChange: (adding: boolean) => void
   run: RunBoardCommand; drag: ReturnType<typeof useBoardDrag>
   onOpen: (card: BoardCard) => void; onRename: () => void
 }
-export function KanbanColumn({ column, cards, commentCounts, index, count, pending, deleted, error, register, run, drag,
+export function KanbanColumn({ column, cards, commentCounts, childProgress = {}, columnEmpty, index, count, pending, deleted, error, register, run, drag,
   onOpen, onRename, adding, onAddingChange }: Props) {
   const label = useId()
   const composer = useComposerFocus(adding)
@@ -26,15 +28,16 @@ export function KanbanColumn({ column, cards, commentCounts, index, count, pendi
     onDrop={(event) => drag.drop(event, column.id)}>
     <header><h2 id={label}>{column.title}</h2>
       <span className="kanban-column-count" aria-label={`${cards.length} ${cards.length === 1 ? 'card' : 'cards'}`}>{cards.length}</span>
-      <BoardColumnMenu column={column} index={index} count={count} empty={!cards.length}
+      <BoardColumnMenu column={column} index={index} count={count} empty={columnEmpty ?? !cards.length}
         pending={pending || !!deleted} rename={onRename} run={run} />
     </header>
     <ol className="kanban-cards" aria-label={`${column.title} cards`}>
       {cards.map((card) => {
+        const progress = childProgress[card.id]
         const commentCount = commentCounts[card.id] ?? 0
         const hasDescription = Boolean(card.description.trim())
         const summary = [hasDescription ? 'Has description.' : '', commentCount > 0
-          ? `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}.` : ''].filter(Boolean).join(' ')
+          ? `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}.` : '', progress ? `${progress.done}/${progress.total} child tickets done.` : ''].filter(Boolean).join(' ')
         const metaId = `${label}-${card.id}-meta`
         return <li key={card.id}>
         <button className="kanban-card" type="button" disabled={pending || deleted} draggable={!pending && !deleted}
@@ -42,8 +45,9 @@ export function KanbanColumn({ column, cards, commentCounts, index, count, pendi
           aria-describedby={summary ? metaId : undefined}
           onDragStart={(event) => drag.start(event, card.id)} onDragEnd={drag.end}
           onDrop={(event) => drag.drop(event, column.id, card.id)}
-          onClick={() => onOpen(card)}>{card.title}{(hasDescription || commentCount > 0 || card.storyPoints != null) &&
+          onClick={() => onOpen(card)}>{card.title}{(hasDescription || commentCount > 0 || card.storyPoints != null || progress) &&
             <span className="kanban-card-meta" aria-hidden="true">
+              {progress && <span>{progress.done}/{progress.total} done</span>}
               {hasDescription && <AlignLeft size={14} />}
               {commentCount > 0 && <span><MessageSquare size={14} />{commentCount}</span>}
               {card.storyPoints != null && <span className="kanban-story-points-badge" aria-hidden="true">

@@ -111,7 +111,7 @@ service cloud.firestore {
               || (before.status == 'importing' && after.status == 'importing'));
           }
           function validCard(data) {
-            return data.keys().hasOnly(['schemaVersion', 'canvasId', 'columnId', 'title', 'description', 'storyPoints', 'rank', 'updatedAt'])
+            return data.keys().hasOnly(['schemaVersion', 'canvasId', 'columnId', 'title', 'description', 'storyPoints', 'parentTicketId', 'rank', 'updatedAt'])
               && data.schemaVersion == 1 && data.canvasId == canvasId
               && data.columnId is string && data.columnId.size() > 0
               && data.title is string && data.title.size() > 0 && data.title.size() <= 500
@@ -140,8 +140,17 @@ service cloud.firestore {
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['revision', 'updatedAt']);
           allow delete: if ownsBoard() && resource.data.status == 'deleting' && !existsAfter(canvasRef());
           match /cards/{cardId} {
+            function validParent(data) {
+              return !data.keys().hasAny(['parentTicketId']) || data.parentTicketId == null ||
+                (data.parentTicketId is string && data.parentTicketId != cardId
+                  && data.parentTicketId.matches('^[^/]+$')
+                  && exists(/databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId)/boards/default/cards/$(data.parentTicketId)));
+            }
             allow read: if readsBoard();
-            allow create, update: if ownsBoard() && writable() && validCard(request.resource.data);
+            // Parent links are set at creation. Existing tickets cannot be reparented into cycles.
+            allow create: if ownsBoard() && writable() && validCard(request.resource.data) && validParent(request.resource.data);
+            allow update: if ownsBoard() && writable() && validCard(request.resource.data)
+              && request.resource.data.get('parentTicketId', null) == resource.data.get('parentTicketId', null);
             allow delete: if ownsBoard() && canDeleteCard(cardId);
           }
           match /comments/{commentId} {

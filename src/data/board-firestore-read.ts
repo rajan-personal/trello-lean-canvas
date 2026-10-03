@@ -65,7 +65,7 @@ export async function readBoardSummary(db: Firestore, uid: string, canvasId: str
       const { canvasId: _canvasId, schemaVersion: _version, updatedAt: _time, ...data } = value
       void _canvasId; void _version; void _time
       const card = boardCardSchema.parse({ ...data, id: item.id })
-      return { id: card.id, columnId: card.columnId, title: card.title, ...(card.storyPoints === undefined ? {} : { storyPoints: card.storyPoints }), rank: card.rank }
+      return { id: card.id, ...(card.parentTicketId == null ? {} : { parentTicketId: card.parentTicketId }), columnId: card.columnId, title: card.title, ...(card.storyPoints === undefined ? {} : { storyPoints: card.storyPoints }), rank: card.rank }
     })
     return { revision: after.revision, data: boardSummarySchema.parse({ columns: after.columns, cards: summaryCards, ...(after.activity ? { activity: after.activity } : {}) }) }
   }

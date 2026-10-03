@@ -27,14 +27,16 @@ describe('Firestore efficiency and concurrency', () => {
     expect(reads).not.toHaveBeenCalled()
     expect((await readBoard(test.db, 'alice', 'a')).data).toEqual(saved?.data)
   })
-  it('reads only the deleted card comments, in batches of at most 200', async () => {
+  it('checks for a child once, then reads only the deleted card comments in batches of at most 200', async () => {
     const source = populatedBoard()
     source.comments = [...Array.from({ length: 205 }, (_, index) => comment(`comment-${index}`)), comment('keep', 'card-b')]
     await importBoard(test.db, 'alice', 'a', source, 'import-a')
     const reads = vi.mocked(firestore.getDocsFromServer).mockClear()
     await mutateBoard(test.db, 'alice', 'a', { type: 'delete-card', id: 'card-a' })
     const pages = await Promise.all(reads.mock.results.map((result) => result.value as Promise<firestore.QuerySnapshot>))
-    expect(pages.map((page) => page.size)).toEqual([200, 5])
+    expect(pages.map((page) => page.size)).toEqual([0, 200, 5])
+    const childQuery = reads.mock.calls[0][0] as unknown as { _query: { limit: number } }
+    expect(childQuery._query.limit).toBe(1)
     expect(pages.flatMap((page) => page.docs).every((item) => item.data().cardId === 'card-a')).toBe(true)
     expect((await readBoard(test.db, 'alice', 'a')).data.comments).toEqual([comment('keep', 'card-b')])
   })
