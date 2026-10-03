@@ -32,6 +32,7 @@ describe('project about data', () => {
     expect(decodeCanvas(original.id, { ...canvasPayload(original), schemaVersion: 1, revision: 2, updatedAt: timestamp }).canvas).toEqual(original)
     expect(yamlToCanvas(canvasToYaml(original), canvas())).toEqual(original)
     expect(yamlToCanvas('canvas:\n  sections:\n    - id: problem', canvas()).aboutTabs).toEqual([])
+    expect(canvasPayload(canvas())).not.toHaveProperty('aboutTabs')
     const tab = (id: string) => ({ id, title: id, content: '' })
     for (const aboutTabs of [
       [tab('a'), tab('a')],
