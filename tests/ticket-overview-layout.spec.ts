@@ -22,7 +22,7 @@ for (const width of [390, 1440]) {
     await expect(tickets.getByRole('button', { name: 'Duplicate title, In Review' }).first()).toBeVisible()
     const colors = await row.evaluate((node) => ({
       panel: getComputedStyle(node.closest('.ticket-list-content')!).backgroundColor,
-      card: getComputedStyle(node.querySelector('.ticket-active-open')!).backgroundColor,
+      card: getComputedStyle(node.querySelector('.ticket-active-list')!).backgroundColor,
       graph: getComputedStyle(node.querySelector('.ticket-activity-sparkline')!).color,
     }))
     expect(colors).toEqual({ panel: 'rgb(241, 242, 244)', card: 'rgb(255, 255, 255)', graph: 'rgb(11, 74, 111)' })

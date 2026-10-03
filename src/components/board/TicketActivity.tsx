@@ -5,17 +5,21 @@ interface Props { activity?: BoardActivity; today: number; peak: number; project
 export function TicketActivity({ activity, today, peak, projectName, unavailable }: Props) {
   const days = activityDays(activity, today)
   const total = days.reduce((sum, { count }) => sum + count, 0)
-  const points = days.map(({ count }, index) => `${(2 + index * 100 / 6).toFixed(2)},${(26 - count / peak * 24).toFixed(2)}`).join(' ')
+  // Seven bars on a 104×28 grid; zero (or unknown) days keep a 2px stub so the week stays readable.
+  const bars = days.map(({ date, count }, index) => {
+    const height = unavailable ? 2 : Math.max(2, Math.round(count / peak * 24 * 100) / 100)
+    return { date, zero: unavailable || count === 0, x: Number((index * 92 / 6).toFixed(2)), y: Number((26 - height).toFixed(2)), height }
+  })
   const changes = total === 1 ? 'change' : 'changes'
   const label = unavailable ? `Activity for ${projectName}: unavailable`
     : `Activity for ${projectName}: ${total} recorded ${changes} in the last 7 days`
   return <details className="ticket-activity" onKeyDown={(event) => {
     if (event.key === 'Escape') { event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus() }
   }}>
-    <summary data-total={unavailable ? '–' : total} aria-label={label} aria-description="Daily activity, oldest to newest. Graphs share one scale across loaded projects.">
+    <summary title="Ticket changes in the last 7 days" data-total={unavailable ? '–' : total} aria-label={label} aria-description="Daily activity, oldest to newest. Graphs share one scale across loaded projects.">
       <svg className="ticket-activity-sparkline" viewBox="0 0 104 28" aria-hidden="true" focusable="false"
         data-state={unavailable ? 'unknown' : total === 0 ? 'empty' : 'recorded'}>
-        <polyline points={unavailable ? '2,26 102,26' : points} />
+        {bars.map(({ date, zero, x, y, height }) => <rect key={date} x={x} y={y} width="12" height={height} rx="1.5" data-zero={zero || undefined} />)}
       </svg>
     </summary>
     <div className="ticket-activity-breakdown">
