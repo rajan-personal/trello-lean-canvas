@@ -24,12 +24,12 @@ export function TicketProjectRow({ project, blocked, today, activityPeak, onOpen
       <h2 className="ticket-project-title"><button type="button" className="ticket-project-open"
         aria-label={`Open board for ${canvas.name}`} aria-description={canvas.favorite ? 'Starred project' : undefined}
         disabled={blocked} onClick={() => onOpenProjectBoard(canvas.id)}>
-        <span className="ticket-project-star-slot" aria-hidden="true">{canvas.favorite && <Star className="ticket-project-star" size={15} />}</span>
         <span className="ticket-project-name">{canvas.name}</span>
+        {canvas.favorite && <Star className="ticket-project-star" size={14} aria-hidden="true" />}
       </button></h2>
-      <div className="ticket-project-meta">
+      <div className="ticket-project-meta ticket-project-activity">
         {!unavailable && <span className="ticket-project-total" aria-label={`Active ticket count for ${canvas.name}`}>
-          {tickets.length} active {tickets.length === 1 ? 'ticket' : 'tickets'}
+          {tickets.length} active<span className="ticket-project-total-word"> {tickets.length === 1 ? 'ticket' : 'tickets'}</span>
         </span>}
         <TicketActivity activity={summary?.activity} today={today} peak={activityPeak} projectName={canvas.name} unavailable={unavailable} />
       </div>

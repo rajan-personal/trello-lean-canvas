@@ -1,12 +1,10 @@
 /* All tickets: L2 panel (grey) holds project sections; each project's tickets sit on one L3 surface (white),
-   matching the Kanban column → card layering. Every row shares one left edge (--ticket-indent). */
+   matching the Kanban column → card layering. Project names and ticket lists share one left edge (--ticket-indent). */
 .ticket-list-content > * {
   --ticket-gutter: 16px;
-  --ticket-indent: calc(var(--ticket-gutter) + 23px);
+  --ticket-indent: var(--ticket-gutter);
 }
 .ticket-list-area {
-  display: flex;
-  flex-direction: column;
   flex: 1;
   min-inline-size: 0;
   min-block-size: 0;
@@ -16,7 +14,6 @@
   scrollbar-gutter: stable;
 }
 .ticket-list-content {
-  flex: 1 0 auto;
   container: ticket-list / inline-size;
   border-radius: 12px;
   background: var(--color-panel);
@@ -56,8 +53,8 @@
 .ticket-project-row + .ticket-project-row { border-block-start: 1px solid #dcdfe4; }
 .ticket-project-header {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 4px 16px;
   min-block-size: 48px;
@@ -65,11 +62,9 @@
   padding: 8px var(--ticket-gutter) 4px;
 }
 .ticket-project-header:has(.ticket-project-open:not(:disabled):hover) .ticket-project-name { color: #0c66e4; text-decoration: underline; text-underline-offset: 3px; }
-.ticket-project-title { margin: 0; font-size: 14px; line-height: 20px; }
+.ticket-project-title { flex: 1 1 180px; min-inline-size: 0; margin: 0; font-size: 14px; line-height: 20px; }
 .ticket-project-open {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: block;
   inline-size: 100%;
   padding: 0;
   border: 0;
@@ -81,17 +76,15 @@
   overflow-wrap: anywhere;
   cursor: pointer;
 }
-.ticket-project-name { min-inline-size: 0; }
-.ticket-project-star-slot { display: flex; flex: 0 0 15px; }
-.ticket-project-star { color: #946f00; fill: #f5cd47; }
+.ticket-project-star { display: inline-block; margin-inline-start: 6px; vertical-align: -2px; color: #946f00; fill: #f5cd47; }
 /* Whole header is the hit target; the meta column sits above it so the sparkline stays interactive. */
 .ticket-project-open::after { position: absolute; inset: 0; content: ''; border-radius: 4px; }
 .ticket-project-open:focus-visible { outline: none; }
 .ticket-project-open:focus-visible::after { outline: 2px solid #0c66e4; outline-offset: -2px; }
 .ticket-project-open:disabled { opacity: .6; cursor: not-allowed; }
-.ticket-project-meta { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; }
+.ticket-project-meta { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; margin-inline-start: auto; }
 .ticket-project-total { color: #44546f; font-size: 12px; line-height: 16px; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.ticket-project-meta .ticket-activity-sparkline { inline-size: 72px; block-size: 24px; }
+.ticket-project-meta .ticket-activity-sparkline { inline-size: 64px; block-size: 20px; }
 
 .ticket-project-state, .ticket-project-error, .ticket-active-empty {
   margin: 0;
@@ -117,7 +110,7 @@
 
 /* Tickets: one white surface per project, hairline-separated rows */
 .ticket-active-list {
-  margin: 4px var(--ticket-gutter) 0 calc(var(--ticket-indent) - 8px);
+  margin: 4px var(--ticket-gutter) 0 var(--ticket-indent);
   padding: 0;
   overflow: hidden;
   border-radius: 8px;
@@ -178,8 +171,10 @@
   .ticket-list-content > * { --ticket-gutter: 12px; }
 }
 @container ticket-list (max-width: 420px) {
-  .ticket-project-header { grid-template-columns: minmax(0, 1fr); gap: 0; }
-  .ticket-project-meta { justify-content: space-between; padding-inline-start: 23px; }
+  .ticket-project-header { column-gap: 8px; }
+  .ticket-project-title { flex-basis: 120px; }
+  .ticket-project-meta { gap: 8px; }
+  .ticket-project-total-word { display: none; }
   .ticket-status-pill { display: none; }
 }
 @media (max-width: 760px) {

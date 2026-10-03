@@ -51,7 +51,7 @@ export const Loading: Story = {
     await expect(canvas.queryByLabelText('Active ticket count for Loading project')).not.toBeInTheDocument()
     const activity = canvas.getByLabelText('Activity for Loading project: unavailable')
     await expect(activity.querySelector('svg')).toHaveAttribute('data-state', 'unknown')
-    await expect(activity.querySelector('polyline')).toHaveAttribute('points', '2,26 102,26')
+    await expect([...activity.querySelectorAll('rect')].map((bar) => bar.getAttribute('height'))).toEqual(Array(7).fill('2'))
   },
 }
 export const PartialProjectStates: Story = {
@@ -61,7 +61,7 @@ export const PartialProjectStates: Story = {
     await expect(canvas.getByRole('alert')).toHaveTextContent('Tickets could not be loaded')
     const activity = canvas.getByLabelText('Activity for Needs retry: unavailable')
     await expect(activity.querySelector('svg')).toHaveAttribute('data-state', 'unknown')
-    await expect(activity.querySelector('polyline')).toHaveAttribute('points', '2,26 102,26')
+    await expect([...activity.querySelectorAll('rect')].map((bar) => bar.getAttribute('height'))).toEqual(Array(7).fill('2'))
     await expect(canvas.queryByLabelText('Active ticket count for Needs retry')).not.toBeInTheDocument()
     await userEvent.click(canvas.getByRole('button', { name: 'Retry loading tickets for Needs retry' }))
     await expect(args.onRetry).toHaveBeenCalledWith('error')
