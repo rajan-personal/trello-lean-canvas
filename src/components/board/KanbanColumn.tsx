@@ -12,13 +12,13 @@ interface Props {
   column: BoardColumn; cards: BoardCard[]; index: number; count: number; pending: boolean
   commentCounts: Readonly<Record<string, number>>
   columnEmpty?: boolean
-  childProgress?: Readonly<Record<string, { done: number; total: number }>>
+  childProgress?: ReadonlyMap<string, { done: number; total: number }>
   deleted?: boolean; error: string | null; register: RegisterDraftGuard
   adding: boolean; onAddingChange: (adding: boolean) => void
   run: RunBoardCommand; drag: ReturnType<typeof useBoardDrag>
   onOpen: (card: BoardCard) => void; onRename: () => void
 }
-export function KanbanColumn({ column, cards, commentCounts, childProgress = {}, columnEmpty, index, count, pending, deleted, error, register, run, drag,
+export function KanbanColumn({ column, cards, commentCounts, childProgress, columnEmpty, index, count, pending, deleted, error, register, run, drag,
   onOpen, onRename, adding, onAddingChange }: Props) {
   const label = useId()
   const composer = useComposerFocus(adding)
@@ -33,7 +33,7 @@ export function KanbanColumn({ column, cards, commentCounts, childProgress = {},
     </header>
     <ol className="kanban-cards" aria-label={`${column.title} cards`}>
       {cards.map((card) => {
-        const progress = childProgress[card.id]
+        const progress = childProgress?.get(card.id)
         const commentCount = commentCounts[card.id] ?? 0
         const hasDescription = Boolean(card.description.trim())
         const summary = [hasDescription ? 'Has description.' : '', commentCount > 0

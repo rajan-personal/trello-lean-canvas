@@ -33,7 +33,8 @@ Reload older clients after release: their strict schemas do not understand `pare
 
 ## Validation
 
-- Unit coverage: independent ordering/status, graph validation, summaries, YAML round trips, and 10,000 levels.
+- CI runs the unit suite, Firestore emulator suite, and all `tests/nested-*.spec.ts` browser regressions before the production build and Cloudflare deployment. Firestore rules deployment remains a separate release prerequisite above.
+- Unit coverage: independent ordering/status, graph validation, summaries, YAML round trips, 10,000 levels, and completion counters for imported IDs matching JavaScript prototype properties.
 - Emulator coverage: nested persistence, leaf-only deletion, invalid parent writes, immutable parent links, reverse-order and resumed imports, legacy-client deletion rejection, forged counters, create/delete races, and guard cleanup on project deletion.
 - Browser coverage: nested navigation, reload/back, sibling scoping, drag and status edits, draft protection, active descendants, missing parents, desktop/mobile layout, and long/unbroken column names on mobile.
 - Screenshot fixtures: `tests/nested-tickets-layout.spec.ts`; captures in `docs/pr-proofs/nested-tickets/`.

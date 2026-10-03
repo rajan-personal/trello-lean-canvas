@@ -51,10 +51,11 @@ export function KanbanBoard({ board, user, pending, deleted, error, run, registe
     else { setEditor(null); setLocalParent(id) }
   }
   const drag = useBoardDrag(scopedBoard, pending || !!deleted, run, parentId)
-  const childProgress: Record<string, { done: number; total: number }> = {}
+  const childProgress = new Map<string, { done: number; total: number }>()
   const done = new Set(board.columns.filter((column) => ['done', 'closed'].includes(column.id) || /^(done|closed)$/i.test(column.title)).map((column) => column.id))
   for (const card of board.cards) if (card.parentTicketId) {
-    const progress = childProgress[card.parentTicketId] ??= { done: 0, total: 0 }
+    const progress = childProgress.get(card.parentTicketId) ?? { done: 0, total: 0 }
+    childProgress.set(card.parentTicketId, progress)
     progress.total++
     if (done.has(card.columnId)) progress.done++
   }
