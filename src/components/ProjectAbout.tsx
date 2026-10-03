@@ -22,6 +22,7 @@ export function ProjectAbout({ canvas, onSave, register }: Props) {
   const [draft, setDraft] = useState<AboutDetails | null>(null)
   const [active, setActive] = useState(overview)
   const [focusName, setFocusName] = useState(false)
+  const [sectionsOpen, setSectionsOpen] = useState(false)
   const saved: AboutDetails = { about: canvas.about, aboutTabs: canvas.aboutTabs }
   const value = draft ?? saved
   const invalid = aboutProblem(value)
@@ -43,6 +44,7 @@ export function ProjectAbout({ canvas, onSave, register }: Props) {
     const tab = { id: crypto.randomUUID(), title: 'New tab', content: '' }
     update({ ...value, aboutTabs: [...value.aboutTabs, tab] })
     setActive(tab.id)
+    setSectionsOpen(false)
     setFocusName(true)
   }
   const moveTab = (tabId: string, index: number) => {
@@ -69,10 +71,11 @@ export function ProjectAbout({ canvas, onSave, register }: Props) {
         </div>
       </div>
       <div className="flex min-h-0 flex-1 gap-4 max-[760px]:flex-col max-[760px]:gap-3">
-      <ProjectAboutTabs id={id} tabs={tabs} active={current.id} pinned={overview} onSelect={setActive} onAdd={addTab} onMove={moveTab}
+      <ProjectAboutTabs id={id} tabs={tabs} active={current.id} pinned={overview} onAdd={addTab} onMove={moveTab}
+        open={sectionsOpen} onToggle={setSectionsOpen} onSelect={(tabId) => { setActive(tabId); setSectionsOpen(false) }}
         canAdd={!save.pending && value.aboutTabs.length < maxAboutTabs} canMove={!save.pending}
         addTitle={value.aboutTabs.length >= maxAboutTabs ? `Up to ${maxAboutTabs + 1} tabs` : 'Add tab'} />
-      <div role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-${current.id}-tab`} className="flex min-h-0 min-w-0 flex-1 flex-col max-[760px]:min-h-80">
+      <div role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-${current.id}-tab`} className={`flex min-h-0 min-w-0 flex-1 flex-col max-[760px]:min-h-80 ${sectionsOpen ? 'max-[760px]:hidden' : ''}`}>
         <span id={`${editorId}-label`} className="sr-only">{current.id === overview ? 'Project details' : current.title.trim() || 'Untitled tab'}</span>
         {current.id !== overview && <ProjectAboutTabSettings tab={current} disabled={save.pending} focusName={focusName}
           onFocused={() => setFocusName(false)} onRename={(title) => updateTab(current.id, { title })}

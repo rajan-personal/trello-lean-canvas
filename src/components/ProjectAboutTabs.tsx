@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { GripVertical, Plus } from 'lucide-react'
+import { SectionToggle } from './ProjectAboutSectionToggle'
 import type { AboutTab } from '../data/types'
 import { getCanvasDropEdge } from './sidebar-drag'
 
@@ -11,6 +12,9 @@ interface Props {
   canAdd: boolean
   canMove: boolean
   addTitle: string
+  /** Mobile only: whether the section list replaces the editor. */
+  open: boolean
+  onToggle: (open: boolean) => void
   onSelect: (tabId: string) => void
   onAdd: () => void
   /** Moves a tab to an index within the reorderable (non-pinned) tabs. */
@@ -25,6 +29,11 @@ export function ProjectAboutTabs(p: Props) {
   const [target, setTarget] = useState<Target | null>(null)
   const movable = p.tabs.filter((tab) => tab.id !== p.pinned)
   const select = (tabId: string) => { p.onSelect(tabId); buttons.current[tabId]?.focus() }
+  const current = p.tabs.find((tab) => tab.id === p.active)
+  const add = <button type="button" onClick={p.onAdd} disabled={!p.canAdd} aria-label="Add tab" title={p.addTitle}
+    className="flex size-8 shrink-0 items-center justify-center rounded-md text-[#44546f] hover:bg-[#091e420f] hover:text-[#172b4d] focus-visible:outline-2 focus-visible:outline-[#0c66e4] disabled:opacity-50 max-[760px]:size-11">
+    <Plus size={16} aria-hidden="true" />
+  </button>
   const move = (tabId: string, index: number) => {
     p.onMove(tabId, index)
     requestAnimationFrame(() => buttons.current[tabId]?.focus())
@@ -37,15 +46,15 @@ export function ProjectAboutTabs(p: Props) {
     p.onMove(dragged, destination - (source < destination ? 1 : 0))
     reset()
   }
-  return <div className="flex w-52 shrink-0 flex-col border-r border-[#dcdfe4] pr-3 max-[760px]:w-full max-[760px]:border-r-0 max-[760px]:border-b max-[760px]:pr-0 max-[760px]:pb-3">
-    <div className="mb-1 flex items-center justify-between ps-2">
+  return <div className={`flex w-52 shrink-0 flex-col border-r border-[#dcdfe4] pr-3 max-[760px]:w-full max-[760px]:border-r-0 max-[760px]:pr-0 ${p.open ? 'max-[760px]:min-h-0 max-[760px]:flex-1' : ''}`}>
+    <div className="mb-1 flex items-center justify-between ps-2 max-[760px]:hidden">
       <span className="text-[11px] font-semibold tracking-wide text-[#44546f] uppercase">Sections</span>
-      <button type="button" onClick={p.onAdd} disabled={!p.canAdd} aria-label="Add tab" title={p.addTitle}
-        className="flex size-8 items-center justify-center rounded-md text-[#44546f] hover:bg-[#091e420f] hover:text-[#172b4d] focus-visible:outline-2 focus-visible:outline-[#0c66e4] disabled:opacity-50 max-[760px]:size-11">
-        <Plus size={16} aria-hidden="true" />
-      </button>
+      {add}
     </div>
-    <div role="tablist" aria-label="About sections" aria-orientation="vertical" className="flex min-h-0 flex-col gap-0.5 overflow-y-auto max-[760px]:max-h-44">
+    <SectionToggle listId={`${p.id}-sections`} title={current?.title.trim() || 'Untitled'} count={p.tabs.length}
+      open={p.open} onToggle={p.onToggle}>{add}</SectionToggle>
+    <div role="tablist" id={`${p.id}-sections`} aria-label="About sections" aria-orientation="vertical"
+      className={`flex min-h-0 flex-col gap-0.5 overflow-y-auto max-[760px]:mt-2 ${p.open ? '' : 'max-[760px]:hidden'}`}>
       {p.tabs.map((tab, index) => {
         const selected = tab.id === p.active
         const canDrag = p.canMove && tab.id !== p.pinned
