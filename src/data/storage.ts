@@ -17,7 +17,8 @@ export function readStoredCanvases(storage: Storage = browserStorage()): LeanCan
 function serializeCanvases(canvases: LeanCanvas[]): string {
   const parsed = parseCanvasArray(canvases)
   if (!parsed.ok) throw new Error(`Invalid stored canvases: ${parsed.error}`)
-  return JSON.stringify(parsed.value)
+  // Omit empty aboutTabs so older bundles can still parse local data.
+  return JSON.stringify(parsed.value.map(({ aboutTabs, ...canvas }) => aboutTabs.length ? { ...canvas, aboutTabs } : canvas))
 }
 export function writeStoredCanvases(
   canvases: LeanCanvas[], storage: Storage = browserStorage(),

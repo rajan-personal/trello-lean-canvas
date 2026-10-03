@@ -20,6 +20,12 @@ export interface CanvasSectionData {
   cards: string[]
 }
 
+export interface AboutTab {
+  id: string
+  title: string
+  content: string
+}
+
 export interface LeanCanvas {
   id: string
   name: string
@@ -27,5 +33,6 @@ export interface LeanCanvas {
   favorite: boolean
   notes: string
   about: string
+  aboutTabs: AboutTab[]
   sections: CanvasSectionData[]
 }

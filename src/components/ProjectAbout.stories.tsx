@@ -51,7 +51,7 @@ export const SelectedText: Story = {
     await userEvent.click(canvas.getByRole('button', { name: 'Redo' }))
     await expect(editor.querySelector('pre')).toHaveTextContent(/^Run npm test before saving\.$/)
     await userEvent.click(canvas.getByRole('button', { name: 'Save' }))
-    await expect(args.onSave).toHaveBeenCalledWith('Keep this introduction. \n\n```\nRun npm test before saving.\n```\n\n Keep this conclusion.')
+    await expect(args.onSave).toHaveBeenCalledWith({ about: 'Keep this introduction. \n\n```\nRun npm test before saving.\n```\n\n Keep this conclusion.', aboutTabs: [] })
   },
 }
 

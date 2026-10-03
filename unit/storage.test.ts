@@ -39,3 +39,14 @@ describe('local migration claims', () => {
     expect(readStoredCanvases(storage)).toEqual([])
   })
 })
+describe('About tabs local compatibility', () => {
+  it('omits empty About tabs and round-trips filled ones', () => {
+    const storage = new MemoryStorage()
+    writeStoredCanvases([canvas()], storage)
+    expect(JSON.parse(storage.getItem('lean-canvas:v2')!)[0]).not.toHaveProperty('aboutTabs')
+    expect(readStoredCanvases(storage)).toEqual([canvas()])
+    const withTabs = { ...canvas(), aboutTabs: [{ id: 'goals', title: 'Goals', content: 'Ship' }] }
+    writeStoredCanvases([withTabs], storage)
+    expect(readStoredCanvases(storage)).toEqual([withTabs])
+  })
+})

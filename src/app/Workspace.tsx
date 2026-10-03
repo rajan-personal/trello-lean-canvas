@@ -82,8 +82,8 @@ export function Workspace({ user, onSignOut, onSetPassword, persistence, browser
                 if (allow()) history.navigate(projectPath(id, 'board', cardId))
               }, onRetry: ticketList.retry }}
             workspaceView={{ view, board, sectionProps, user, ticket, blocked: state.pending, deleted: state.deleted,
-              about: { onSave: async (about) => {
-                state.updateActiveCanvas((canvas) => ({ ...canvas, about })); await state.flushCanvases() } },
+              about: { onSave: async ({ about, aboutTabs }) => {
+                state.updateActiveCanvas((canvas) => ({ ...canvas, about, aboutTabs })); await state.flushCanvases() } },
               onDismissDeleted: () => { if (allow()) state.setActiveId(null) }, register: guard.register, notify }}
             unavailable={{ route, onReturn: () => { if (allow()) history.navigate('/') }, empty: state.canvases.length === 0,
               onNew: () => { if (allow()) setDialog({ heading: 'Create canvas', submitLabel: 'Create canvas', value: '' }) },

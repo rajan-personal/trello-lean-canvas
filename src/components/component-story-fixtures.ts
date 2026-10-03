@@ -24,6 +24,7 @@ export const storyCanvas: LeanCanvas = {
   favorite: false,
   notes: 'Interview five customers before Friday.',
   about: '',
+  aboutTabs: [],
   sections: storySections,
 }
 

@@ -25,13 +25,31 @@ service cloud.firestore {
         && values[8].id == 'segments' && values[9].id == 'adopters'
         && values[10].id == 'cost' && values[11].id == 'revenue';
     }
+    function validAboutTab(tab) {
+      return tab is map && tab.keys().hasAll(['id', 'title', 'content'])
+        && tab.keys().hasOnly(['id', 'title', 'content'])
+        && tab.id is string && tab.id.size() > 0 && tab.id.size() <= 100
+        && tab.id != 'overview'
+        && tab.title is string && tab.title.size() <= 60
+        && tab.content is string && tab.content.size() <= 100000;
+    }
+    function validAboutTabs(tabs) {
+      // Rules have no loops: validate each optional slot and its ID against earlier slots.
+      return tabs is list && tabs.size() <= 5
+        && (tabs.size() < 1 || validAboutTab(tabs[0]))
+        && (tabs.size() < 2 || (validAboutTab(tabs[1]) && tabs[1].id != tabs[0].id))
+        && (tabs.size() < 3 || (validAboutTab(tabs[2]) && !(tabs[2].id in [tabs[0].id, tabs[1].id])))
+        && (tabs.size() < 4 || (validAboutTab(tabs[3]) && !(tabs[3].id in [tabs[0].id, tabs[1].id, tabs[2].id])))
+        && (tabs.size() < 5 || (validAboutTab(tabs[4]) && !(tabs[4].id in [tabs[0].id, tabs[1].id, tabs[2].id, tabs[3].id])));
+    }
     function validCanvas(data) {
       return data.keys().hasOnly(['schemaVersion', 'name', 'title', 'favorite', 'notes',
-          'about', 'sections', 'revision', 'updatedAt', 'legacyId'])
+          'about', 'aboutTabs', 'sections', 'revision', 'updatedAt', 'legacyId'])
         && data.schemaVersion == 1 && data.name is string && data.name.size() <= 500
         && data.title is string && data.title.size() <= 500
         && data.favorite is bool && data.notes is string && data.notes.size() <= 100000
         && (!data.keys().hasAny(['about']) || (data.about is string && data.about.size() <= 100000))
+        && (!data.keys().hasAny(['aboutTabs']) || validAboutTabs(data.aboutTabs))
         && validSections(data.sections) && data.revision is int && data.revision > 0
         && data.updatedAt == request.time
         && (!data.keys().hasAny(['legacyId']) || data.legacyId is string);

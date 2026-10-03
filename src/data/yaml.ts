@@ -35,7 +35,7 @@ export function canvasToYaml(canvas: LeanCanvas, board?: BoardData): string {
         title: canvas.title,
         favorite: canvas.favorite,
         notes: canvas.notes,
-        about: canvas.about,
+        about: canvas.about, aboutTabs: canvas.aboutTabs,
         sections: canvas.sections.map(({ id, number, title, hint, cards }) => ({
           id,
           ...(number ? { number } : {}),
@@ -55,10 +55,7 @@ export function yamlToCanvasBundle(source: string, fallbackCanvas: LeanCanvas): 
   return { canvas: yamlToCanvas(source, fallbackCanvas), board }
 }
 
-export function yamlToCanvas(
-  source: string,
-  fallbackCanvas: LeanCanvas,
-): LeanCanvas {
+export function yamlToCanvas(source: string, fallbackCanvas: LeanCanvas): LeanCanvas {
   const parsed: unknown = load(source)
   const input =
     isRecord(parsed) && isRecord(parsed.canvas) ? parsed.canvas : parsed
@@ -95,6 +92,7 @@ export function yamlToCanvas(
     favorite: Boolean(input.favorite ?? fallbackCanvas.favorite),
     notes: String(input.notes ?? fallbackCanvas.notes),
     about: canvasSchema.shape.about.parse(input.about),
+    aboutTabs: canvasSchema.shape.aboutTabs.parse(input.aboutTabs),
     sections,
   }
 }
