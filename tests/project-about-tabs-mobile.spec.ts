@@ -1,0 +1,36 @@
+import { expect, test } from '@playwright/test'
+import { loadSamples } from './support/canvas-fixtures'
+
+test('on phones the section list collapses and swaps with the editor', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 760 })
+  await loadSamples(page)
+  await page.getByRole('tab', { name: 'About', exact: true }).click()
+  const panel = page.getByRole('tabpanel', { name: 'About' })
+  const toggle = panel.getByRole('button', { name: /^Sections/ })
+  const sections = panel.getByRole('tablist', { name: 'About sections' })
+  const overview = panel.getByRole('textbox', { name: 'Project details' })
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(sections).toBeHidden()
+  await expect(overview).toBeVisible()
+  await panel.getByRole('button', { name: 'Add tab' }).click()
+  await expect(overview).toBeHidden()
+  await panel.getByRole('textbox', { name: 'Tab name' }).fill('Goals')
+  await page.keyboard.press('Enter')
+  await expect(sections).toBeHidden()
+  await expect(toggle).toContainText('Goals')
+  await expect(panel.getByRole('textbox', { name: 'Goals' })).toBeVisible()
+  for (const action of ['Rename tab', 'Move tab up', 'Move tab down', 'Delete tab']) {
+    const bounds = await panel.getByRole('button', { name: action }).boundingBox()
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(375)
+    expect(bounds!.height).toBeGreaterThanOrEqual(44)
+  }
+  await toggle.click()
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+  await expect(sections).toBeVisible()
+  await expect(panel.getByRole('textbox', { name: 'Goals' })).toBeHidden()
+  await sections.getByRole('tab', { name: 'Overview' }).click()
+  await expect(sections).toBeHidden()
+  await expect(overview).toBeVisible()
+  await expect(toggle).toContainText('Overview')
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(375)
+})

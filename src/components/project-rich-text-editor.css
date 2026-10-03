@@ -111,3 +111,6 @@
   .notepad-panel[data-expanded="true"] .rich-text-toolbar { padding-inline: 24px; }
   .notepad-panel[data-expanded="true"] .project-rich-text-content .tiptap { padding: 24px; }
 }
+.about-workbench .project-rich-text-editor { border: 0; border-radius: 0; }
+.about-workbench .project-rich-text-editor:focus-within { outline: none; }
+.about-workbench .project-rich-text-editor:focus-within .rich-text-toolbar { box-shadow: inset 0 -2px 0 #0090f1; }
