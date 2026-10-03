@@ -1,6 +1,7 @@
 import { Circle, GitPullRequest, LoaderCircle, Star } from 'lucide-react'
 import type { TicketListProject } from '../../app/useWorkspaceTicketList'
 import { projectActiveTickets, ticketCountStatuses } from '../../data/ticket-project-summary'
+import { ticketAncestors } from '../../data/ticket-hierarchy'
 import { TicketActivity } from './TicketActivity'
 
 interface Props {
@@ -45,7 +46,7 @@ export function TicketProjectRow({ project, blocked, today, activityPeak, onOpen
           <button type="button" className={`ticket-active-open ticket-active-${ticket.status}`} disabled={blocked}
             aria-label={`${ticket.title}, ${label}`} title={label} onClick={() => onOpenTicket(canvas.id, ticket.id)}>
             <Icon className="ticket-active-icon" size={15} aria-hidden="true" />
-            <span className="ticket-active-title">{ticket.title}</span>
+            <span className="ticket-active-title">{ticket.title}{ticket.parentTicketId && <small className="ticket-parent-path">{ticketAncestors(summary!.cards, ticket.id).map((parent) => parent.title).join(' / ')}</small>}</span>
           </button>
         </li>
       })}

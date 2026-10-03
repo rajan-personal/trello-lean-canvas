@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { safeCanvasId } from './firestore-model'
 import { boardActivitySchema } from './board-activity'
+import { hierarchyError } from './ticket-hierarchy'
 
 const id = z.string().refine(safeCanvasId, 'Unsafe record id')
 const title = z.string().trim().min(1).max(500)
@@ -17,24 +18,26 @@ export const storyPointGuidance: Record<StoryPoints, string> = {
 }
 export const boardColumnSchema = z.strictObject({ id, title })
 export const boardCardSchema = z.strictObject({
-  id, columnId: id, title, description: z.string().max(100000),
+  id, parentTicketId: id.nullable().optional(), columnId: id, title, description: z.string().max(100000),
   storyPoints: storyPointsSchema.nullable().optional(),
   rank: z.string().regex(/^[0-9a-z]*[1-9a-z]$/).max(2048),
 })
 export const boardSummaryCardSchema = z.strictObject({
-  id, columnId: id, title, storyPoints: storyPointsSchema.nullable().optional(),
+  id, parentTicketId: id.nullable().optional(), columnId: id, title, storyPoints: storyPointsSchema.nullable().optional(),
   rank: z.string().regex(/^[0-9a-z]*[1-9a-z]$/).max(2048),
 })
 export const boardSummarySchema = z.strictObject({
   activity: boardActivitySchema.optional(),
   columns: z.array(boardColumnSchema).max(100), cards: z.array(boardSummaryCardSchema),
 }).superRefine((data, ctx) => {
+  const error = hierarchyError(data.cards)
+  if (error) ctx.addIssue({ code: 'custom', message: error })
   const unique = (values: string[]) => new Set(values).size === values.length
   if (!unique(data.columns.map(({ id }) => id)) || !unique(data.cards.map(({ id }) => id)))
     ctx.addIssue({ code: 'custom', message: 'Duplicate board record ids' })
   if (data.cards.some(({ columnId }) => !data.columns.some(({ id }) => id === columnId)))
     ctx.addIssue({ code: 'custom', message: 'Dangling board reference' })
-  if (!unique(data.cards.map(({ columnId, rank }) => `${columnId}/${rank}`)))
+  if (!unique(data.cards.map(({ parentTicketId, columnId, rank }) => `${parentTicketId ?? ''}/${columnId}/${rank}`)))
     ctx.addIssue({ code: 'custom', message: 'Duplicate card ordering' })
 })
 export const boardCommentSchema = z.strictObject({
@@ -48,6 +51,8 @@ export const boardDataSchema = z.strictObject({
   columns: z.array(boardColumnSchema).max(100),
   cards: z.array(boardCardSchema), comments: z.array(boardCommentSchema),
 }).superRefine((data, ctx) => {
+  const error = hierarchyError(data.cards)
+  if (error) ctx.addIssue({ code: 'custom', message: error })
   const unique = (values: string[]) => new Set(values).size === values.length
   if (!unique(data.columns.map((column) => column.id)) ||
       !unique(data.cards.map((card) => card.id)) ||
@@ -56,7 +61,7 @@ export const boardDataSchema = z.strictObject({
   if (data.cards.some((card) => !data.columns.some((column) => column.id === card.columnId)) ||
       data.comments.some((comment) => !data.cards.some((card) => card.id === comment.cardId)))
     ctx.addIssue({ code: 'custom', message: 'Dangling board reference' })
-  if (!unique(data.cards.map((card) => `${card.columnId}/${card.rank}`)))
+  if (!unique(data.cards.map((card) => `${card.parentTicketId ?? ''}/${card.columnId}/${card.rank}`)))
     ctx.addIssue({ code: 'custom', message: 'Duplicate card ordering' })
 })
 export type BoardColumn = z.infer<typeof boardColumnSchema>
@@ -67,8 +72,8 @@ export type BoardComment = z.infer<typeof boardCommentSchema>
 export type BoardData = z.infer<typeof boardDataSchema>
 export const boardSummary = (data: BoardData): BoardSummary => boardSummarySchema.parse({
   ...(data.activity ? { activity: data.activity } : {}), columns: data.columns,
-  cards: data.cards.map(({ id, columnId, title, storyPoints, rank }) => ({
-    id, columnId, title, ...(storyPoints === undefined ? {} : { storyPoints }), rank,
+  cards: data.cards.map(({ id, parentTicketId, columnId, title, storyPoints, rank }) => ({
+    id, ...(parentTicketId == null ? {} : { parentTicketId }), columnId, title, ...(storyPoints === undefined ? {} : { storyPoints }), rank,
   })),
 })
 export const defaultBoardColumns: BoardColumn[] = [

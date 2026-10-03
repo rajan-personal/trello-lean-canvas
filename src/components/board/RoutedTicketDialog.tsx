@@ -3,6 +3,8 @@ import { BoardCardDialog } from './BoardCardDialog'
 
 export interface TicketSelection {
   id: string | null
+  parentId?: string | null
+  board?: (id: string | null) => void
   open: (id: string) => void
   close: () => void
 }

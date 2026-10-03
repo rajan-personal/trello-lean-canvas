@@ -111,7 +111,7 @@ service cloud.firestore {
               || (before.status == 'importing' && after.status == 'importing'));
           }
           function validCard(data) {
-            return data.keys().hasOnly(['schemaVersion', 'canvasId', 'columnId', 'title', 'description', 'storyPoints', 'rank', 'updatedAt'])
+            return data.keys().hasOnly(['schemaVersion', 'canvasId', 'columnId', 'title', 'description', 'storyPoints', 'parentTicketId', 'rank', 'updatedAt'])
               && data.schemaVersion == 1 && data.canvasId == canvasId
               && data.columnId is string && data.columnId.size() > 0
               && data.title is string && data.title.size() > 0 && data.title.size() <= 500
@@ -121,16 +121,36 @@ service cloud.firestore {
               && data.rank is string && data.rank.matches('^[0-9a-z]*[1-9a-z]$') && data.rank.size() <= 2048
               && data.updatedAt == request.time;
           }
+          function cardRef(cardId) {
+            return /databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId)/boards/default/cards/$(cardId);
+          }
+          function countRef(cardId) {
+            return /databases/$(database)/documents/users/$(userId)/workspaces/default/canvases/$(canvasId)/boards/default/childCounts/$(cardId);
+          }
+          function childCount(cardId) {
+            return exists(countRef(cardId)) ? get(countRef(cardId)).data.count : 0;
+          }
+          function countChanged(parentId, childId, delta) {
+            let after = getAfter(countRef(parentId)).data;
+            return after.count == childCount(parentId) + delta && after.childId == childId;
+          }
+          function validDeletionState(data) {
+            // Reject old clients before they can acquire a tombstone or drain comments.
+            return data.status != 'deleting-card' ||
+              (data.deletingCardId.size() > 0 && data.deletingCardId.matches('^[^/]+$')
+                && exists(cardRef(data.deletingCardId)) && childCount(data.deletingCardId) == 0);
+          }
           function canDeleteCard(cardId) {
             let board = get(boardRef()).data;
             return board.status == 'deleting' ||
-              (board.status == 'deleting-card' && board.deletingCardId == cardId);
+              (board.status == 'deleting-card' && board.deletingCardId == cardId && childCount(cardId) == 0);
           }
           allow read: if readsBoard();
           allow create: if ownsBoard() && existsAfter(canvasRef())
             && validBoard(request.resource.data) && request.resource.data.revision == 1
             && request.resource.data.status in ['active', 'importing', 'deleting'];
           allow update: if ownsBoard() && existsAfter(canvasRef()) && validBoard(request.resource.data)
+            && validDeletionState(request.resource.data)
             && request.resource.data.revision == resource.data.revision + 1
             && request.resource.data.importId == resource.data.importId
             && resource.data.status != 'deleting';
@@ -140,9 +160,40 @@ service cloud.firestore {
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['revision', 'updatedAt']);
           allow delete: if ownsBoard() && resource.data.status == 'deleting' && !existsAfter(canvasRef());
           match /cards/{cardId} {
+            function validParent(data) {
+              return !data.keys().hasAny(['parentTicketId']) || data.parentTicketId == null ||
+                (data.parentTicketId is string && data.parentTicketId != cardId
+                  && data.parentTicketId.matches('^[^/]+$')
+                  && exists(cardRef(data.parentTicketId))
+                  && countChanged(data.parentTicketId, cardId, 1));
+            }
             allow read: if readsBoard();
-            allow create, update: if ownsBoard() && writable() && validCard(request.resource.data);
-            allow delete: if ownsBoard() && canDeleteCard(cardId);
+            // Parent links are set at creation. Existing tickets cannot be reparented into cycles.
+            allow create: if ownsBoard() && writable() && validCard(request.resource.data) && validParent(request.resource.data);
+            allow update: if ownsBoard() && writable() && validCard(request.resource.data)
+              && request.resource.data.get('parentTicketId', null) == resource.data.get('parentTicketId', null);
+            allow delete: if ownsBoard() && canDeleteCard(cardId)
+              && (get(boardRef()).data.status == 'deleting'
+                || resource.data.get('parentTicketId', null) == null
+                || countChanged(resource.data.parentTicketId, cardId, -1));
+          }
+          match /childCounts/{parentId} {
+            function validCountChange() {
+              let data = request.resource.data;
+              let child = cardRef(data.childId);
+              let before = childCount(parentId);
+              return data.keys().hasOnly(['count', 'childId'])
+                && data.count is int && data.count >= 0
+                && data.childId is string && data.childId.size() > 0 && data.childId.matches('^[^/]+$')
+                && ((data.count == before + 1 && writable()
+                    && !exists(child) && getAfter(child).data.parentTicketId == parentId)
+                  || (data.count == before - 1 && canDeleteCard(data.childId)
+                    && get(child).data.parentTicketId == parentId && !existsAfter(child)));
+            }
+            allow read: if readsBoard();
+            // A count can change only alongside the corresponding child create/delete.
+            allow create, update: if ownsBoard() && validCountChange();
+            allow delete: if ownsBoard() && get(boardRef()).data.status == 'deleting';
           }
           match /comments/{commentId} {
             function validComment(data) {

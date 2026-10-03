@@ -1,7 +1,8 @@
-import { collection, doc, getDocsFromServer, limit, query, runTransaction, serverTimestamp, where, writeBatch, type Firestore } from 'firebase/firestore'
+import { collection, doc, getDocFromServer, getDocsFromServer, limit, query, runTransaction, serverTimestamp, where, writeBatch, type Firestore } from 'firebase/firestore'
 import { createBoard } from './board'
 import { incrementActivity } from './board-activity'
 import { boardPath, boardRecordSchema, boardRecord } from './board-firestore-model'
+import { childCountChange } from './board-firestore-hierarchy'
 
 // Chunked deletes are safe only behind a durable tombstone; every child write rule checks it.
 async function drain(db: Firestore, path: string, cardId?: string): Promise<void> {
@@ -17,6 +18,9 @@ async function drain(db: Firestore, path: string, cardId?: string): Promise<void
 }
 export async function startCardDeletion(db: Firestore, uid: string, canvasId: string, cardId: string) {
   const path = boardPath(uid, canvasId)
+  const baseline = boardRecordSchema.parse((await getDocFromServer(doc(db, path))).data())
+  const children = await getDocsFromServer(query(collection(db, `${path}/cards`), where('parentTicketId', '==', cardId), limit(1)))
+  if (!children.empty) throw new Error('Delete child tickets before deleting their parent.')
   await runTransaction(db, async (tx) => {
     const ref = doc(db, path)
     const current = boardRecordSchema.parse((await tx.get(ref)).data())
@@ -24,6 +28,7 @@ export async function startCardDeletion(db: Firestore, uid: string, canvasId: st
     if (current.status === 'deleting-card' && current.deletingCardId === cardId) return
     if (current.status !== 'active') throw new Error('Board is busy; retry after recovery.')
     if (!card.exists()) return
+    if (current.revision !== baseline.revision) throw new Error('Board changed in another session. Reload and retry your change.')
     tx.update(ref, { status: 'deleting-card', deletingCardId: cardId,
       revision: current.revision + 1, updatedAt: serverTimestamp() })
   })
@@ -37,7 +42,12 @@ export async function finishCardDeletion(db: Firestore, uid: string, canvasId: s
     if (current.status === 'active') return
     if (current.status !== 'deleting-card' || current.deletingCardId !== cardId)
       throw new Error('Board deletion state changed; retry.')
-    tx.delete(doc(db, `${path}/cards`, cardId))
+    const cardRef = doc(db, `${path}/cards`, cardId)
+    const card = await tx.get(cardRef)
+    const parentId = card.data()?.parentTicketId as string | null | undefined
+    const updateChildren = parentId ? await childCountChange(tx, db, path, parentId, cardId, -1) : undefined
+    updateChildren?.()
+    tx.delete(cardRef)
     tx.update(ref, { status: 'active', deletingCardId: '', revision: current.revision + 1, updatedAt: serverTimestamp(),
       activity: incrementActivity(current.activity) })
   })
@@ -58,5 +68,6 @@ export async function prepareBoardDeletion(db: Firestore, uid: string, canvasId:
   })
   await drain(db, `${path}/comments`)
   await drain(db, `${path}/cards`)
+  await drain(db, `${path}/childCounts`)
   // Caller atomically removes this tombstone with the canvas, never before it.
 }

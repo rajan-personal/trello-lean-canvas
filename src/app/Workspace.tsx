@@ -7,7 +7,7 @@ import { WorkspaceNotepad } from './WorkspaceNotepad'
 import { Sidebar } from '../components/Sidebar'
 import { SyncError } from '../components/SyncError'
 import { Toast } from '../components/Toast'
-import { projectPath, ticketsPath } from './workspace-route'
+import { projectPath, ticketBoardPath, ticketsPath } from './workspace-route'
 import { useWorkspaceHistory, useWorkspaceRoute } from './useWorkspaceRoute'
 import { useCanvasCommands } from './useCanvasCommands'
 import { useCanvasState } from './useCanvasState'
@@ -21,14 +21,13 @@ import { WorkspaceHeader } from './WorkspaceHeader'
 import { WorkspaceRouteContent } from './WorkspaceRouteContent'
 import { useWorkspaceTicketList } from './useWorkspaceTicketList'
 interface Props {
-  user: AppUser
-  onSignOut: () => void | Promise<void>
+  user: AppUser; onSignOut: () => void | Promise<void>
   onSetPassword?: (password: string) => Promise<void>
   persistence?: 'firestore' | 'local'
   browserRouting?: boolean
 }
 export function Workspace({ user, onSignOut, onSetPassword, persistence, browserRouting = false }: Props) {
-  const { history, route, allTickets, view, projectId, ticketId } = useWorkspaceRoute(browserRouting)
+  const { history, route, allTickets, view, projectId, ticketId, parentTicketId } = useWorkspaceRoute(browserRouting)
   const state = useCanvasState(user.uid, persistence, view === 'board', {
     id: projectId,
     setId: (id) => history.navigate(id ? projectPath(id, view) : '/'),
@@ -47,10 +46,13 @@ export function Workspace({ user, onSignOut, onSetPassword, persistence, browser
     if (defaultId) history.navigate(projectPath(defaultId, 'board'), true)
   }, [defaultId, history])
   const ticket = {
-    id: ticketId,
+    id: ticketId, parentId: parentTicketId,
+    board: (id: string | null) => { if (projectId && allow()) history.navigate(id ? ticketBoardPath(projectId, id) : projectPath(projectId, 'board')) },
     open: (id: string) => { if (projectId && allow()) history.navigate(projectPath(projectId, 'board', id)) },
-    close: () => { if (projectId) history.navigate(projectPath(projectId, 'board')) },
-  }
+    close: () => {
+      const parent = board.board?.cards.find((card) => card.id === ticketId)?.parentTicketId
+      if (projectId) history.navigate(parent ? ticketBoardPath(projectId, parent) : projectPath(projectId, 'board'))
+    } }
   const openAllTickets = () => { if (allow()) { history.navigate(ticketsPath()); panels.closeSidebar() } }
   const openProjectBoard = (id: string) => { if (allow()) history.navigate(projectPath(id, 'board')) }
   const signOut = () => { if (allow()) return onSignOut() }

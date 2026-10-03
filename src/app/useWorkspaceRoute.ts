@@ -87,6 +87,7 @@ export function useWorkspaceRoute(browser: boolean) {
   return { history, route, allTickets: route.kind === 'tickets',
     view: route.kind === 'project' ? route.view : 'board',
     projectId: route.kind === 'project' ? route.projectId : null,
+    parentTicketId: route.kind === 'project' ? route.parentTicketId ?? null : null,
     ticketId: route.kind === 'project' ? route.ticketId ?? null : null,
   } as const
 }

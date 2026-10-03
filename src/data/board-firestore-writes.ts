@@ -5,6 +5,7 @@ import { readBoard, type BoardSnapshot } from './board-firestore-read'
 import { startCardDeletion, finishCardDeletion } from './board-firestore-delete'
 import { appendBoardComment } from './board-firestore-comments'
 import { recordTicketActivity } from './board-activity'
+import { childCountChange } from './board-firestore-hierarchy'
 
 export async function mutateBoard(
   db: Firestore, uid: string, canvasId: string, command: BoardCommand, baseline?: BoardSnapshot,
@@ -26,6 +27,9 @@ export async function mutateBoard(
     const current = boardRecordSchema.parse((await tx.get(ref)).data())
     if (current.status !== 'active' || current.revision !== source.revision)
       throw new Error('Board changed in another session. Reload and retry your change.')
+    const updateChildren = command.type === 'create-card' && command.parentTicketId
+      ? await childCountChange(tx, db, path, command.parentTicketId, command.id, 1) : undefined
+    updateChildren?.()
     tx.update(ref, { columns: next.columns, revision: current.revision + 1, updatedAt: serverTimestamp(),
       ...(next.activity ? { activity: next.activity } : {}) })
     for (const kind of ['cards', 'comments'] as const) {
