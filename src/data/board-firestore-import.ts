@@ -3,6 +3,7 @@ import { boardDataSchema, type BoardData } from './board'
 import { hierarchyLayers } from './ticket-hierarchy'
 import { canvasesPath } from './firestore-model'
 import { boardPath, boardRecordSchema, boardRecord, childPayload } from './board-firestore-model'
+import { childCountChange } from './board-firestore-hierarchy'
 
 export async function importBoard(db: Firestore, uid: string, canvasId: string, source: BoardData, importId: string): Promise<void> {
   const data = boardDataSchema.parse(source)
@@ -22,6 +23,8 @@ export async function importBoard(db: Firestore, uid: string, canvasId: string, 
     return false
   })
   if (complete) return
+  // Roots/comments retain batched imports. Each nested create updates its parent's
+  // guard in one transaction; an interrupted import never double-counts a child.
   const layers = [
     ...hierarchyLayers(data.cards).map((cards) => cards.map((item) => ({ kind: 'cards', item }))),
     data.comments.map((item) => ({ kind: 'comments', item })),
@@ -29,9 +32,26 @@ export async function importBoard(db: Firestore, uid: string, canvasId: string, 
   // Each comment rule reads its card; stay below the 20-access batch rule limit.
   for (const entries of layers) for (let start = 0; start < entries.length; start += 10) {
     const batch = writeBatch(db)
-    entries.slice(start, start + 10).forEach(({ kind, item }) =>
-      batch.set(doc(db, `${path}/${kind}`, item.id), childPayload(item, canvasId)))
-    await batch.commit()
+    let batched = false
+    for (const { kind, item } of entries.slice(start, start + 10)) {
+      if ('parentTicketId' in item && item.parentTicketId) {
+        const parentId = item.parentTicketId
+        await runTransaction(db, async (tx) => {
+          const board = boardRecordSchema.parse((await tx.get(doc(db, path))).data())
+          if (board.importId !== importId || board.status !== 'importing')
+            throw new Error('Import state changed. Retry to verify completion.')
+          const ref = doc(db, `${path}/cards`, item.id)
+          if ((await tx.get(ref)).exists()) return
+          const updateChildren = await childCountChange(tx, db, path, parentId, item.id, 1)
+          updateChildren()
+          tx.set(ref, childPayload(item, canvasId))
+        })
+      } else {
+        batch.set(doc(db, `${path}/${kind}`, item.id), childPayload(item, canvasId))
+        batched = true
+      }
+    }
+    if (batched) await batch.commit()
   }
   await runTransaction(db, async (tx) => {
     const ref = doc(db, path)
