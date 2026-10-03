@@ -1,6 +1,7 @@
 import { lazy, Suspense, useId, useState } from 'react'
 import { ProjectAboutTabs } from './ProjectAboutTabs'
-import { ProjectAboutEditorHeader } from './ProjectAboutEditorHeader'
+import { FilePlus } from 'lucide-react'
+import { iconButton, ProjectAboutEditorHeader } from './ProjectAboutEditorHeader'
 import type { RegisterDraftGuard } from '../app/useNavigationGuard'
 import { useDraftGuard } from './board/useDraftGuard'
 import { usePendingAction } from './usePendingAction'
@@ -64,35 +65,34 @@ export function ProjectAbout({ canvas, onSave, register }: Props) {
     if (tabId === current.id) setActive(tabs[index - 1]?.id ?? overview)
   }
 
+  const addButton = <button type="button" onClick={addTab} disabled={save.pending || value.aboutTabs.length >= maxAboutTabs} aria-label="Add tab"
+    title={value.aboutTabs.length >= maxAboutTabs ? `Up to ${maxAboutTabs + 1} sections` : 'New section'} className={iconButton}>
+    <FilePlus size={16} aria-hidden="true" />
+  </button>
+
   return <div className="flex min-h-0 min-w-0 flex-1 overflow-auto p-4 max-[760px]:p-2">
-    <form onSubmit={(event) => { event.preventDefault(); if (dirty && !invalid) void save.run() }} className="flex h-full min-h-0 min-w-0 w-full flex-col rounded-xl bg-panel p-6 text-[#172b4d] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)] max-[760px]:p-4">
-      <div className="mb-4 flex shrink-0 items-center justify-between gap-4 max-[760px]:mb-3">
-        <h2 className="text-base font-semibold">Project details</h2>
-        <div className="flex items-center gap-3">
-          <p id={`${editorId}-status`} role="status" className="text-xs text-[#44546f]">{aboutSaveStatus(invalid, failed, save.pending, dirty)}</p>
-          <button type="submit" disabled={save.pending || !dirty || !!invalid}
-          className="min-h-10 shrink-0 rounded-md bg-[#0c66e4] px-4 text-sm font-semibold text-white hover:bg-[#0055cc] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0c66e4] disabled:opacity-60 max-[760px]:min-h-12">{save.pending ? 'Saving…' : 'Save'}</button>
-        </div>
-      </div>
-      <div className="about-workbench flex min-h-0 flex-1 overflow-hidden rounded-md border border-[#d4d4d4] bg-white max-[760px]:flex-col">
-        <ProjectAboutTabs id={id} tabs={tabs} active={current.id} pinned={overview} renaming={renaming?.id ?? null}
-          onAdd={addTab} onMove={moveTab} onDelete={removeTab} onRename={(tabId, title) => updateTab(tabId, { title })}
-          onRenameStart={startRename} onRenameEnd={endRename}
-          open={sectionsOpen} onToggle={setSectionsOpen} onSelect={(tabId) => { setActive(tabId); setSectionsOpen(false) }}
-          canAdd={!save.pending && value.aboutTabs.length < maxAboutTabs} canMove={!save.pending}
-          addTitle={value.aboutTabs.length >= maxAboutTabs ? `Up to ${maxAboutTabs + 1} sections` : 'New section'} />
-        <div role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-${current.id}-tab`} className={`flex min-h-0 min-w-0 flex-1 flex-col max-[760px]:min-h-80 ${sectionsOpen ? 'max-[760px]:hidden' : ''}`}>
-          <span id={`${editorId}-label`} className="sr-only">{current.id === overview ? 'Project details' : current.title.trim() || 'Untitled tab'}</span>
-          <ProjectAboutEditorHeader tab={current} pinned={current.id === overview} disabled={save.pending}
-            onRename={() => startRename(current.id)} onDelete={() => removeTab(current.id)}
-            onMoveUp={position > 0 ? () => moveTab(current.id, position - 1) : undefined}
-            onMoveDown={position >= 0 && position < value.aboutTabs.length - 1 ? () => moveTab(current.id, position + 1) : undefined} />
-          <Suspense fallback={<p className="flex-1 p-4">Loading editor…</p>}>
-            <ProjectRichTextEditor key={current.id} id={editorId} value={current.content} disabled={save.pending}
-              invalid={current.content.length > maxAboutText}
-              onChange={(next) => current.id === overview ? update({ ...value, about: next }) : updateTab(current.id, { content: next })} />
-          </Suspense>
-        </div>
+    <form onSubmit={(event) => { event.preventDefault(); if (dirty && !invalid) void save.run() }}
+      className="about-workbench grid h-full min-h-0 w-full min-w-0 grid-cols-[15rem_minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-xl bg-surface text-[#172b4d] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)] max-[760px]:flex max-[760px]:flex-col">
+      <h2 className="sr-only">Project details</h2>
+      <div className="col-start-2 row-start-1 min-w-0"><ProjectAboutEditorHeader tab={current} pinned={current.id === overview} disabled={save.pending}
+          statusId={`${editorId}-status`} status={aboutSaveStatus(invalid, failed, save.pending, dirty)}
+          saveLabel={save.pending ? 'Saving…' : 'Save'} canSave={!save.pending && dirty && !invalid}
+          listId={`${id}-sections`} count={tabs.length} open={sectionsOpen} onToggle={setSectionsOpen} addButton={addButton}
+          onRename={() => startRename(current.id)} onDelete={() => removeTab(current.id)}
+          onMoveUp={position > 0 ? () => moveTab(current.id, position - 1) : undefined}
+          onMoveDown={position >= 0 && position < value.aboutTabs.length - 1 ? () => moveTab(current.id, position + 1) : undefined} /></div>
+      <ProjectAboutTabs id={id} tabs={tabs} active={current.id} pinned={overview} renaming={renaming?.id ?? null}
+        onMove={moveTab} onDelete={removeTab} onRename={(tabId, title) => updateTab(tabId, { title })}
+        onRenameStart={startRename} onRenameEnd={endRename} addButton={addButton}
+        open={sectionsOpen} onSelect={(tabId) => { setActive(tabId); setSectionsOpen(false) }} canMove={!save.pending} />
+      <div role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-${current.id}-tab`}
+        className={`col-start-2 row-start-2 flex min-h-0 min-w-0 flex-col max-[760px]:min-h-80 max-[760px]:flex-1 ${sectionsOpen ? 'max-[760px]:hidden' : ''}`}>
+        <span id={`${editorId}-label`} className="sr-only">{current.id === overview ? 'Project details' : current.title.trim() || 'Untitled tab'}</span>
+        <Suspense fallback={<p className="flex-1 p-4">Loading editor…</p>}>
+          <ProjectRichTextEditor key={current.id} id={editorId} value={current.content} disabled={save.pending}
+            invalid={current.content.length > maxAboutText}
+            onChange={(next) => current.id === overview ? update({ ...value, about: next }) : updateTab(current.id, { content: next })} />
+        </Suspense>
       </div>
     </form>
   </div>

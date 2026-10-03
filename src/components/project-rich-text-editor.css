@@ -113,4 +113,5 @@
 }
 .about-workbench .project-rich-text-editor { border: 0; border-radius: 0; }
 .about-workbench .project-rich-text-editor:focus-within { outline: none; }
-.about-workbench .project-rich-text-editor:focus-within .rich-text-toolbar { box-shadow: inset 0 -2px 0 #0090f1; }
+.about-workbench .rich-text-toolbar { padding-inline: 10px; border-color: #dcdfe4; }
+.about-workbench .project-rich-text-editor:focus-within .rich-text-toolbar { box-shadow: inset 0 -2px 0 #0c66e4; }
