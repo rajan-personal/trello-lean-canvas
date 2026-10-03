@@ -8,6 +8,7 @@ describe('project about data', () => {
   it('defaults older local and Firestore projects to empty details', () => {
     const legacy = canvas()
     Reflect.deleteProperty(legacy, 'about')
+    Reflect.deleteProperty(legacy, 'aboutTabs')
     expect(parseCanvasArray([legacy])).toEqual({ ok: true, value: [canvas()] })
     const { id, ...payload } = legacy
     expect(decodeCanvas(id, { ...payload, schemaVersion: 1, revision: 1, updatedAt: timestamp }).canvas).toEqual(canvas())
@@ -36,10 +37,16 @@ describe('project about data', () => {
     const tab = (id: string) => ({ id, title: id, content: '' })
     for (const aboutTabs of [
       [tab('a'), tab('a')],
+      [tab('overview')],
       Array.from({ length: 6 }, (_, index) => tab(`t${index}`)),
       [{ ...tab('a'), title: 'x'.repeat(61) }],
       [{ ...tab('a'), content: 'x'.repeat(100001) }],
       [{ id: 'a', title: 'A' }],
     ]) expect(parseCanvasArray([{ ...canvas(), aboutTabs }]).ok).toBe(false)
+  })
+  it('rejects the reserved Overview ID in YAML and Firestore data', () => {
+    const invalid = { ...canvas(), aboutTabs: [{ id: 'overview', title: 'Goals', content: 'Hidden content' }] }
+    expect(() => yamlToCanvas(canvasToYaml(invalid), canvas())).toThrow()
+    expect(() => decodeCanvas(invalid.id, { ...canvasPayload(invalid), schemaVersion: 1, revision: 1, updatedAt: timestamp })).toThrow()
   })
 })

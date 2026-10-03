@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ReactNode, Ref } from 'react'
 import { ArrowDown, ArrowUp, ChevronDown, Pencil, Trash2, type LucideIcon } from 'lucide-react'
 import type { AboutTab } from '../data/types'
 import { AboutFileIcon, AboutFileName } from './about-file-icon'
@@ -12,6 +12,7 @@ interface Props {
   saveLabel: string
   canSave: boolean
   listId: string
+  switcherRef: Ref<HTMLButtonElement>
   count: number
   open: boolean
   onToggle: (open: boolean) => void
@@ -33,13 +34,13 @@ function Action({ icon: Icon, label, title, onClick, disabled, danger }: { icon:
 
 /** Title bar of the open section: name and section actions on the left, save state on the right.
  * Phones: the name becomes the section switcher and the bar wraps onto a second row of actions. */
-export function ProjectAboutEditorHeader(p: Props) {
+export function ProjectAboutEditorHeader({ switcherRef, ...p }: Props) {
   return <div className="flex min-h-12 shrink-0 flex-wrap items-center gap-x-1 border-b border-[#dcdfe4] ps-4 pe-3 max-[760px]:px-1">
     <div className="order-1 flex min-w-0 items-center gap-2 pe-1 text-sm font-semibold text-[#172b4d] max-[760px]:hidden">
       <AboutFileIcon pinned={p.pinned} />
       <AboutFileName title={p.tab.title} />
     </div>
-    <button type="button" aria-expanded={p.open} aria-controls={p.listId} onClick={() => p.onToggle(!p.open)}
+    <button ref={switcherRef} type="button" aria-expanded={p.open} aria-controls={p.listId} onClick={() => p.onToggle(!p.open)}
       className="order-1 my-0.5 hidden h-11 min-w-0 flex-1 items-center gap-2 rounded px-2 text-left text-sm font-semibold text-[#172b4d] hover:bg-[#f1f2f4] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#0c66e4] max-[760px]:flex">
       <span className="sr-only">Sections, </span>
       <AboutFileIcon pinned={p.pinned} />

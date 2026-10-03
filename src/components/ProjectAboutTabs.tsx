@@ -1,4 +1,4 @@
-import { useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from 'react'
 import { ProjectAboutTabRow } from './ProjectAboutTabRow'
 import type { AboutTab } from '../data/types'
 import { getCanvasDropEdge } from './sidebar-drag'
@@ -13,12 +13,14 @@ interface Props {
   addButton: ReactNode
   /** Mobile only: whether the section list replaces the editor. */
   open: boolean
-  onSelect: (tabId: string) => void
+  switcherRef: RefObject<HTMLButtonElement | null>
+  /** Arrow navigation selects without closing the mobile list; activation closes it. */
+  onSelect: (tabId: string, activate: boolean) => void
   /** Moves a tab to an index within the reorderable (non-pinned) tabs. */
   onMove: (tabId: string, index: number) => void
   onRename: (tabId: string, title: string) => void
   onRenameStart: (tabId: string) => void
-  onRenameEnd: (cancel: boolean) => void
+  onRenameEnd: (cancel: boolean, close: boolean) => void
   onDelete: (tabId: string) => void
 }
 type Target = { tabId: string; edge: 'before' | 'after' }
@@ -28,8 +30,13 @@ export function ProjectAboutTabs(p: Props) {
   const [dragged, setDragged] = useState<string | null>(null)
   const [target, setTarget] = useState<Target | null>(null)
   const movable = p.tabs.filter((tab) => tab.id !== p.pinned)
-  const focus = (tabId: string) => requestAnimationFrame(() => buttons.current[tabId]?.focus())
-  const select = (tabId: string) => { p.onSelect(tabId); buttons.current[tabId]?.focus() }
+  const focus = (tabId: string) => requestAnimationFrame(() => {
+    const button = buttons.current[tabId]
+    // After mobile activation/rename the tab is hidden. Return to its visible trigger.
+    const target = button?.getClientRects().length ? button : p.switcherRef.current
+    target?.focus()
+  })
+  const select = (tabId: string, activate = false) => { p.onSelect(tabId, activate); focus(tabId) }
   const reset = () => { setDragged(null); setTarget(null) }
   const edgeFor = (tabId: string, event: Parameters<typeof getCanvasDropEdge>[0]) => tabId === p.pinned ? 'after' : getCanvasDropEdge(event)
   const drop = (targetId: string, edge: 'before' | 'after') => {
@@ -64,9 +71,9 @@ export function ProjectAboutTabs(p: Props) {
       {p.tabs.map((tab, index) => <ProjectAboutTabRow key={tab.id} id={p.id} tab={tab} selected={tab.id === p.active}
         pinned={tab.id === p.pinned} canDrag={p.canMove && tab.id !== p.pinned} dragged={dragged === tab.id}
         indicator={dragged && target?.tabId === tab.id ? target.edge : ''} renaming={p.renaming === tab.id}
-        buttonRef={(button) => { buttons.current[tab.id] = button }} onClick={() => select(tab.id)}
+        buttonRef={(button) => { buttons.current[tab.id] = button }} onClick={() => select(tab.id, true)}
         onRename={(title) => p.onRename(tab.id, title)} onRenameStart={() => p.onRenameStart(tab.id)}
-        onRenameEnd={(cancel, refocus) => { p.onRenameEnd(cancel); if (refocus) focus(tab.id) }} onKeyDown={keyDown(tab, index)}
+        onRenameEnd={(cancel, refocus) => { p.onRenameEnd(cancel, refocus); if (refocus) focus(tab.id) }} onKeyDown={keyDown(tab, index)}
         onDragStart={() => setDragged(tab.id)} onDragEnd={reset}
         onDragOver={(event) => {
           if (!dragged) return
