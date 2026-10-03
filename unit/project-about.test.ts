@@ -24,4 +24,21 @@ describe('project about data', () => {
     }
     expect(() => yamlToCanvas('canvas:\n  about: 123\n  sections:\n    - id: problem', canvas())).toThrow()
   })
+  it('round-trips extra About tabs and validates them', () => {
+    const original = { ...canvas(), about: 'Overview', aboutTabs: [
+      { id: 'goals', title: 'Goals', content: '- Validate demand' },
+      { id: 'links', title: 'Links', content: '[Repo](https://example.com)' },
+    ] }
+    expect(decodeCanvas(original.id, { ...canvasPayload(original), schemaVersion: 1, revision: 2, updatedAt: timestamp }).canvas).toEqual(original)
+    expect(yamlToCanvas(canvasToYaml(original), canvas())).toEqual(original)
+    expect(yamlToCanvas('canvas:\n  sections:\n    - id: problem', canvas()).aboutTabs).toEqual([])
+    const tab = (id: string) => ({ id, title: id, content: '' })
+    for (const aboutTabs of [
+      [tab('a'), tab('a')],
+      Array.from({ length: 6 }, (_, index) => tab(`t${index}`)),
+      [{ ...tab('a'), title: 'x'.repeat(61) }],
+      [{ ...tab('a'), content: 'x'.repeat(100001) }],
+      [{ id: 'a', title: 'A' }],
+    ]) expect(parseCanvasArray([{ ...canvas(), aboutTabs }]).ok).toBe(false)
+  })
 })

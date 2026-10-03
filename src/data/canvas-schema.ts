@@ -15,9 +15,20 @@ const sections = z.array(section).length(12).superRefine((value, context) => {
   if (value.some((item, index) => item.id !== sectionIds[index]))
     context.addIssue({ code: 'custom', message: 'sections must use canonical order' })
 })
+export const maxAboutTabs = 5
+export const maxAboutTabTitle = 60
+export const maxAboutText = 100000
+const aboutTab = z.strictObject({
+  id: z.string().min(1).max(100), title: z.string().max(maxAboutTabTitle), content: z.string().max(maxAboutText),
+})
+export const aboutTabsSchema = z.array(aboutTab).max(maxAboutTabs).superRefine((value, context) => {
+  if (new Set(value.map(({ id }) => id)).size !== value.length)
+    context.addIssue({ code: 'custom', message: 'about tab ids must be unique' })
+}).default([])
 export const canvasSchema = z.strictObject({
   id: z.string().min(1), name: z.string(), title: z.string(),
-  favorite: z.boolean(), notes: z.string(), about: z.string().max(100000).default(''), sections,
+  favorite: z.boolean(), notes: z.string(), about: z.string().max(maxAboutText).default(''),
+  aboutTabs: aboutTabsSchema, sections,
 })
 const legacyCanvas = canvasSchema.extend({ notes: z.string().default('') }).strict()
 const timestamp = z.custom<{ seconds: number; nanoseconds: number }>((value) => {

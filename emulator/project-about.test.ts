@@ -34,4 +34,13 @@ describe('project About rules', () => {
       await assertFails(ref.update({ about, revision: 3, updatedAt: timestamp() }))
     }
   })
+  it('validates About tabs on update', async () => {
+    const db = await createWorkspace('bob', ['b'])
+    const ref = db.doc(`${workspace('bob')}/canvases/b`)
+    await assertSucceeds(ref.set({ schemaVersion: 1, ...canvasPayload(canvas('b')), revision: 1, updatedAt: timestamp() }))
+    const tabs = Array.from({ length: 5 }, (_, index) => ({ id: `t${index}`, title: `Tab ${index}`, content: '' }))
+    await assertSucceeds(ref.update({ aboutTabs: tabs, revision: 2, updatedAt: timestamp() }))
+    await assertFails(ref.update({ aboutTabs: [...tabs, { id: 't5', title: 'Tab 5', content: '' }], revision: 3, updatedAt: timestamp() }))
+    await assertFails(ref.update({ aboutTabs: 'Goals', revision: 3, updatedAt: timestamp() }))
+  })
 })
