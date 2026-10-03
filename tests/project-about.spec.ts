@@ -55,7 +55,7 @@ test('all three tabs support arrow wraparound and Home/End', async ({ page }) =>
   await expect(tickets).toBeFocused()
 })
 
-for (const width of [320, 375, 768, 1440]) {
+for (const width of [320, 375, 768, 1440, 1920]) {
   test(`About and header fit at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 800 })
     await loadSamples(page)
@@ -65,10 +65,10 @@ for (const width of [320, 375, 768, 1440]) {
     await expect(details).toBeVisible()
     const form = page.getByRole('tabpanel', { name: 'About' }).locator('form')
     const panelBounds = await form.boundingBox()
-    expect(panelBounds!.width).toBeLessThanOrEqual(760)
     const parentBounds = await form.locator('..').boundingBox()
-    expect(Math.round(panelBounds!.x - parentBounds!.x)).toBe(Math.round((parentBounds!.width - panelBounds!.width) / 2))
-    if (width <= 760) expect(Math.round(panelBounds!.x - parentBounds!.x)).toBe(8)
+    const gutter = width <= 760 ? 8 : 16
+    expect(Math.round(panelBounds!.x - parentBounds!.x)).toBe(gutter)
+    expect(Math.round(parentBounds!.width - panelBounds!.width)).toBe(gutter * 2)
     expect(await form.locator('..').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
     const status = form.getByRole('status')
     await expect(status.locator('..').getByRole('button', { name: 'Save', exact: true })).toBeVisible()
