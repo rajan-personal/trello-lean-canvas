@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: './tests',
   testIgnore: '**/remote/**',
   use: {
+    launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE, args: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? ['--no-sandbox', '--disable-dev-shm-usage'] : [] },
     baseURL: 'http://127.0.0.1:4173',
     viewport: { width: 1440, height: 900 },
   },

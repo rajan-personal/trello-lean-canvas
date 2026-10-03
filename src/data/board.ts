@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { safeCanvasId } from './firestore-model'
+import { safeCanvasId } from './persistence-types'
 import { boardActivitySchema } from './board-activity'
 import { hierarchyError } from './ticket-hierarchy'
 

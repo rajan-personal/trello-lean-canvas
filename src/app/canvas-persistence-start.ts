@@ -1,5 +1,5 @@
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
-import { prepareWorkspace, subscribeToWorkspace } from '../data/firestore'
+import { prepareWorkspace, subscribeToWorkspace } from '../data/workspace-remote'
 import { migrationCanvases, type WorkspaceValue } from '../data/firestore-model'
 import { reconcileRemote } from '../data/persistence-state'
 import type { BoardRepository } from '../data/board-repository'
@@ -8,12 +8,12 @@ import { claimStoredCanvases, clearClaimedCanvases } from '../data/storage'
 import type { LeanCanvas } from '../data/types'
 
 interface Options {
-  uid: string; isLocal: boolean; boards: BoardRepository
+  uid: string; isLocal: boolean; boards: BoardRepository; onConflict?: () => void
   base: MutableRefObject<WorkspaceValue | null>; current: MutableRefObject<LeanCanvas[]>
   ready: MutableRefObject<boolean>; setCanvases: Dispatch<SetStateAction<LeanCanvas[]>>
   setLoading: (value: boolean) => void; setError: (value: string | null) => void
 }
-export function startCanvasPersistence({ uid, isLocal, boards, base, current, ready, setCanvases, setLoading, setError }: Options) {
+export function startCanvasPersistence({ uid, isLocal, boards, base, current, ready, setCanvases, setLoading, setError, onConflict }: Options) {
     let active = true
     let unsubscribe: (() => void) | undefined
     let remoteSequence = 0
@@ -59,8 +59,10 @@ export function startCanvasPersistence({ uid, isLocal, boards, base, current, re
               const reconciled = reconcileRemote(base.current, current.current, remote)
               base.current = reconciled.value
               setCanvases(reconciled.canvases)
-              if (reconciled.conflictedIds.length)
-                setError('Another session changed the same canvas or ordering. Your latest edit will be kept.')
+              if (reconciled.conflictedIds.length) {
+                onConflict?.()
+                setError(onConflict ? 'Another session changed this project. Your draft is retained. Copy it before reloading.' : 'Another session changed the same canvas or ordering. Your latest edit will be kept.')
+              }
             }
             ready.current = true
             setLoading(false)

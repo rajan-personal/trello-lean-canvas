@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   base: '/',
+  server: { proxy: { '/api': 'http://127.0.0.1:8787' } },
   build: { chunkSizeWarningLimit: 600 },
   plugins: [
     react(),
@@ -45,6 +46,7 @@ export default defineConfig({
       workbox: {
         cleanupOutdatedCaches: true,
         navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api(?:\/|$)/],
       },
     }),
   ],

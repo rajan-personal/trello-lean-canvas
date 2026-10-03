@@ -1,3 +1,5 @@
+import { productionPersistence } from '../data/persistence-types'
+import { PostgresAuthProvider } from '../auth/PostgresAuthProvider'
 import { lazy, Suspense } from 'react'
 import { AuthProvider } from '../auth/AuthProvider'
 import { LoginScreen } from '../auth/LoginScreen'
@@ -41,7 +43,7 @@ function WorkspaceScreen({
         browserRouting={browserRouting}
         onSignOut={onSignOut}
         onSetPassword={onSetPassword}
-        persistence={local ? 'local' : 'firestore'}
+        persistence={local ? 'local' : productionPersistence()}
       />
     </Suspense>
   )
@@ -85,9 +87,10 @@ export default function App({ previewUser, browserRouting = false }: Props) {
   const localUser = previewUser ?? e2eUser
   if (localUser)
     return <WorkspaceScreen browserRouting={browserRouting} user={localUser} local onSignOut={() => {}} />
+  const Provider = productionPersistence() === 'postgres' ? PostgresAuthProvider : AuthProvider
   return (
-    <AuthProvider>
+    <Provider>
       <AuthenticatedApp browserRouting={browserRouting} />
-    </AuthProvider>
+    </Provider>
   )
 }

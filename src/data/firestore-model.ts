@@ -3,11 +3,8 @@ import { canvasDocumentSchema, parseResult } from './canvas-schema'
 import type { LeanCanvas } from './types'
 
 export interface RevisionedCanvas { canvas: LeanCanvas; revision: number }
-export interface WorkspaceValue {
-  canvases: LeanCanvas[]
-  revisions: Record<string, number>
-  orderRevision: number
-}
+export type { WorkspaceValue } from './persistence-types'
+export { equalCanvas, safeCanvasId } from './persistence-types'
 export const workspacePath = (uid: string) =>
   `users/${uid}/workspaces/default`
 export const canvasesPath = (uid: string) =>
@@ -26,26 +23,7 @@ export function decodeCanvas(id: string, data: unknown): RevisionedCanvas {
     notes: value.notes, about: value.about, aboutTabs: value.aboutTabs, sections: value.sections }
   return { canvas, revision: value.revision }
 }
-export function equalCanvas(left: LeanCanvas | undefined, right: LeanCanvas): boolean {
-  return !!left && JSON.stringify(left) === JSON.stringify(right)
-}
-export function safeCanvasId(id: string): boolean {
-  return id.length > 0 && id !== '.' && id !== '..' && !id.includes('/') &&
-    new TextEncoder().encode(id).length <= 1500
-}
-async function digest(value: string): Promise<string> {
-  const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
-  return [...new Uint8Array(bytes)].map((byte) => byte.toString(16).padStart(2, '0')).join('')
-}
-export async function migrationCanvases(canvases: LeanCanvas[]): Promise<LeanCanvas[]> {
-  const counts = new Map<string, number>()
-  canvases.forEach(({ id }) => counts.set(id, (counts.get(id) ?? 0) + 1))
-  return Promise.all(canvases.map(async (canvas, index) => {
-    if (safeCanvasId(canvas.id) && counts.get(canvas.id) === 1) return canvas
-    const hash = await digest(JSON.stringify([index, canvas]))
-    return { ...canvas, id: `migrated-${hash}` }
-  }))
-}
+export { migrationCanvases } from './migration-ids'
 export function isLegacy(data: DocumentData | undefined): data is DocumentData & { canvases: unknown } {
   return !!data && Array.isArray(data.canvases) && data.schemaVersion === undefined
 }

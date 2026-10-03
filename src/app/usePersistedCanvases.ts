@@ -1,7 +1,7 @@
 import {
   useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction,
 } from 'react'
-import { saveWorkspaceDiff } from '../data/firestore'
+import { saveWorkspaceDiff } from '../data/workspace-remote'
 import { startCanvasPersistence } from './canvas-persistence-start'
 import { type WorkspaceValue } from '../data/firestore-model'
 import { acceptSaveResult } from '../data/persistence-state'
@@ -11,7 +11,7 @@ import {
 } from '../data/storage'
 import type { LeanCanvas } from '../data/types'
 
-export function usePersistedCanvases(uid: string, persistence: 'firestore' | 'local') {
+export function usePersistedCanvases(uid: string, persistence: 'firestore' | 'local' | 'postgres') {
   const isLocal = persistence === 'local'
   const boards = useMemo(() => createBoardRepository(uid, persistence), [uid, persistence])
   const [canvases, setCanvasState] = useState<LeanCanvas[]>(() =>
@@ -24,6 +24,8 @@ export function usePersistedCanvases(uid: string, persistence: 'firestore' | 'lo
   const current = useRef(canvases)
   const localBase = useRef(canvases)
   const ready = useRef(false)
+  const conflict = useRef(false)
+  const onConflict = useCallback(() => { conflict.current = true }, [])
   const saving = useRef<Promise<void> | null>(null)
   const setCanvases: Dispatch<SetStateAction<LeanCanvas[]>> = useCallback((update) => {
     const next = typeof update === 'function' ? update(current.current) : update
@@ -38,6 +40,7 @@ export function usePersistedCanvases(uid: string, persistence: 'firestore' | 'lo
   }, [setCanvases])
   const flushCanvases = useCallback((): Promise<void> => {
     const work = (saving.current ?? Promise.resolve()).catch(() => undefined).then(async () => {
+      if (conflict.current) throw new Error('Copy your unsaved draft, then reload to resolve the conflict.')
       if (!ready.current) throw new Error('Canvases are still loading. Retry shortly.')
       setScheduled(false)
       setPending(true)
@@ -70,7 +73,7 @@ export function usePersistedCanvases(uid: string, persistence: 'firestore' | 'lo
     return work
   }, [boards, isLocal, uid])
   useEffect(() => startCanvasPersistence({ uid, isLocal, boards, base, current, ready,
-    setCanvases, setLoading, setError }), [boards, isLocal, uid, setCanvases])
+    setCanvases, setLoading, setError, onConflict: persistence === 'postgres' ? onConflict : undefined }), [boards, isLocal, uid, setCanvases, persistence, onConflict])
   useEffect(() => {
     if (loading || !ready.current) return
     const timer = window.setTimeout(() => { void flushCanvases().catch(() => undefined) }, isLocal ? 0 : 450)
