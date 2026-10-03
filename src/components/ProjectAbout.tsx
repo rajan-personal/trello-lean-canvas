@@ -32,7 +32,7 @@ export function ProjectAbout({ canvas, onSave, register }: Props) {
   const dirty = draft !== null && (draft !== canvas.about || failed)
   useDraftGuard(dirty, save.pending, () => setDraft(null), register)
   return <div className="flex min-h-0 min-w-0 flex-1 overflow-auto p-4 max-[760px]:p-2">
-    <form onSubmit={(event) => { event.preventDefault(); if (dirty && !tooLong) void save.run() }} className="mx-auto flex h-full min-h-0 w-full max-w-[760px] flex-col rounded-xl bg-panel p-6 text-[#172b4d] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)] max-[760px]:p-4">
+    <form onSubmit={(event) => { event.preventDefault(); if (dirty && !tooLong) void save.run() }} className="flex h-full min-h-0 min-w-0 w-full flex-col rounded-xl bg-panel p-6 text-[#172b4d] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)] max-[760px]:p-4">
       <div className="mb-4 flex shrink-0 items-center justify-between gap-4">
         <h2 id={`${id}-label`} className="text-base font-semibold">Project details</h2>
         <div className="flex items-center gap-3">
