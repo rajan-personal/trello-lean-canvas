@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Lean Canvas',
@@ -43,6 +43,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        importScripts: ['/sw-update-bridge.js'],
+        skipWaiting: false,
+        clientsClaim: true,
         cleanupOutdatedCaches: true,
         navigateFallback: '/index.html',
       },
