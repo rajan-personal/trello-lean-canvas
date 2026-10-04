@@ -1,24 +1,31 @@
-/* All tickets: L2 panel (grey) holds project sections; each project's tickets sit on one L3 surface (white),
-   matching the Kanban column → card layering. Project names and ticket lists share one left edge (--ticket-indent). */
+/* All tickets: same full-height white workbench as the About page (rounded-xl surface, 48px header bar,
+   #dcdfe4 hairlines); the project list scrolls inside it. Project names and ticket lists share one left edge (--ticket-indent). */
 .ticket-list-content > * {
   --ticket-gutter: 16px;
   --ticket-indent: var(--ticket-gutter);
 }
 .ticket-list-area {
+  display: flex;
   flex: 1;
   min-inline-size: 0;
   min-block-size: 0;
-  overflow: auto;
-  padding: 18px 16px 28px;
+  overflow: hidden;
+  padding: 16px;
   color: #172b4d;
-  scrollbar-gutter: stable;
 }
 .ticket-list-content {
   container: ticket-list / inline-size;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow: hidden;
   border-radius: 12px;
-  background: var(--color-panel);
-  box-shadow: 0 2px 4px #091e4226, 0 0 0 1px #091e4214;
+  background: var(--color-surface);
+  box-shadow: 0 1px 1px #091e4240, 0 0 1px #091e424f;
 }
+.ticket-project-list, .ticket-list-message { flex: 1; min-block-size: 0; overflow: auto; }
 
 /* Page heading */
 .ticket-list-heading {
@@ -26,11 +33,14 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
   gap: 8px 16px;
-  padding: 12px var(--ticket-gutter);
+  min-block-size: 48px;
+  box-sizing: border-box;
+  padding: 8px 12px 8px var(--ticket-gutter);
   border-block-end: 1px solid #dcdfe4;
 }
-.ticket-list-heading h1 { margin: 0; color: #172b4d; font-size: 16px; font-weight: 650; line-height: 24px; }
+.ticket-list-heading h1 { margin: 0; color: #172b4d; font-size: 14px; font-weight: 600; line-height: 20px; }
 .ticket-list-totals { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .ticket-list-totals li {
   display: inline-flex;
@@ -39,13 +49,13 @@
   min-block-size: 24px;
   padding: 0 8px;
   border-radius: 999px;
-  background: var(--color-surface);
+  background: #f7f8f9;
   box-shadow: inset 0 0 0 1px #dcdfe4;
   color: #44546f;
   font-size: 12px;
 }
 .ticket-list-totals strong { color: #172b4d; font-weight: 650; font-variant-numeric: tabular-nums; }
-.ticket-list-message { margin: 0; padding: 12px var(--ticket-gutter); color: #626f86; font-size: 12px; }
+.ticket-list-message { margin: 0; padding: 12px var(--ticket-gutter); color: #626f86; font-size: 13px; }
 
 /* Project section */
 .ticket-project-list { margin: 0; padding: 0; list-style: none; }
@@ -113,9 +123,9 @@
   margin: 4px var(--ticket-gutter) 0 var(--ticket-indent);
   padding: 0;
   overflow: hidden;
+  border: 1px solid #dcdfe4;
   border-radius: 8px;
   background: var(--color-surface);
-  box-shadow: 0 1px 2px #091e4230, 0 0 0 1px #091e420a;
   list-style: none;
 }
 .ticket-active-list > li + li { border-block-start: 1px solid #f1f2f4; }
@@ -178,7 +188,7 @@
   .ticket-status-pill { display: none; }
 }
 @media (max-width: 760px), (max-height: 500px) {
-  .ticket-list-area { padding: 12px 12px 28px; }
+  .ticket-list-area { padding: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { .ticket-active-in-progress .ticket-active-icon { animation: none; } }
 @media (pointer: coarse) {
