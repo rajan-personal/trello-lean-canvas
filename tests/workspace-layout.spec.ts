@@ -69,3 +69,11 @@ test(`keeps the canvas grid intact and scrollable on mobile at ${width}px`, asyn
   }
 })
 }
+
+test('retains desktop grid placement at 761px', async ({ page }) => {
+  await page.setViewportSize({ width: 761, height: 900 })
+  await openSampleCanvas(page)
+  await expect(page.locator('.lean-grid')).toHaveCSS('min-width', '1000px')
+  const tops = await page.locator('.canvas-column').evaluateAll((columns) => columns.map((column) => column.getBoundingClientRect().top))
+  expect(new Set(tops).size).toBe(1)
+})

@@ -25,21 +25,21 @@ export function CanvasBoard({ sections, sectionProps }: Props) {
     sections.map((section) => [section.id, section]),
   ) as Record<SectionId, CanvasSectionData>
   return (
-    <div className="main-area h-full min-w-0 flex-1 [container:lean-canvas/inline-size]">
+    <div className="main-area h-full min-w-0 flex-1">
       <div className="board-scroll h-full w-full overflow-auto p-3 [scrollbar-color:rgba(255,255,255,0.35)_rgba(0,0,0,0.12)]">
-        <div className="lean-grid grid w-full min-w-0 grid-cols-10 grid-rows-[auto_auto_auto] content-start gap-2.5">
+        <div className="lean-grid grid w-full min-w-[1000px] grid-cols-10 grid-rows-[auto_auto_auto] content-start gap-2.5 phone:min-w-0">
           {groups.map(([top, bottom]) => top === 'solution' || top === 'advantage' ? (
             <Fragment key={top}>
-              <div className={`canvas-panel ${top} ${panelClass} ${columns[top]} row-[1] flex min-h-0 min-w-0 flex-col`}>
+              <div className={`canvas-panel ${top} ${panelClass} ${columns[top]} row-[1] flex min-h-0 flex-col`}>
                 <CanvasSection section={byId[top]} {...sectionProps} />
               </div>
-              <div className={`canvas-panel ${bottom} ${panelClass} ${columns[top]} row-[2] flex min-h-0 min-w-0 flex-col`}>
+              <div className={`canvas-panel ${bottom} ${panelClass} ${columns[top]} row-[2] flex min-h-0 flex-col`}>
                 <CanvasSection section={byId[bottom]} {...sectionProps} />
               </div>
             </Fragment>
           ) : (
             <div
-              className={`canvas-panel ${top} canvas-column ${panelClass} ${columns[top] ?? ''} row-[1/3] flex min-h-0 min-w-0 flex-col ${top === 'value' ? 'border-t-4 border-[#0c66e4]' : ''}`}
+              className={`canvas-panel ${top} canvas-column ${panelClass} ${columns[top] ?? ''} row-[1/3] flex min-h-0 flex-col ${top === 'value' ? 'border-t-4 border-[#0c66e4]' : ''}`}
               key={top}
             >
               <CanvasSection section={byId[top]} {...sectionProps} />
@@ -47,12 +47,12 @@ export function CanvasBoard({ sections, sectionProps }: Props) {
             </div>
           ))}
           <div
-            className={`canvas-panel bottom-panel cost ${panelClass} col-[1/6] row-start-3 flex min-h-0 min-w-0`}
+            className={`canvas-panel bottom-panel cost ${panelClass} col-[1/6] row-start-3 flex min-h-0`}
           >
             <CanvasSection section={byId.cost} bottom {...sectionProps} />
           </div>
           <div
-            className={`canvas-panel bottom-panel revenue ${panelClass} col-[6/11] row-start-3 flex min-h-0 min-w-0`}
+            className={`canvas-panel bottom-panel revenue ${panelClass} col-[6/11] row-start-3 flex min-h-0`}
           >
             <CanvasSection section={byId.revenue} bottom {...sectionProps} />
           </div>
