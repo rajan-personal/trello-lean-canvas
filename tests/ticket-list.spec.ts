@@ -8,9 +8,10 @@ test('shows one project list with stars, counts, and seven-day activity, without
   await expect(list.getByRole('button', { name: /Open board for/ })).toHaveText(['Alpha project', 'Beta project', 'Empty project'])
   await expect(list.locator('.ticket-project-star')).toHaveCount(1)
   await expect(list.getByText('Prepare the next product release.', { exact: false })).toHaveCount(0)
-  await expect(page.getByLabel('Active ticket count for Alpha project', { exact: true })).toHaveText('3 active tickets')
-  await expect(page.getByLabel('Active ticket count for Beta project', { exact: true })).toHaveText('2 active tickets')
-  await expect(page.getByLabel('Active ticket count for Empty project', { exact: true })).toHaveText('0 active tickets')
+  await expect(page.getByRole('list', { name: 'Active tickets for Alpha project' }).getByRole('button')).toHaveCount(3)
+  await expect(page.getByRole('list', { name: 'Active tickets for Beta project' }).getByRole('button')).toHaveCount(2)
+  await expect(page.getByText('No active tickets.', { exact: true })).toHaveCount(1)
+  await expect(page.locator('.ticket-project-total')).toHaveCount(0)
   await expect(page.locator('.ticket-project-updated')).toHaveCount(0)
   await expect(page.locator('.ticket-activity-sparkline')).toHaveCount(3)
   await expect(page.getByRole('table')).toHaveCount(0)
@@ -59,7 +60,7 @@ test('updates the star when favorited and counts after a card is added', async (
   await page.getByRole('button', { name: 'All tickets', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Open board for Beta project' })).toHaveAccessibleDescription('Starred project')
   await expect(page.locator('.ticket-project-row[data-project-id="b"] .ticket-project-star')).toBeVisible()
-  await expect(page.getByLabel('Active ticket count for Beta project', { exact: true })).toHaveText('3 active tickets')
+  await expect(page.getByRole('list', { name: 'Active tickets for Beta project' }).getByRole('button')).toHaveCount(3)
 })
 
 for (const width of [320, 375, 390]) {
