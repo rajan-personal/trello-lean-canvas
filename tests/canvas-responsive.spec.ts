@@ -2,10 +2,10 @@ import { expect, test } from '@playwright/test'
 import { openSampleCanvas } from './support/canvas-fixtures'
 
 for (const viewport of [
-  { width: 761, height: 900, columns: 2 },
-  { width: 800, height: 1192, columns: 2 },
+  { width: 761, height: 900, columns: 10 },
+  { width: 800, height: 1192, columns: 10 },
   { width: 1024, height: 768, columns: 10 },
-  { width: 1200, height: 800, columns: 2 },
+  { width: 1200, height: 800, columns: 10 },
   { width: 1280, height: 712, columns: 10 },
   { width: 844, height: 390, columns: 1 },
 ]) {
@@ -28,6 +28,12 @@ for (const viewport of [
       expect(layout.columns).toBe(viewport.columns)
       expect(layout.scrollWidth).toBeLessThanOrEqual(layout.boardWidth)
       expect(layout.panelsFit).toBe(true)
+      if (viewport.columns === 10) {
+        // Classic Lean Canvas: the five top columns share one row above Cost / Revenue.
+        const tops = await page.locator('.lean-grid > .canvas-panel:not(.bottom-panel)').evaluateAll((panels) =>
+          panels.filter((panel) => !panel.matches('.metrics, .channels')).map((panel) => Math.round(panel.getBoundingClientRect().top)))
+        expect(new Set(tops).size).toBe(1)
+      }
       for (const section of await page.locator('.canvas-cell').all()) {
         await section.scrollIntoViewIfNeeded()
         await expect(section.getByRole('button', { name: 'Add a card', exact: true })).toBeVisible()
@@ -40,7 +46,7 @@ for (const viewport of [
   })
 }
 
-test('canvas adapts to notes and restores its wide layout when they close', async ({ page }) => {
+test('canvas keeps the classic grid beside wide notes without horizontal overflow', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await openSampleCanvas(page)
   const columns = () => page.locator('.lean-grid').evaluate((grid) => getComputedStyle(grid).gridTemplateColumns.split(' ').length)
@@ -52,7 +58,7 @@ test('canvas adapts to notes and restores its wide layout when they close', asyn
   await expect(handle).toHaveAttribute('aria-valuemax', '1440')
   await handle.focus()
   for (let index = 0; index < 20; index++) await handle.press('ArrowLeft')
-  await expect.poll(columns).toBe(2)
+  await expect.poll(columns).toBe(10)
   await expect.poll(noOverflow).toBe(true)
   await page.getByRole('button', { name: 'Close notepad', exact: true }).click()
   await expect.poll(columns).toBe(10)
