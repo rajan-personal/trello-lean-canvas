@@ -34,7 +34,7 @@ export function TopBar(props: Props) {
   return (
     <header className="topbar relative z-20 flex h-12 items-center bg-chrome text-white shadow-[0_1px_0_rgba(9,30,66,0.25)]">
       <button
-        className={`mobile-sidebar-button ms-2 me-[7px] hidden ${toolbarButtonClass} max-[761px]:grid max-[761px]:ms-1 max-[761px]:me-0.5`}
+        className={`mobile-sidebar-button ms-2 me-[7px] hidden ${toolbarButtonClass} drawer:grid phone:ms-1 phone:me-0.5`}
         onClick={props.onOpenSidebar}
         aria-label="Open sidebar"
         title="Open sidebar"
@@ -44,7 +44,7 @@ export function TopBar(props: Props) {
         <Menu size={19} />
       </button>
       <button
-        className={`desktop-sidebar-button ms-2 me-[7px] ${toolbarButtonClass} max-[761px]:hidden`}
+        className={`desktop-sidebar-button ms-2 me-[7px] ${toolbarButtonClass} drawer:hidden`}
         onClick={props.onToggleSidebar}
         aria-label={
           props.sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
@@ -59,14 +59,14 @@ export function TopBar(props: Props) {
         onClick={props.onOpenAllTickets} aria-label="All tickets" title="All tickets" aria-current={props.allTicketsActive ? 'page' : undefined}>
         <Ticket size={19} aria-hidden="true" />
       </button>}
-      <div className="topbar-brand flex h-full w-11 flex-none items-center justify-center px-2 max-[761px]:w-9">
+      <div className="topbar-brand flex h-full w-11 flex-none items-center justify-center px-2 phone:w-9">
         <CanvasAddMenu
           onNew={props.onNewCanvas}
           onImport={props.onImport}
           onLoadSamples={props.onLoadSamples}
         />
       </div>
-      <div className="board-toolbar flex h-full min-w-0 flex-1 items-center border-s border-white/14 px-3 text-white max-[761px]:px-1.5">
+      <div className="board-toolbar flex h-full min-w-0 flex-1 items-center border-s border-white/14 px-3 text-white phone:px-1.5">
         {canvas ? <BoardTitle key={canvas.id} canvas={canvas} onRename={props.onRename} /> : props.heading && (
           <h1 className="truncate text-base font-semibold" aria-label={props.heading}>{props.heading}</h1>
         )}

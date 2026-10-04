@@ -32,9 +32,9 @@ test('desktop notes expand, restore, and follow the available workspace', async 
   await expect.poll(panelWidth).toBe(1192)
   await expect(page.getByRole('navigation', { name: 'Workspace navigation' })).toBeVisible()
   await page.setViewportSize({ width: 1024, height: 768 })
-  await expect.poll(panelWidth).toBe(776)
-  await page.getByRole('button', { name: 'Collapse sidebar' }).click()
+  // Below the docked width the sidebar overlays content, so notes keep the full width.
   await expect.poll(panelWidth).toBe(1024)
+  await expect(page.getByRole('button', { name: 'Open sidebar' })).toBeVisible()
   await panel.getByRole('button', { name: 'Restore notepad width' }).click()
   await expect.poll(panelWidth).toBe(720)
   await expect(handle).toBeVisible()

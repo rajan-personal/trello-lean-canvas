@@ -37,7 +37,8 @@ for (const width of [320, 375, 760, 761, 1424]) {
       const selected = key === 'End' || key === 'ArrowLeft' ? about : board
       await expect(selected).toBeFocused()
       await expect(selected).toHaveAttribute('aria-selected', 'true')
-      await expect(page.getByRole('tabpanel')).toHaveAccessibleName((await selected.getAttribute('title'))!)
+      const panelId = await selected.getAttribute('aria-controls')
+      await expect(page.locator(`#${panelId}`)).toHaveAccessibleName((await selected.getAttribute('title'))!)
       await page.keyboard.press('Tab')
       await expect(nextAction).toBeFocused()
       await page.keyboard.press('Shift+Tab')
@@ -48,12 +49,17 @@ for (const width of [320, 375, 760, 761, 1424]) {
     if (width <= 760) await nextAction.click()
     await expect(favorite).toHaveAttribute('aria-pressed', 'true')
     if (width <= 760) await page.keyboard.press('Escape')
-    if (width > 760) {
+    if (width >= 1200) {
       await page.getByRole('button', { name: 'Collapse sidebar' }).click()
       await expect(page.locator('#canvas-sidebar')).toHaveAttribute('inert', '')
       await expectHeaderLayout(page, width)
       await page.getByRole('button', { name: 'Expand sidebar' }).click()
       await expect(page.locator('#canvas-sidebar')).not.toHaveAttribute('inert', '')
+    } else {
+      await page.getByRole('button', { name: 'Open sidebar' }).click()
+      await expect(page.locator('#canvas-sidebar')).not.toHaveAttribute('inert', '')
+      await page.keyboard.press('Escape')
+      await expect(page.locator('#canvas-sidebar')).toHaveAttribute('inert', '')
     }
     if (width <= 760) await nextAction.click()
     await page.getByRole('button', { name: 'Notepad', exact: true }).click()

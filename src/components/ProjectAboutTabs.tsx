@@ -61,8 +61,8 @@ export function ProjectAboutTabs(p: Props) {
     select(event.key === 'Home' ? p.tabs[0].id : event.key === 'End' ? p.tabs[p.tabs.length - 1].id
       : p.tabs[(index + (up ? -1 : 1) + p.tabs.length) % p.tabs.length].id)
   }
-  return <div className={`col-start-1 row-span-2 row-start-1 flex min-h-0 flex-col border-r border-[#dcdfe4] bg-[#f7f8f9] max-[760px]:border-r-0 max-[760px]:bg-white ${p.open ? 'max-[760px]:flex-1' : 'max-[760px]:hidden'}`}>
-    <div className="flex h-12 shrink-0 items-center justify-between border-b border-[#dcdfe4] ps-4 pe-2 max-[760px]:hidden">
+  return <div className={`col-start-1 row-span-2 row-start-1 flex min-h-0 flex-col border-r border-[#dcdfe4] bg-[#f7f8f9] phone:border-r-0 phone:bg-white ${p.open ? 'phone:flex-1' : 'phone:hidden'}`}>
+    <div className="flex h-12 shrink-0 items-center justify-between border-b border-[#dcdfe4] ps-4 pe-2 phone:hidden">
       <span className="text-xs font-semibold text-[#44546f]">Sections</span>
       {p.addButton}
     </div>

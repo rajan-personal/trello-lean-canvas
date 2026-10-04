@@ -23,7 +23,7 @@ interface Props {
   onDragOver: (event: DragEvent<HTMLElement>) => void
   onDrop: (event: DragEvent<HTMLElement>) => void
 }
-const row = 'flex h-8 w-full items-center gap-2 rounded px-2 text-left text-sm max-[760px]:h-11 max-[760px]:px-3'
+const row = 'flex h-8 w-full items-center gap-2 rounded px-2 text-left text-sm phone:h-11 phone:px-3'
 const line = { before: 'before:absolute before:inset-x-1 before:-top-px before:h-0.5 before:rounded-full before:bg-[#0c66e4]',
   after: 'after:absolute after:inset-x-1 after:-bottom-px after:h-0.5 after:rounded-full after:bg-[#0c66e4]', '': '' }
 
@@ -37,7 +37,7 @@ export function ProjectAboutTabRow({ buttonRef, ...p }: Props) {
           if (event.key === 'Enter') { event.preventDefault(); p.onRenameEnd(false, true) }
           if (event.key === 'Escape') { event.preventDefault(); p.onRenameEnd(true, true) }
         }}
-        className="h-6 min-w-0 flex-1 rounded-sm border border-[#0c66e4] bg-white px-1.5 text-sm text-[#172b4d] outline-none max-[760px]:h-9" />
+        className="h-6 min-w-0 flex-1 rounded-sm border border-[#0c66e4] bg-white px-1.5 text-sm text-[#172b4d] outline-none phone:h-9" />
     </div>
       : <button type="button" role="tab" id={`${p.id}-${p.tab.id}-tab`} ref={buttonRef} draggable={p.canDrag}
         aria-selected={p.selected} aria-controls={`${p.id}-panel`} tabIndex={p.selected ? 0 : -1}

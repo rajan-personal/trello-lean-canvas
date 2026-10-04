@@ -69,9 +69,9 @@ export function ProjectAbout({ canvas, onSave, register }: Props) {
     title={value.aboutTabs.length >= maxAboutTabs ? `Up to ${maxAboutTabs + 1} sections` : 'New section'} className={iconButton}>
     <FilePlus size={16} aria-hidden="true" />
   </button>
-  return <div className="flex min-h-0 min-w-0 flex-1 overflow-auto p-4 max-[760px]:p-2">
+  return <div className="flex min-h-0 min-w-0 flex-1 overflow-auto p-4 phone:p-2">
     <form onSubmit={(event) => { event.preventDefault(); if (dirty && !invalid) void save.run() }}
-      className="about-workbench grid h-full min-h-0 w-full min-w-0 grid-cols-[15rem_minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-xl bg-surface text-[#172b4d] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)] max-[760px]:flex max-[760px]:flex-col">
+      className="about-workbench grid h-full min-h-0 w-full min-w-0 grid-cols-[15rem_minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-xl bg-surface text-[#172b4d] shadow-[0_1px_1px_rgba(9,30,66,0.25),0_0_1px_rgba(9,30,66,0.31)] phone:flex phone:flex-col">
       <h2 className="sr-only">Project details</h2>
       <div className="col-start-2 row-start-1 min-w-0"><ProjectAboutEditorHeader tab={current} pinned={current.id === overview} disabled={save.pending}
           statusId={`${editorId}-status`} status={aboutSaveStatus(invalid, failed, save.pending, dirty)}
@@ -86,7 +86,7 @@ export function ProjectAbout({ canvas, onSave, register }: Props) {
         open={sectionsOpen} switcherRef={switcherRef}
         onSelect={(tabId, activate) => { setActive(tabId); if (activate) setSectionsOpen(false) }} canMove={!save.pending} />
       <div role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-${current.id}-tab`}
-        className={`col-start-2 row-start-2 flex min-h-0 min-w-0 flex-col max-[760px]:min-h-80 max-[760px]:flex-1 ${sectionsOpen ? 'max-[760px]:hidden' : ''}`}>
+        className={`col-start-2 row-start-2 flex min-h-0 min-w-0 flex-col phone:min-h-80 phone:flex-1 ${sectionsOpen ? 'phone:hidden' : ''}`}>
         <span id={`${editorId}-label`} className="sr-only">{current.id === overview ? 'Project details' : current.title.trim() || 'Untitled tab'}</span>
         <Suspense fallback={<p className="flex-1 p-4">Loading editor…</p>}>
           <ProjectRichTextEditor key={current.id} id={editorId} value={current.content} disabled={save.pending}

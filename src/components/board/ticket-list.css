@@ -177,7 +177,7 @@
   .ticket-project-total-word { display: none; }
   .ticket-status-pill { display: none; }
 }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) {
   .ticket-list-area { padding: 12px 12px 28px; }
 }
 @media (prefers-reduced-motion: reduce) { .ticket-active-in-progress .ticket-active-icon { animation: none; } }

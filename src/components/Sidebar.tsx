@@ -20,7 +20,7 @@ interface Props {
   onClose: () => void
 }
 export function Sidebar(p: Props) {
-  const { ref: sidebarRef, hidden, mobile } = useSidebarVisibility(p.open, p.collapsed)
+  const { ref: sidebarRef, hidden, drawer } = useSidebarVisibility(p.open, p.collapsed)
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [target, setTarget] = useState<DropTarget | null>(null)
   const drop = (event: DragEvent<HTMLElement>, targetId: string) => {
@@ -39,7 +39,7 @@ export function Sidebar(p: Props) {
     <>
       {p.open && (
         <button
-          className="sidebar-scrim fixed inset-x-0 top-12 bottom-0 z-50 block h-[calc(100dvh-48px)] w-full border-0 bg-[rgba(9,30,66,0.45)] p-0 min-[761px]:hidden"
+          className="sidebar-scrim fixed inset-x-0 top-12 bottom-0 z-50 block h-[calc(100dvh-48px)] w-full border-0 bg-[rgba(9,30,66,0.45)] p-0 docked:hidden"
           onClick={p.onClose}
           aria-label="Close sidebar"
         />
@@ -50,11 +50,11 @@ export function Sidebar(p: Props) {
         inert={hidden}
         aria-hidden={hidden}
         onKeyDown={(event) => {
-          if (mobile && event.key === 'Escape') { event.preventDefault(); p.onClose() }
+          if (drawer && event.key === 'Escape') { event.preventDefault(); p.onClose() }
         }}
-        className={`sidebar relative z-10 flex h-full w-[248px] basis-[248px] flex-col overflow-hidden bg-chrome px-2.5 py-3.5 text-white border-e border-white/20 shadow-[2px_0_8px_rgba(9,30,66,0.28)] transition-[flex-basis,width,padding] duration-180 ease-out max-[760px]:fixed max-[760px]:top-12 max-[760px]:bottom-0 max-[760px]:left-0 max-[760px]:z-60 max-[760px]:h-auto max-[760px]:shadow-[8px_0_24px_rgba(9,30,66,0.35)] max-[760px]:transition-transform ${p.open ? 'max-[760px]:translate-x-0' : 'max-[760px]:translate-x-[-102%]'} ${p.collapsed ? 'min-[761px]:w-0 min-[761px]:basis-0 min-[761px]:px-0 min-[761px]:border-e-0 min-[761px]:shadow-none' : ''}`}
+        className={`sidebar relative z-10 flex h-full w-[248px] basis-[248px] flex-col overflow-hidden bg-chrome px-2.5 py-3.5 text-white border-e border-white/20 shadow-[2px_0_8px_rgba(9,30,66,0.28)] transition-[flex-basis,width,padding] duration-180 ease-out drawer:fixed drawer:top-12 drawer:bottom-0 drawer:left-0 drawer:z-60 drawer:h-auto drawer:shadow-[8px_0_24px_rgba(9,30,66,0.35)] drawer:transition-transform ${p.open ? 'drawer:translate-x-0' : 'drawer:translate-x-[-102%]'} ${p.collapsed ? 'docked:w-0 docked:basis-0 docked:px-0 docked:border-e-0 docked:shadow-none' : ''}`}
       >
-        <div className="sidebar-heading hidden min-h-[34px] justify-end max-[760px]:mb-1.5 max-[760px]:flex">
+        <div className="sidebar-heading hidden min-h-[34px] justify-end drawer:mb-1.5 drawer:flex">
           <button
             className={`${brandActionButtonClass} mobile-close`}
             onClick={p.onClose}

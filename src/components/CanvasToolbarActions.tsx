@@ -22,7 +22,7 @@ export function CanvasToolbarActions({
 }: Props) {
   return (
     <>
-      <div className="flex items-center max-[761px]:hidden">
+      <div className="flex items-center phone:hidden">
       <ToolbarIconButton
         label="Favorite canvas"
         onClick={onFavorite}
