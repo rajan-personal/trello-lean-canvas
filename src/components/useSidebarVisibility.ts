@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useSyncExternalStore } from 'react'
+import { drawerQuery as query } from '../lib/breakpoints'
 
-const query = '(max-width: 760px)'
 const subscribe = (notify: () => void) => {
   const media = window.matchMedia(query)
   media.addEventListener('change', notify)
@@ -9,8 +9,8 @@ const subscribe = (notify: () => void) => {
 const snapshot = () => window.matchMedia(query).matches
 
 export function useSidebarVisibility(open: boolean, collapsed: boolean) {
-  const mobile = useSyncExternalStore(subscribe, snapshot, () => false)
-  const hidden = mobile ? !open : collapsed
+  const drawer = useSyncExternalStore(subscribe, snapshot, () => false)
+  const hidden = drawer ? !open : collapsed
   const ref = useRef<HTMLElement>(null)
   useLayoutEffect(() => {
     const sidebar = ref.current
@@ -18,9 +18,9 @@ export function useSidebarVisibility(open: boolean, collapsed: boolean) {
     if (hidden && sidebar.contains(document.activeElement)) {
       const controls = document.querySelectorAll<HTMLButtonElement>('button[aria-controls="canvas-sidebar"]')
       Array.from(controls).find((button) => button.getClientRects().length)?.focus()
-    } else if (mobile && !hidden) {
+    } else if (drawer && !hidden) {
       sidebar.querySelector<HTMLButtonElement>('button')?.focus()
     }
-  }, [hidden, mobile])
-  return { ref, hidden, mobile }
+  }, [hidden, drawer])
+  return { ref, hidden, drawer }
 }

@@ -11,7 +11,7 @@ test('About converts only selected text and preserves it after saving', async ({
   await expect(editor).toHaveText(text)
   // Select the middle sentence with the keyboard, then use the real toolbar.
   await editor.click()
-  await page.keyboard.press('Control+Home')
+  await page.keyboard.press(process.platform === 'darwin' ? 'Meta+ArrowUp' : 'Control+Home')
   for (let index = 0; index < 'Keep this introduction. '.length; index++) await page.keyboard.press('ArrowRight')
   await page.keyboard.down('Shift')
   for (let index = 0; index < 'Run npm test before saving.'.length; index++) await page.keyboard.press('ArrowRight')

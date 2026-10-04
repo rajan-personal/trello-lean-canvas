@@ -2,6 +2,20 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Layout tiers — keep in sync with src/lib/breakpoints.ts. */
+@custom-variant phone {
+  @media (max-width: 760px), (max-height: 500px) { @slot; }
+}
+@custom-variant above-phone {
+  @media (min-width: 761px) and (min-height: 501px) { @slot; }
+}
+@custom-variant drawer {
+  @media (max-width: 1199px), (max-height: 500px) { @slot; }
+}
+@custom-variant docked {
+  @media (min-width: 1200px) and (min-height: 501px) { @slot; }
+}
+
 @theme {
   --font-sans: "Schibsted Grotesk", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   /* Layers: L0 app → L1 chrome → L2 panel → L3 card. */
@@ -70,18 +84,4 @@
     translate: none;
     transition: opacity 80ms linear;
   }
-}
-
-@media (max-width: 760px) {
-  .lean-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
-  .lean-grid > * { grid-column: auto; grid-row: auto; }
-  .lean-grid > .problem { order: 1; }
-  .lean-grid > .segments { order: 2; }
-  .lean-grid > .value { order: 3; }
-  .lean-grid > .solution { order: 4; }
-  .lean-grid > .channels { order: 5; }
-  .lean-grid > .revenue { order: 6; }
-  .lean-grid > .cost { order: 7; }
-  .lean-grid > .metrics { order: 8; }
-  .lean-grid > .advantage { order: 9; }
 }

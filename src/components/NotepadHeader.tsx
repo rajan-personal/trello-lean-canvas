@@ -23,7 +23,7 @@ export function NotepadHeader({ id, saving, saveFailed, onClose, expanded, onTog
     <button type="button" aria-label={expanded ? 'Restore notepad width' : 'Expand notepad'}
       title={expanded ? 'Restore notepad width' : 'Expand notepad'} aria-pressed={expanded}
       onClick={onToggleExpanded}
-      className="flex size-8 shrink-0 items-center justify-center rounded text-[#44546f] hover:bg-[#dcdfe4] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#0c66e4] max-[761px]:hidden">
+      className="flex size-8 shrink-0 items-center justify-center rounded text-[#44546f] hover:bg-[#dcdfe4] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#0c66e4] phone:hidden">
       {expanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
     </button>
     <button type="button" aria-label="Close notepad" onClick={close}

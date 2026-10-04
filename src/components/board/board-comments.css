@@ -32,7 +32,7 @@
 .kanban-comment-form:focus-within .kanban-comment-shortcut { display: block; }
 .kanban-comment-shortcut kbd { font: inherit; }
 .kanban-comments fieldset:disabled .kanban-comment-composer { background: #f2f4f7; }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) {
   .kanban-comments .kanban-comment-composer textarea { font-size: 1rem; min-height: 44px; }
   .kanban-comments .kanban-comment-composer .kanban-comment-send { width: 44px; min-height: 44px; }
 }

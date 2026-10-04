@@ -30,7 +30,7 @@ export function CanvasMoreMenu(props: Props) {
     menuRef.current?.hidePopover()
   }
 
-  return <div className="min-[761px]:hidden">
+  return <div className="above-phone:hidden">
     <button ref={triggerRef} type="button" className={toolbarButtonClass}
       aria-label="More actions" title="More actions" aria-expanded={open} aria-controls={menuId}
       popoverTarget={menuId} onClick={positionMenu}>

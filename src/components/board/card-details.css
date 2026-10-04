@@ -72,7 +72,7 @@
 .kanban-dialog.kanban-card-dialog .kanban-primary:not(:disabled):hover { background: #1d4fb0; }
 .kanban-draft-indicator { margin-inline-start: auto; color: #667085; font-size: .75rem; }
 .kanban-card-layout > .kanban-comments { padding: 24px 20px; border-inline-start: 1px solid #e4e7ec; background: #f8fafc; }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) {
   .kanban-dialog.kanban-card-dialog { width: calc(100% - 24px); max-height: calc(100dvh - 24px); border-radius: 12px; }
   .kanban-dialog.kanban-card-dialog > header { padding: 8px 16px; gap: 8px; }
   .kanban-dialog-heading { gap: 8px; flex-wrap: wrap; }

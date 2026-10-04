@@ -74,7 +74,7 @@ button.kanban-add-column:hover { background: #fff; }
 .kanban-composer button { min-height: 36px; border-radius: 6px; padding: 7px 12px; background: transparent; font-weight: 600; }
 .kanban-composer button:not(:disabled):hover { background: #dcdfe4; }
 .kanban-composer .kanban-actions { margin-top: 8px; }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) {
   .kanban-lists { padding-inline: 12px; }
   .kanban-dialog { padding: 16px; max-height: calc(100dvh - 24px); }
   .kanban-dialog :is(input, textarea, select), .kanban-composer textarea { font-size: 16px; }

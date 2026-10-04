@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { openSampleCanvas } from './support/canvas-fixtures'
 
-test('mobile stacked panels retain editing and cross-section drag', async ({ page }) => {
+test('mobile full-grid panels retain editing and cross-section drag', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 900 })
   await openSampleCanvas(page)
   const problem = page.locator('.problem .canvas-cell').first()
@@ -25,5 +25,6 @@ test('mobile stacked panels retain editing and cross-section drag', async ({ pag
   await expect(problem.getByRole('button', { name: 'Edited mobile problem', exact: true })).toHaveCount(0)
   await page.reload()
   await expect(cost.locator('.card-content').first()).toHaveText('Edited mobile problem')
-  expect(await page.locator('.board-scroll').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
+  expect(await page.locator('.board-scroll').evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false)
 })

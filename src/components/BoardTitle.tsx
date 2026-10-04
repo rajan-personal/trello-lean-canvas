@@ -35,11 +35,11 @@ export function BoardTitle({
   }
   return (
     <h1
-      className={`board-title m-0 flex min-w-0 max-w-[min(52vw,620px)] items-center text-lg leading-7 font-bold tracking-[-0.15px] whitespace-nowrap max-[760px]:text-base ${editing ? 'flex-[0_1_auto] overflow-visible' : 'overflow-hidden'}`}
+      className={`board-title m-0 flex min-w-0 max-w-[min(52vw,620px)] items-center text-lg leading-7 font-bold tracking-[-0.15px] whitespace-nowrap phone:text-base ${editing ? 'flex-[0_1_auto] overflow-visible' : 'overflow-hidden'}`}
     >
       {editing ? (
         <input
-          className="board-title-input h-8 w-[clamp(100px,18vw,260px)] min-w-0 rounded-sm border-2 border-[#85b8ff] bg-white px-1.5 py-0.5 font-[inherit] leading-6 tracking-[inherit] text-[#172b4d] outline-none focus:border-[#579dff] focus:shadow-[0_0_0_1px_rgba(255,255,255,0.85)] max-[760px]:w-[clamp(90px,30vw,170px)]"
+          className="board-title-input h-8 w-[clamp(100px,18vw,260px)] min-w-0 rounded-sm border-2 border-[#85b8ff] bg-white px-1.5 py-0.5 font-[inherit] leading-6 tracking-[inherit] text-[#172b4d] outline-none focus:border-[#579dff] focus:shadow-[0_0_0_1px_rgba(255,255,255,0.85)] phone:w-[clamp(90px,30vw,170px)]"
           aria-label="Rename canvas"
           autoFocus
           value={draft}
