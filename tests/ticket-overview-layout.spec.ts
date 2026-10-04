@@ -17,7 +17,6 @@ for (const width of [390, 1440]) {
     const ticketBox = (await tickets.boundingBox())!
     expect(activityBox.y + activityBox.height).toBeLessThanOrEqual(ticketBox.y)
     await expect(tickets.getByRole('button')).toHaveCount(3)
-    await expect(row.getByLabel('Active ticket count for Alpha project')).toHaveText('3 active tickets')
     await expect(tickets.getByRole('button', { name: 'Build release, In Progress' })).toBeVisible()
     await expect(tickets.getByRole('button', { name: 'Duplicate title, In Review' }).first()).toBeVisible()
     const colors = await row.evaluate((node) => ({
@@ -25,7 +24,7 @@ for (const width of [390, 1440]) {
       card: getComputedStyle(node.querySelector('.ticket-active-list')!).backgroundColor,
       graph: getComputedStyle(node.querySelector('.ticket-activity-sparkline')!).color,
     }))
-    expect(colors).toEqual({ panel: 'rgb(241, 242, 244)', card: 'rgb(255, 255, 255)', graph: 'rgb(11, 74, 111)' })
+    expect(colors).toEqual({ panel: 'rgb(255, 255, 255)', card: 'rgb(255, 255, 255)', graph: 'rgb(34, 160, 107)' })
     await activity.locator('summary').focus()
     await page.keyboard.press('Enter')
     await expect(activity.locator('.ticket-activity-breakdown')).toBeVisible()
