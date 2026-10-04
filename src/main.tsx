@@ -1,6 +1,7 @@
 import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './app/App'
+import { PwaUpdate } from './components/PwaUpdate'
 import './styles.css'
 
 const Agentation = import.meta.env.DEV
@@ -13,6 +14,7 @@ if (!rootElement) throw new Error('Root element was not found.')
 createRoot(rootElement).render(
   <StrictMode>
     <App browserRouting />
+    <PwaUpdate />
     {Agentation && (
       <Suspense fallback={null}>
         <Agentation />
@@ -20,4 +22,3 @@ createRoot(rootElement).render(
     )}
   </StrictMode>,
 )
-

@@ -56,11 +56,11 @@ jobs:
       - name: Firestore rules and persistence tests
         run: npm run test:firestore
 
-      - name: Install Chromium for nested-ticket regression tests
+      - name: Install Chromium for browser regression tests
         run: npx playwright install --with-deps chromium
 
-      - name: Nested-ticket browser regression tests
-        run: npx playwright test tests/nested-*.spec.ts --workers=2
+      - name: Nested-ticket and PWA browser regression tests
+        run: npx playwright test tests/nested-*.spec.ts tests/pwa-updates.spec.ts --workers=2
 
       # Rebuild in production mode after the browser tests' test-mode build.
       - name: Validate production build and Worker configuration

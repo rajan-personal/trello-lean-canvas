@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Lean Canvas',
@@ -43,6 +43,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Keep the current app and its cached chunks together until the user updates.
+        skipWaiting: false,
+        clientsClaim: true,
         cleanupOutdatedCaches: true,
         navigateFallback: '/index.html',
       },
