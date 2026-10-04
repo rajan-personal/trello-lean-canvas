@@ -51,6 +51,25 @@ describe('mobile service worker update checks', () => {
     browser.dispatchEvent(new Event('online'))
     expect(update).toHaveBeenCalledTimes(1)
   })
+  it('reports a waiting worker again when the app resumes', async () => {
+    const onWaiting = vi.fn()
+    Object.assign(registration, { waiting: {} })
+    stop = watchPwaUpdates(registration, onWaiting)
+    expect(update).not.toHaveBeenCalled()
+    expect(onWaiting).toHaveBeenCalledTimes(1)
+    await vi.advanceTimersByTimeAsync(60_000)
+    browser.dispatchEvent(new Event('pageshow'))
+    expect(onWaiting).toHaveBeenCalledTimes(2)
+  })
+  it('reports a worker that starts waiting after an update check', async () => {
+    const onWaiting = vi.fn()
+    update.mockImplementation(async () => {
+      Object.assign(registration, { waiting: {} })
+    })
+    stop = watchPwaUpdates(registration, onWaiting)
+    await Promise.resolve()
+    expect(onWaiting).toHaveBeenCalledTimes(1)
+  })
   it('contains network failures and throttles event bursts', async () => {
     update.mockRejectedValue(new Error('offline'))
     stop = watchPwaUpdates(registration)

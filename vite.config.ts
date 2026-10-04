@@ -43,7 +43,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Keep the current app and its cached chunks together until the user updates.
+        importScripts: ['/sw-update-bridge.js'],
         skipWaiting: false,
         clientsClaim: true,
         cleanupOutdatedCaches: true,

@@ -3,7 +3,9 @@ import { readFile } from 'node:fs/promises'
 import { extname, resolve } from 'node:path'
 
 // Serve the real production SW with two HTML revisions to exercise its lifecycle.
-export async function servePwaBuild() {
+export async function servePwaBuild(
+  { legacy = false }: { legacy?: boolean } = {},
+) {
   let version = 'a'
   const root = resolve('dist')
   const types: Record<string, string> = {
@@ -17,8 +19,24 @@ export async function servePwaBuild() {
       const file = resolve(root, `.${pathname === '/' ? '/index.html' : pathname}`)
       if (!file.startsWith(`${root}/`)) { response.writeHead(403).end(); return }
       let content: Buffer | string = await readFile(file)
-      if (pathname === '/sw.js') {
+      if (legacy && version === 'a' && pathname === '/sw.js') {
+        content = `
+          self.addEventListener('install', () => self.skipWaiting())
+          self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()))
+          self.addEventListener('fetch', () => {})
+        `
+      } else if (pathname === '/sw.js') {
         content = content.toString().replace(/(url:"index.html",revision:")[^"]+/, `$1${version}`)
+      } else if (legacy && version === 'a' && file.endsWith('/index.html')) {
+        content = `<!doctype html><html><head>
+          <meta name="test-release" content="a"><title>Legacy Lean</title>
+          </head><body><main id="root">Legacy app</main><script>
+          let reloading = false
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!reloading) { reloading = true; window.location.reload() }
+          })
+          navigator.serviceWorker.register('/sw.js')
+          </script></body></html>`
       } else if (file.endsWith('/index.html')) {
         content = content.toString().replace('<head>', `<head><meta name="test-release" content="${version}">`)
       }

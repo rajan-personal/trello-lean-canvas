@@ -29,7 +29,11 @@ test('mobile update waits for consent, supports Later, and retains offline stora
   await prompt(page).getByRole('button', { name: 'Later' }).click()
   await expect(prompt(page)).toBeHidden()
   await expect(release(page)).toHaveAttribute('content', 'a')
-  await page.reload()
+  await page.evaluate(() => {
+    const resumedAt = Date.now() + 61_000
+    Date.now = () => resumedAt
+    window.dispatchEvent(new Event('pageshow'))
+  })
   await expect(prompt(page)).toBeVisible()
   await prompt(page).getByRole('button', { name: 'Update', exact: true }).click()
   await expect(release(page)).toHaveAttribute('content', 'b')
@@ -41,22 +45,25 @@ test('mobile update waits for consent, supports Later, and retains offline stora
   await expect(page.locator('#root')).not.toBeEmpty()
 })
 
-test('updating one tab does not reload another tab with unfinished edits', async ({ page, context }) => {
+test('updating one tab reloads every tab onto the same release', async ({ page, context }) => {
   await open(page)
   const other = await context.newPage()
   await open(other)
-  await other.evaluate(() => {
-    const draft = document.createElement('textarea')
-    draft.id = 'unsaved-draft'
-    draft.value = 'unfinished edit'
-    document.body.append(draft)
-  })
+  await other.evaluate(() => localStorage.setItem('pwa-cross-tab', 'persisted'))
   await deploy(page)
   await expect(prompt(other)).toBeVisible()
   await prompt(page).getByRole('button', { name: 'Update', exact: true }).click()
   await expect(release(page)).toHaveAttribute('content', 'b')
-  await expect(release(other)).toHaveAttribute('content', 'a')
-  await expect(other.locator('#unsaved-draft')).toHaveValue('unfinished edit')
-  await prompt(other).getByRole('button', { name: 'Update', exact: true }).click()
   await expect(release(other)).toHaveAttribute('content', 'b')
+  expect(await other.evaluate(() => localStorage.getItem('pwa-cross-tab'))).toBe('persisted')
+})
+
+test('a client from the previous auto-update release upgrades without closing', async ({ page }) => {
+  await server.close()
+  server = await servePwaBuild({ legacy: true })
+  await open(page)
+  await expect(release(page)).toHaveAttribute('content', 'a')
+  server.deploy()
+  await page.evaluate(async () => { await (await navigator.serviceWorker.ready).update() })
+  await expect(release(page)).toHaveAttribute('content', 'b')
 })
