@@ -27,7 +27,7 @@ export function CanvasBoard({ sections, sectionProps }: Props) {
   return (
     <div className="main-area h-full min-w-0 flex-1">
       <div className="board-scroll h-full w-full overflow-auto p-3 [scrollbar-color:rgba(255,255,255,0.35)_rgba(0,0,0,0.12)]">
-        <div className="lean-grid grid w-full min-w-[1000px] grid-cols-10 grid-rows-[auto_auto_auto] content-start gap-2.5 phone:min-w-0">
+        <div className="lean-grid grid w-full min-w-[1000px] grid-cols-10 grid-rows-[auto_auto_auto] content-start gap-2.5">
           {groups.map(([top, bottom]) => top === 'solution' || top === 'advantage' ? (
             <Fragment key={top}>
               <div className={`canvas-panel ${top} ${panelClass} ${columns[top]} row-[1] flex min-h-0 flex-col`}>

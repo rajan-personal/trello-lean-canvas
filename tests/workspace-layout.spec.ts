@@ -55,18 +55,19 @@ test(`keeps the canvas grid intact and scrollable on mobile at ${width}px`, asyn
     display: getComputedStyle(grid).display,
     gridWidth: Math.round(grid.getBoundingClientRect().width),
     boardWidth: grid.parentElement?.clientWidth ?? 0,
-    panelTops: ['problem', 'segments', 'value', 'solution', 'channels', 'revenue', 'cost', 'metrics', 'advantage'].map((id) =>
+    panelTops: ['problem', 'solution', 'value', 'advantage', 'segments'].map((id) =>
       Math.round(grid.querySelector(`:scope > .${id}`)!.getBoundingClientRect().top),
     ),
     scrollWidth: grid.parentElement!.scrollWidth,
+    pageOverflow: document.documentElement.scrollWidth > window.innerWidth,
   }))
 
   expect(layout.display).toBe('grid')
-  expect(layout.gridWidth).toBeLessThanOrEqual(layout.boardWidth)
-  expect(layout.scrollWidth).toBeLessThanOrEqual(layout.boardWidth)
-  for (let index = 1; index < layout.panelTops.length; index++) {
-    expect(layout.panelTops[index]).toBeGreaterThan(layout.panelTops[index - 1])
-  }
+  expect(layout.gridWidth).toBeGreaterThanOrEqual(1000)
+  expect(layout.gridWidth).toBeGreaterThan(layout.boardWidth)
+  expect(layout.scrollWidth).toBeGreaterThan(layout.boardWidth)
+  expect(new Set(layout.panelTops).size).toBe(1)
+  expect(layout.pageOverflow).toBe(false)
 })
 }
 

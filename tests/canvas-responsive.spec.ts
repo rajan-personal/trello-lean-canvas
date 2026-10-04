@@ -1,15 +1,19 @@
 import { expect, test } from '@playwright/test'
 import { openSampleCanvas } from './support/canvas-fixtures'
 
-// Above phone size the canvas keeps its full-size classic grid and scrolls
-// horizontally inside the board when the available width is narrower.
+// Every viewport keeps the full-size classic grid and scrolls horizontally
+// inside the board when the available width is narrower, including phones.
 for (const viewport of [
-  { width: 761, height: 900, columns: 10 },
-  { width: 800, height: 1192, columns: 10 },
-  { width: 1024, height: 768, columns: 10 },
-  { width: 1200, height: 800, columns: 10 },
-  { width: 1280, height: 712, columns: 10 },
-  { width: 844, height: 390, columns: 1 },
+  { width: 320, height: 568 },
+  { width: 390, height: 844 },
+  { width: 760, height: 900 },
+  { width: 761, height: 900 },
+  { width: 800, height: 1192 },
+  { width: 1024, height: 768 },
+  { width: 1200, height: 800 },
+  { width: 1280, height: 712 },
+  { width: 844, height: 390 },
+  { width: 1280, height: 500 },
 ]) {
   test.describe(`${viewport.width}×${viewport.height}`, () => {
     test.use({ hasTouch: true })
@@ -22,12 +26,13 @@ for (const viewport of [
         width: grid.getBoundingClientRect().width,
         pageOverflow: document.documentElement.scrollWidth > window.innerWidth,
       }))
-      expect(layout.columns).toBe(viewport.columns)
+      expect(layout.columns).toBe(10)
       expect(layout.pageOverflow).toBe(false)
-      if (viewport.columns === 10) {
-        expect(layout.width).toBeGreaterThanOrEqual(1000)
-        const tops = await page.locator('.canvas-column').evaluateAll((columns) => columns.map((column) => Math.round(column.getBoundingClientRect().top)))
-        expect(new Set(tops).size).toBe(1)
+      expect(layout.width).toBeGreaterThanOrEqual(1000)
+      const tops = await page.locator('.lean-grid > .problem, .lean-grid > .solution, .lean-grid > .value, .lean-grid > .advantage, .lean-grid > .segments').evaluateAll((columns) => columns.map((column) => Math.round(column.getBoundingClientRect().top)))
+      expect(new Set(tops).size).toBe(1)
+      if (viewport.width < 1000) {
+        expect(await page.locator('.board-scroll').evaluate((board) => board.scrollWidth > board.clientWidth)).toBe(true)
       }
       for (const section of await page.locator('.canvas-cell').all()) {
         await section.scrollIntoViewIfNeeded()

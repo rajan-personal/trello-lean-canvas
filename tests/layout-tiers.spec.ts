@@ -47,7 +47,7 @@ test('choosing a canvas from the drawer closes it', async ({ page }) => {
   await expect(sidebar(page)).toHaveAttribute('inert', '')
 })
 
-test('phone landscape uses the phone layout and fits the viewport height', async ({ page }) => {
+test('phone landscape uses compact chrome, preserves the canvas grid, and fits the viewport height', async ({ page }) => {
   await page.setViewportSize({ width: 844, height: 390 })
   await openSampleCanvas(page)
   await expect(page.getByRole('button', { name: 'Open sidebar' })).toBeVisible()
@@ -55,7 +55,7 @@ test('phone landscape uses the phone layout and fits the viewport height', async
   await expect(page.getByRole('button', { name: 'Favorite canvas' })).toBeHidden()
   expect(await contentWidth(page)).toBe(844)
   const grid = await page.locator('.lean-grid').evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length)
-  expect(grid).toBe(1)
+  expect(grid).toBe(10)
   const shell = await page.locator('.app-shell').boundingBox()
   expect(shell!.height).toBe(390)
 })
