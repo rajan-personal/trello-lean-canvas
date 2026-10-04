@@ -35,7 +35,7 @@ export function TicketListView({ projects, blocked, onOpenProjectBoard, onOpenTi
           {ticketCountStatuses.map(({ id, label }) => {
             const Icon = ticketStatusIcons[id]
             return <li key={id} className={`ticket-total-${id}`}>
-              <Icon className="ticket-total-icon" size={13} aria-hidden="true" />
+              {Icon && <Icon className="ticket-total-icon" size={13} aria-hidden="true" />}
               <span>{label}</span><strong>{totals[id]}</strong>
             </li>
           })}

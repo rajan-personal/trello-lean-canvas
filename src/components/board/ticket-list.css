@@ -93,8 +93,7 @@
 .ticket-project-open:focus-visible::after { outline: 2px solid #0c66e4; outline-offset: -2px; }
 .ticket-project-open:disabled { opacity: .6; cursor: not-allowed; }
 .ticket-project-meta { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; margin-inline-start: auto; }
-.ticket-project-total { color: #44546f; font-size: 12px; line-height: 16px; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.ticket-project-meta .ticket-activity-sparkline { inline-size: 64px; block-size: 20px; }
+.ticket-project-meta:has(.ticket-activity[open]) { z-index: 3; }
 
 .ticket-project-state, .ticket-project-error, .ticket-active-empty {
   margin: 0;
@@ -154,9 +153,11 @@
 .ticket-parent-path { min-inline-size: 0; max-inline-size: 100%; overflow: hidden; color: #626f86; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .ticket-parent-path::before { content: '↳ '; }
 
-/* Status: icon + pill share one hue per status */
+/* Status: Todo plain, In Progress spinner, In Review bold. The icon slot keeps titles aligned. */
+.ticket-active-icon-slot { display: flex; flex: 0 0 15px; justify-content: center; margin-block-start: 2.5px; }
 .ticket-active-icon, .ticket-total-icon { flex: 0 0 auto; }
-.ticket-active-icon { margin-block-start: 2.5px; }
+.ticket-active-review .ticket-active-title { font-weight: 650; }
+.ticket-total-review span { font-weight: 650; color: #172b4d; }
 .ticket-status-pill { flex: 0 0 auto; margin-block-start: 1px; }
 .ticket-status-pill::after {
   display: block;
@@ -168,12 +169,10 @@
   line-height: 18px;
   white-space: nowrap;
 }
-.ticket-active-todo .ticket-active-icon, .ticket-total-todo .ticket-total-icon { color: #626f86; }
 .ticket-active-todo .ticket-status-pill::after { background: #f1f2f4; color: #44546f; }
 .ticket-active-in-progress .ticket-active-icon, .ticket-total-in-progress .ticket-total-icon { color: #0c66e4; }
 .ticket-active-in-progress .ticket-status-pill::after { background: #e9f2ff; color: #0055cc; }
 .ticket-active-in-progress .ticket-active-icon { animation: ticket-active-spin 1.6s linear infinite; }
-.ticket-active-review .ticket-active-icon, .ticket-total-review .ticket-total-icon { color: #946f00; }
 .ticket-active-review .ticket-status-pill::after { background: #fff7d6; color: #7f5f01; }
 @keyframes ticket-active-spin { to { transform: rotate(360deg); } }
 
@@ -184,7 +183,6 @@
   .ticket-project-header { column-gap: 8px; }
   .ticket-project-title { flex-basis: 120px; }
   .ticket-project-meta { gap: 8px; }
-  .ticket-project-total-word { display: none; }
   .ticket-status-pill { display: none; }
 }
 @media (max-width: 760px), (max-height: 500px) {
