@@ -4,7 +4,6 @@ import type { TicketListProject } from '../../app/useWorkspaceTicketList'
 import { defaultBoardColumns } from '../../data/board'
 import { activityDay, ACTIVITY_TIME_ZONE } from '../../data/board-activity'
 import { TicketListView } from './TicketListView'
-
 const project = (id: string, name: string, favorite = false, notes = ''): TicketListProject => ({
   canvas: { id, name, title: name, favorite, notes, about: '', aboutTabs: [], sections: [] }, loading: false, error: null,
   summary: { activity: { timeZone: ACTIVITY_TIME_ZONE, throughDay: activityDay(), counts: [0, 1, 3, 0, 7, 12, 2] }, columns: defaultBoardColumns, cards: [
@@ -73,11 +72,8 @@ export const EmptyWorkspace: Story = { args: { projects: [] }, play: async ({ ca
 export const EmptyProject: Story = {
   args: { projects: [{ ...project('empty', 'Empty project'), summary: { columns: [], cards: [] } }] },
   play: async ({ canvas }) => {
-    await expect(canvas.getByRole('button', { name: 'Open board for Empty project' })).toBeVisible()
-    await expect(canvas.getByLabelText('Active ticket count for Empty project')).toHaveTextContent('0 active tickets')
-    await expect(canvas.queryByText('No description yet.')).not.toBeInTheDocument()
-    await expect(canvas.queryByText('7 days', { exact: true })).not.toBeInTheDocument()
-    await expect(canvas.getByLabelText('Activity for Empty project: 0 recorded changes in the last 7 days')).toBeVisible()
+    await expect(canvas.queryByRole('button', { name: 'Open board for Empty project' })).not.toBeInTheDocument()
+    await expect(canvas.getByRole('status')).toHaveTextContent('No project activity in the last 7 days.')
   },
 }
 export const Blocked: Story = { args: { blocked: true }, play: async ({ canvas }) => {
@@ -87,4 +83,18 @@ export const Mobile: Story = { globals: { viewport: { value: 'mobile1', isRotate
 export const LongDataMobile: Story = {
   args: { projects: [project('long', 'Customer research and product discovery with a very long project name', false, 'A long description with enough detail to wrap across multiple lines. '.repeat(10))] },
   globals: { viewport: { value: 'mobile1', isRotated: false } },
+}
+
+export const RecentProjectsOnly: Story = {
+  args: { projects: [projects[0], {
+    ...projects[1], summary: { ...projects[1].summary!, activity: {
+      timeZone: ACTIVITY_TIME_ZONE, throughDay: activityDay() - 7, counts: [0, 0, 0, 0, 0, 0, 5],
+    } },
+  }, { ...projects[2], summary: { ...projects[2].summary!, activity: undefined } }] },
+  play: async ({ canvas }) => {
+    await expect(canvas.getAllByRole('button', { name: /Open board for/ })).toHaveLength(1)
+    await expect(canvas.getByRole('button', { name: 'Open board for Product launch' })).toBeVisible()
+    await expect(within(canvas.getByRole('list', { name: 'Active tickets by status' })).getAllByRole('listitem').map((item) => item.textContent))
+      .toEqual(['Todo1', 'In Progress1', 'In Review2'])
+  },
 }

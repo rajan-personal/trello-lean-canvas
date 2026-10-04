@@ -16,7 +16,10 @@ interface Props {
 
 export function TicketListView({ projects, blocked, onOpenProjectBoard, onOpenTicket, onRetry }: Props) {
   const today = useActivityDay()
-  const loaded = projects.filter((project) => !project.loading && !project.error && project.summary)
+  // Keep unavailable summaries visible so loading feedback and retries remain accessible.
+  const visibleProjects = projects.filter((project) => project.loading || project.error || !project.summary
+    || activityDays(project.summary.activity, today).some(({ count }) => count > 0))
+  const loaded = visibleProjects.filter((project) => !project.loading && !project.error && project.summary)
   const activityPeak = loaded.reduce((peak, project) =>
     Math.max(peak, ...activityDays(project.summary!.activity, today).map(({ count }) => count)), 1)
   const totals = { todo: 0, 'in-progress': 0, review: 0 }
@@ -38,10 +41,10 @@ export function TicketListView({ projects, blocked, onOpenProjectBoard, onOpenTi
           })}
         </ul>}
       </header>
-      {projects.length ? <ul className="ticket-project-list" role="list" aria-label="Projects">
-        {projects.map((project) => <TicketProjectRow key={project.canvas.id} project={project} blocked={blocked} today={today} activityPeak={activityPeak}
+      {visibleProjects.length ? <ul className="ticket-project-list" role="list" aria-label="Projects">
+        {visibleProjects.map((project) => <TicketProjectRow key={project.canvas.id} project={project} blocked={blocked} today={today} activityPeak={activityPeak}
           onOpenProjectBoard={onOpenProjectBoard} onOpenTicket={onOpenTicket} onRetry={onRetry} />)}
-      </ul> : <p className="ticket-list-message" role="status">No projects yet.</p>}
+      </ul> : <p className="ticket-list-message" role="status">{projects.length ? 'No project activity in the last 7 days.' : 'No projects yet.'}</p>}
     </div>
   </main>
 }

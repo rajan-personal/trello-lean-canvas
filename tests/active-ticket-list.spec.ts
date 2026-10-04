@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { boards, openList, projects } from './support/ticket-list'
+import { boards, openList, projects, recentActivity } from './support/ticket-list'
 
 test('shows only active tickets with distinct status cues and opens the exact ticket', async ({ page }) => {
   await openList(page)
@@ -69,11 +69,11 @@ for (const width of [390, 1440]) {
           ['todo', 'Add project search'], ['in-progress', 'Keep editor tools in one row on mobile'],
           ['review', 'Google and email login'], ['review', 'Open tickets directly from the list'],
           ['backlog', 'Hidden backlog ticket'], ['done', 'Hidden completed ticket'], ['closed', 'Hidden closed ticket'],
-        ]), comments: [] },
+        ]), comments: [], activity: recentActivity },
         b: { columns, cards: cards([
           ['todo', 'Plan shared albums'], ['in-progress', 'Improve photo upload progress'], ['review', 'Review gallery layout'],
-        ]), comments: [] },
-        c: { columns, cards: [], comments: [] },
+        ]), comments: [], activity: recentActivity },
+        c: { columns, cards: [], comments: [], activity: recentActivity },
       } })
       await expect(page.locator('.ticket-active-open')).toHaveCount(7)
       await expect(page.getByText(/Hidden .* ticket/)).toHaveCount(0)
