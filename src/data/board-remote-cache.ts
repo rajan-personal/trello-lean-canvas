@@ -1,5 +1,5 @@
 import type { BoardCommand } from './board-mutations'
-import type { BoardSnapshot } from './board-firestore-read'
+import type { BoardSnapshot } from './persistence-types'
 
 export interface BoardVersion { revision: number; status: string }
 interface Source {

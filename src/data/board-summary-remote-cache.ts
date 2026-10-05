@@ -1,5 +1,5 @@
 import type { BoardVersion } from './board-remote-cache'
-import type { BoardSummarySnapshot } from './board-firestore-read'
+import type { BoardSummarySnapshot } from './persistence-types'
 
 interface Source {
   load: () => Promise<BoardSummarySnapshot>

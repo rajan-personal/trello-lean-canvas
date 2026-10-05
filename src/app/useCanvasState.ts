@@ -21,7 +21,7 @@ export interface CanvasState {
 
 export function useCanvasState(
   uid: string,
-  persistence: 'firestore' | 'local' = 'firestore',
+  persistence: 'firestore' | 'local' | 'postgres' = 'firestore',
   retainDeleted = false,
   selection?: { id: string | null; setId: (id: string | null) => void },
 ): CanvasState {
