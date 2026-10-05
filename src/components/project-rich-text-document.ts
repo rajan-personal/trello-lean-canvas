@@ -2,10 +2,11 @@ import type { JSONContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { Markdown, MarkdownManager } from '@tiptap/markdown'
 import { TaskItem, TaskList } from '@tiptap/extension-list'
+import { CodeBlockExit } from './code-block-exit'
 
 export const projectTextExtensions = [
   StarterKit.configure({ underline: false, link: { openOnClick: false }, trailingNode: false }),
-  TaskList, TaskItem.configure({ nested: true }), Markdown,
+  TaskList, TaskItem.configure({ nested: true }), Markdown, CodeBlockExit,
 ]
 
 const markdown = new MarkdownManager({ extensions: projectTextExtensions })
