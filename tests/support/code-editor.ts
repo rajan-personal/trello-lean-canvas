@@ -34,6 +34,6 @@ export async function placeCaret(editor: Locator, offset?: number) {
     const selection = window.getSelection()!
     selection.removeAllRanges()
     selection.addRange(range)
+    document.dispatchEvent(new Event('selectionchange'))
   }, offset)
 }
-
