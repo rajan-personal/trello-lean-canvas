@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useEditorState, type Editor } from '@tiptap/react'
-import { Bold, Italic, Strikethrough, Heading2, List, ListOrdered, ListChecks, Quote, Code, SquareCode, Link, Undo2, Redo2 } from 'lucide-react'
+import { closeHistory } from '@tiptap/pm/history'
+import { Bold, Italic, Strikethrough, Heading2, List, ListOrdered, ListChecks, Quote, Code, SquareCode, CornerDownRight, Link, Undo2, Redo2 } from 'lucide-react'
 import { RichTextLinkControl } from './RichTextLinkControl'
 import { toggleSelectedCodeBlock } from './toggle-selected-code-block'
 
@@ -21,6 +22,7 @@ export function RichTextToolbar({ editor, disabled }: { editor: Editor; disabled
   const [editingLink, setEditingLink] = useState(false)
   const state = useEditorState({ editor, selector: ({ editor }) => ({
     active: formatting.map(({ active }) => editor.isActive(active)),
+    codeBlock: editor.isActive('codeBlock'),
     link: editor.isActive('link'), undo: editor.can().undo(), redo: editor.can().redo(),
   }) })
   return <fieldset disabled={disabled} className="rich-text-toolbar">
@@ -29,6 +31,12 @@ export function RichTextToolbar({ editor, disabled }: { editor: Editor; disabled
       {formatting.map(({ label, icon: Icon, run }, index) =>
         <button key={label} type="button" aria-label={label} title={label} aria-pressed={state.active[index]}
           onClick={() => run(editor)}><Icon size={18} aria-hidden="true" /></button>)}
+      {state.codeBlock && <button type="button" aria-label="Exit code block" title="Exit code block (Ctrl/⌘ + Enter)"
+        onClick={() => editor.chain().focus().command(({ tr }) => {
+          // Undo leaving the block separately from the preceding code edits.
+          closeHistory(tr)
+          return true
+        }).exitCode().run()}><CornerDownRight size={18} aria-hidden="true" /></button>}
       <button type="button" aria-label="Link" title="Link" aria-pressed={state.link} aria-expanded={editingLink}
         onClick={() => setEditingLink((open) => !open)}><Link size={18} aria-hidden="true" /></button>
       <button type="button" aria-label="Undo" title="Undo" disabled={!state.undo}
